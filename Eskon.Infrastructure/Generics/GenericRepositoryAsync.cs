@@ -2,10 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Eskon.Infrastructure.Context;
+using Eskon.Domian.Models;
+using Eskon.Domian.Entities;
 
 namespace Eskon.Infrastructure.Generics
 {
-    public class GenericRepositoryAsync<T> : IGenericRepositoryAsync<T> where T : class
+    public class GenericRepositoryAsync<T> : IGenericRepositoryAsync<T> where T : class, IBaseModel
     {
         #region Fields
         protected readonly MyDbContext _myDbContext;
@@ -39,6 +41,14 @@ namespace Eskon.Infrastructure.Generics
             return await _myDbContext.Set<T>().ToListAsync();
         }
 
+        public virtual async Task<List<T>> GetPageAsync(int pageNum, int numPerPage)
+        {
+            return await _myDbContext.Set<T>()
+                .Skip(pageNum * numPerPage)
+                .Take(numPerPage)
+                .ToListAsync();
+        }
+
         public virtual async Task UpdateAsync(T entity)
         {
             _myDbContext.Set<T>().Update(entity);
@@ -54,11 +64,26 @@ namespace Eskon.Infrastructure.Generics
             _myDbContext.Set<T>().Remove(entity);
         }
 
+        public virtual async Task SoftDeleteAsync(T entity)
+        {
+            entity.DeletedAt = DateTime.UtcNow;
+            _myDbContext.Set<T>().Entry(entity).State = EntityState.Modified;
+        }
+
         public virtual async Task DeleteRangeAsync(ICollection<T> entities)
         {
             foreach (var entity in entities)
             {
                 _myDbContext.Entry(entity).State = EntityState.Deleted;
+            }
+        }
+
+        public virtual async Task SoftDeleteRangeAsync(ICollection<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                entity.DeletedAt = DateTime.UtcNow;
+                _myDbContext.Entry(entity).State = EntityState.Modified;
             }
         }
 
