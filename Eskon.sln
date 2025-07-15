@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eskon", "Eskon\Eskon.csproj", "{53C7703B-2871-4CA1-BACC-6489FFCE6975}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53C7703B-2871-4CA1-BACC-6489FFCE6975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53C7703B-2871-4CA1-BACC-6489FFCE6975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53C7703B-2871-4CA1-BACC-6489FFCE6975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53C7703B-2871-4CA1-BACC-6489FFCE6975}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B39F21CE-22B0-4CA7-B66E-7719BC2328D4}
+	EndGlobalSection
+EndGlobal
