@@ -5,7 +5,7 @@ using Eskon.Domian.Entities.Identity;
 
 namespace Eskon.Domian.Models
 {
-    [Index(nameof(Title), IsUnique = true)]
+    [Index(nameof(Title), nameof(OwnerId), nameof(Longitude), nameof(Latitude), IsUnique = true)]
     public class Property : BaseModel
     {
         [Required, StringLength(100)]
