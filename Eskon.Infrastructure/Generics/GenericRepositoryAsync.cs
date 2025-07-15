@@ -18,7 +18,6 @@ namespace Eskon.Infrastructure.Generics
         }
         #endregion
 
-
         #region Actions
         public virtual async Task<T> AddAsync(T entity)
         {
