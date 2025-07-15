@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Eskon.Domian.Models;
 namespace Eskon.Domian.Entities.Identity
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>, IBaseModel
     {
         [StringLength(100)]
         public string FirstName { get; set; }
@@ -17,7 +17,11 @@ namespace Eskon.Domian.Entities.Identity
         [DataType(DataType.Date)]
         public DateOnly BirthDate { get; set; }
 
+        public DateTime CreatedAt { get; set; }
 
+        public DateTime UpdatedAt { get; set; }
+
+        public DateTime? DeletedAt { get; set; }
 
         //
         //  Navigation Properties
