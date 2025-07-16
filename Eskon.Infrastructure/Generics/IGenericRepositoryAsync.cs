@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Storage;
 using Eskon.Domian.Entities;
+using System.Linq.Expressions;
 
 namespace Eskon.Infrastructure.Generics
 {
@@ -12,6 +13,8 @@ namespace Eskon.Infrastructure.Generics
         Task UpdateAsync(T entity);
         Task UpdateRangeAsync(ICollection<T> entities);
         Task<List<T>> GetAllAsync();
+        Task<List<T>> GetFiltered(Expression<Func<T, bool>>? filter = null);
+        Task<List<T>> GetPageAsync(int pageNumber, int ItemsPerPage);
         Task<T> GetByIdAsync(object id);
         Task DeleteAsync(T entity);
         Task SoftDeleteAsync(T entity);

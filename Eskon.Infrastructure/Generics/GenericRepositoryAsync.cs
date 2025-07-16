@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Eskon.Infrastructure.Context;
 using Eskon.Domian.Models;
 using Eskon.Domian.Entities;
+using System.Linq.Expressions;
 
 namespace Eskon.Infrastructure.Generics
 {
@@ -41,11 +42,23 @@ namespace Eskon.Infrastructure.Generics
             return await _myDbContext.Set<T>().ToListAsync();
         }
 
-        public virtual async Task<List<T>> GetPageAsync(int pageNum, int numPerPage)
+        public virtual async Task<List<T>> GetFiltered(Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _myDbContext.Set<T>();
+
+            if(filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public virtual async Task<List<T>> GetPageAsync(int pageNumber, int itemsPerPage)
         {
             return await _myDbContext.Set<T>()
-                .Skip(pageNum * numPerPage)
-                .Take(numPerPage)
+                .Skip(pageNumber * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToListAsync();
         }
 
