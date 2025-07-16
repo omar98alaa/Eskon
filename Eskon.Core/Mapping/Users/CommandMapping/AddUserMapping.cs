@@ -9,7 +9,7 @@ namespace Eskon.Core.Mapping.Users
         public void AddUserMapping()
         {
             // Source -> Destination
-            CreateMap<UserWriteDto, User>();
+            CreateMap<UserRegisterDto, User>();
         }
     }
 }

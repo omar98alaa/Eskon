@@ -36,12 +36,24 @@ namespace Eskon.API
 
             // Injecting Dependencies
             builder.Services.InjectingInfrastructureDependencies();
-            builder.Services.InjectingServiceDependencies();
+            builder.Services.InjectingServiceDependencies(builder.Configuration);
             builder.Services.InjectingCoreDependencies();
 
-            builder.Services.AddIdentity<User, IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<MyDbContext>()
-                .AddDefaultTokenProviders();
+            builder.Services.AddIdentityApiEndpoints<User>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = false;
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                //options.Lockout.MaxFailedAccessAttempts = 5;
+                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(2);
+            })
+             .AddRoles<IdentityRole<Guid>>()
+             .AddEntityFrameworkStores<MyDbContext>()
+             .AddDefaultTokenProviders();
 
             var app = builder.Build();
 
@@ -56,6 +68,7 @@ namespace Eskon.API
 
             app.UseAuthorization();
 
+            app.UseAuthentication();
 
             app.MapControllers();
 
