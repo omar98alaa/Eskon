@@ -38,5 +38,10 @@ namespace Eskon.Service.Services
         {
             return await _userRepository.SaveChangesAsync(); 
         }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _userRepository.GetUserByEmailAsync(email);
+        }
     }
 }
