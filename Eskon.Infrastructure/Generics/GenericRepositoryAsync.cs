@@ -42,7 +42,7 @@ namespace Eskon.Infrastructure.Generics
             return await _myDbContext.Set<T>().ToListAsync();
         }
 
-        public virtual async Task<List<T>> GetFiltered(Expression<Func<T, bool>>? filter = null)
+        public virtual async Task<List<T>> GetFilteredAsync(Expression<Func<T, bool>>? filter = null)
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
