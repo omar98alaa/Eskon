@@ -54,6 +54,8 @@ namespace Eskon.API
              .AddEntityFrameworkStores<MyDbContext>()
              .AddDefaultTokenProviders();
 
+           
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
