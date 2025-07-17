@@ -9,6 +9,7 @@ namespace Eskon.Service
         public static IServiceCollection InjectingServiceDependencies(this IServiceCollection services)
         {
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ITransactionService, TransactionService>();
             return services;
         }
     }
