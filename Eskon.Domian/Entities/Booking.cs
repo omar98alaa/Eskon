@@ -18,8 +18,11 @@ namespace Eskon.Domian.Models
         [Required]
         public decimal TotalPrice { get; set; }
 
+        [DefaultValue(true)]
+        public bool IsPending { get; set; }
+
         [DefaultValue(false)]
-        public bool IsConfirmed { get; set; }
+        public bool IsAccepted { get; set; }
 
         [DefaultValue(false)]
         public bool IsPayed { get; set; }

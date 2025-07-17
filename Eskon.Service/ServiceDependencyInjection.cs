@@ -11,6 +11,7 @@ namespace Eskon.Service
         public static IServiceCollection InjectingServiceDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IBookingService, BookingService>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
 
             //Authentication

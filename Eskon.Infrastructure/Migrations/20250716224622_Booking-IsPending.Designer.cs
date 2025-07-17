@@ -4,16 +4,19 @@ using Eskon.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Eskon.Infrastructure.Migrations
+namespace Askon.Infrastructure.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250716224622_Booking-IsPending")]
+    partial class BookingIsPending
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,7 +167,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("UserId", "PropertyId", "StartDate", "EndDate")
                         .IsUnique();
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Chat", b =>
@@ -194,7 +197,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("User2Id");
 
-                    b.ToTable("Chats", (string)null);
+                    b.ToTable("Chats");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.ChatMessage", b =>
@@ -229,7 +232,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("ChatMessages", (string)null);
+                    b.ToTable("ChatMessages");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.City", b =>
@@ -262,7 +265,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Cities", (string)null);
+                    b.ToTable("Cities");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Country", b =>
@@ -290,7 +293,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Countries", (string)null);
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Favourite", b =>
@@ -321,7 +324,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("UserId", "PropertyId")
                         .IsUnique();
 
-                    b.ToTable("Favourites", (string)null);
+                    b.ToTable("Favourites");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Image", b =>
@@ -350,7 +353,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.ToTable("Images", (string)null);
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Notification", b =>
@@ -391,7 +394,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("ReceiverId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.NotificationType", b =>
@@ -418,7 +421,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("NotificationTypes", (string)null);
+                    b.ToTable("NotificationTypes");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Payment", b =>
@@ -449,7 +452,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Property", b =>
@@ -547,7 +550,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("Title", "OwnerId", "Longitude", "Latitude")
                         .IsUnique();
 
-                    b.ToTable("Properties", (string)null);
+                    b.ToTable("Properties");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.PropertyType", b =>
@@ -575,7 +578,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("PropertyTypes", (string)null);
+                    b.ToTable("PropertyTypes");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Review", b =>
@@ -614,7 +617,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("UserId", "PropertyId")
                         .IsUnique();
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Ticket", b =>
@@ -657,7 +660,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Tickets", (string)null);
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Transaction", b =>
@@ -699,7 +702,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Transactions", (string)null);
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
