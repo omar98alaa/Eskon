@@ -48,7 +48,7 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
             var result = await _userManager.CreateAsync(userToAdd, request.UserRegisterDto.Password);
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(userToAdd, "Client");
+                await _userManager.AddToRoleAsync(userToAdd, "Customer");
                 var userFromDb = await _userService.GetUserByEmailAsync(request.UserRegisterDto.Email);
                 return Created(_mapper.Map<UserReadDto>(userFromDb));
             }
@@ -72,7 +72,7 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
              
             if(!signInResult.Succeeded)
             {
-                return BadRequest<string>("Wrong Passsword");
+                return BadRequest<string>("Incorrect email or password");
             }
 
             var accessToken = await _authenticationService.GetJWTToken(user);
