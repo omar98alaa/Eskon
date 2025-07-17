@@ -39,14 +39,14 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
 
             var userToAdd = _mapper.Map<User>(request.UserRegisteredDto);
             var result = await _userManager.CreateAsync(userToAdd, request.UserRegisteredDto.Password);
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(userToAdd, "Client");
-                var userFromDb = await _userService.GetUserByEmail(request.UserRegisteredDto.Email);
-                return Created(_mapper.Map<UserReadDto>(userFromDb));
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<UserReadDto?>(dbErrorMessages);
             }
-            var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
-            return BadRequest<UserReadDto?>(dbErrorMessages);
+            await _userManager.AddToRoleAsync(userToAdd, "Customer");
+            var userFromDb = await _userService.GetUserByEmail(request.UserRegisteredDto.Email);
+            return Created(_mapper.Map<UserReadDto>(userFromDb));
 
         }
     }

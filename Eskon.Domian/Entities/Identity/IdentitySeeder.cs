@@ -7,7 +7,7 @@ namespace Eskon.Domian.Entities.Identity
     {
         public static async Task SeedRolesAsync(RoleManager<IdentityRole<Guid>> roleManager)
         {
-            string[] roles = { "Admin", "Client", "Owner", "Root" };
+            string[] roles = { "Admin", "Customer", "Owner", "Root" };
 
             foreach (var roleName in roles)
             {
