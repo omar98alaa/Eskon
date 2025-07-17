@@ -15,6 +15,9 @@ namespace Eskon.Infrastructure
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<ICountryRepository, CountryRepository>();
             services.AddTransient<ICityRepository, CityRepository>();
+            services.AddTransient<IBookingRepository, BookingRepository>();
+            services.AddTransient<IFavouriteRepository, FavouriteRepository>();
+          
             return services;
         }
     }

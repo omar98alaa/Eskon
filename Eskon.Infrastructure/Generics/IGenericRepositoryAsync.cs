@@ -13,7 +13,7 @@ namespace Eskon.Infrastructure.Generics
         Task UpdateAsync(T entity);
         Task UpdateRangeAsync(ICollection<T> entities);
         Task<List<T>> GetAllAsync();
-        Task<List<T>> GetFiltered(Expression<Func<T, bool>>? filter = null);
+        Task<List<T>> GetFilteredAsync(Expression<Func<T, bool>>? filter = null);
         Task<List<T>> GetPageAsync(int pageNumber, int ItemsPerPage);
         Task<T> GetByIdAsync(object id);
         Task DeleteAsync(T entity);
