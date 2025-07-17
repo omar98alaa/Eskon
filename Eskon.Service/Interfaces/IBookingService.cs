@@ -12,11 +12,11 @@ namespace Eskon.Service.Interfaces
         public Task<Booking> GetBookingById(Guid Id);
 
         public Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid ownerId);
-        public Task<List<Booking>> GetPendingBookingsPerCustomerAsync(Guid cusotmerId);
-        public Task<List<Booking>> GetAcceptedBookingsPerCustomerAsync(Guid cusotmerId);
-        public Task<List<Booking>> GetRejectedBookingsPerCustomerAsync(Guid cusotmerId);
-        public Task<List<Booking>> GetPayedBookingsPerCustomerAsync(Guid cusotmerId);
-        public Task<List<Booking>> GetBookingHistoryPerCustomerAsync(Guid cusotmerId);
+        public Task<List<Booking>> GetPendingBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetAcceptedBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetRejectedBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetPayedBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetBookingHistoryPerCustomerAsync(Guid customerId);
         public Task<List<Booking>> GetBookingHistoryPerPropertyAsync(Guid propertyId);
         public Task<List<Booking>> GetUpcomingBookingsPerPropertyAsync(Guid propertyId);
         #endregion

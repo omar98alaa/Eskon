@@ -77,10 +77,10 @@ namespace Eskon.Service.Services
         }
 
 
-        public async Task<List<Booking>> GetBookingHistoryPerCustomerAsync(Guid cusotmerId)
+        public async Task<List<Booking>> GetBookingHistoryPerCustomerAsync(Guid customerId)
         {
             var now = new DateOnly();
-            return await _bookingRepository.GetFiltered(b => b.UserId == cusotmerId && b.StartDate <= now && !b.IsPending && b.IsPayed);
+            return await _bookingRepository.GetFiltered(b => b.UserId == customerId && b.StartDate <= now && !b.IsPending && b.IsPayed);
         }
 
         public async Task<List<Booking>> GetBookingHistoryPerPropertyAsync(Guid propertyId)
@@ -89,21 +89,21 @@ namespace Eskon.Service.Services
             return await _bookingRepository.GetFiltered(b => b.PropertyId == propertyId && b.StartDate <= now && !b.IsPending && b.IsPayed);
         }
 
-        public async Task<List<Booking>> GetAcceptedBookingsPerCustomerAsync(Guid cusotmerId)
+        public async Task<List<Booking>> GetAcceptedBookingsPerCustomerAsync(Guid customerId)
         {
             var now = new DateOnly();
-            return await _bookingRepository.GetFiltered(b => b.UserId == cusotmerId && b.StartDate > now && b.IsAccepted);
+            return await _bookingRepository.GetFiltered(b => b.UserId == customerId && b.StartDate > now && b.IsAccepted);
         }
 
-        public async Task<List<Booking>> GetPayedBookingsPerCustomerAsync(Guid cusotmerId)
+        public async Task<List<Booking>> GetPayedBookingsPerCustomerAsync(Guid customerId)
         {
             var now = new DateOnly();
-            return await _bookingRepository.GetFiltered(b => b.UserId == cusotmerId && b.StartDate > now && b.IsPayed);
+            return await _bookingRepository.GetFiltered(b => b.UserId == customerId && b.StartDate > now && b.IsPayed);
         }
 
-        public async Task<List<Booking>> GetPendingBookingsPerCustomerAsync(Guid cusotmerId)
+        public async Task<List<Booking>> GetPendingBookingsPerCustomerAsync(Guid customerId)
         {
-            return await _bookingRepository.GetFiltered(b => b.UserId == cusotmerId && b.IsPending && !b.IsAccepted);
+            return await _bookingRepository.GetFiltered(b => b.UserId == customerId && b.IsPending && !b.IsAccepted);
         }
 
         public async Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid ownerId)
@@ -112,9 +112,9 @@ namespace Eskon.Service.Services
             return await _bookingRepository.GetFiltered(b => b.Property.OwnerId == ownerId && b.StartDate > now && b.IsPending);
         }
 
-        public async Task<List<Booking>> GetRejectedBookingsPerCustomerAsync(Guid cusotmerId)
+        public async Task<List<Booking>> GetRejectedBookingsPerCustomerAsync(Guid customerId)
         {
-            return await _bookingRepository.GetFiltered(b => b.UserId == cusotmerId && !b.IsPending && !b.IsAccepted);
+            return await _bookingRepository.GetFiltered(b => b.UserId == customerId && !b.IsPending && !b.IsAccepted);
         }
 
         public async Task<List<Booking>> GetUpcomingBookingsPerPropertyAsync(Guid propertyId)

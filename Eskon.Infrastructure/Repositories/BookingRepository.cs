@@ -10,13 +10,13 @@ namespace Eskon.Infrastructure.Repositories
     public class BookingRepository : GenericRepositoryAsync<Booking>, IBookingRepository
     {
         #region Fields
-        private readonly DbSet<Booking> _userDbSet;
+        private readonly DbSet<Booking> _bookingDbSet;
         #endregion
 
         #region Constructors
         public BookingRepository(MyDbContext myDbContext) : base(myDbContext)
         {
-            _userDbSet = myDbContext.Set<Booking>();
+            _bookingDbSet = myDbContext.Set<Booking>();
         }
         #endregion
 
