@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using Azure.Core;
-using MediatR;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
-using Eskon.Domian.Models;
+using Eskon.Domian.Entities.Identity;
 using Eskon.Service.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace Eskon.Core.Features.UserFeatures.Commands.Handler
@@ -15,29 +14,40 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
     {
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
-        public UserCommandHandler(IUserService userService, IMapper mapper)
+        public UserCommandHandler(IUserService userService, IMapper mapper, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
         {
             _userService = userService;
             _mapper = mapper;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
 
         public async Task<Response<UserReadDto?>> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
-            var validationContext = new ValidationContext(request.User);
+            var validationContext = new ValidationContext(request.UserRegisteredDto);
             var results = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(request.User, validationContext, results, true);
+            bool isValid = Validator.TryValidateObject(request.UserRegisteredDto, validationContext, results, true);
             if (!isValid)
             {
-                var errorMessages = results.Select(r => r.ErrorMessage).ToList();
-                return BadRequest<UserReadDto?>(errorMessages);
+                var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
+                return BadRequest<UserReadDto?>(internalErrorMessages);
             }
 
-            var addedUser = await _userService.AddUserAsync(request.User);
-            await _userService.SaveChangesAsync();
-            var userReadDto = _mapper.Map<UserReadDto>(addedUser);
-            return Created(userReadDto);
+            var userToAdd = _mapper.Map<User>(request.UserRegisteredDto);
+            var result = await _userManager.CreateAsync(userToAdd, request.UserRegisteredDto.Password);
+            if (!result.Succeeded)
+            {
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<UserReadDto?>(dbErrorMessages);
+            }
+            await _userManager.AddToRoleAsync(userToAdd, "Customer");
+            var userFromDb = await _userService.GetUserByEmail(request.UserRegisteredDto.Email);
+            return Created(_mapper.Map<UserReadDto>(userFromDb));
+
         }
     }
 }
