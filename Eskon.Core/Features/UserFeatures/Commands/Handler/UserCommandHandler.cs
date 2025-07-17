@@ -75,7 +75,7 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
 
             if (user == null)
             {
-                return BadRequest<string>("The email you provided is not registered before, create new account");
+                return BadRequest<string>("Incorrect email or password.");
             }
 
             var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.UserSignInDto.Password, false);
