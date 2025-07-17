@@ -25,13 +25,7 @@ namespace Eskon.API.Controllers
         #endregion
 
         #region Controllers
-        [HttpPost("/User/AddNew")]
-        public async Task<IActionResult> Post([FromBody] UserWriteDto user)
-        {
-            var userToAdd = _mapper.Map<User>(user);
-            var userAdded = await Mediator.Send(new AddUserCommand(userToAdd));
-            return NewResult(userAdded);
-        }
+
 
         [HttpGet("/User/List")]
         public async Task<IActionResult> GetAllUsers()
