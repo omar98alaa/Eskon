@@ -13,6 +13,7 @@ namespace Eskon.Service
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IBookingService, BookingService>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IPaymentService, PaymentService>();
 
             //Authentication
             var jwtSettings = new JwtSettings();

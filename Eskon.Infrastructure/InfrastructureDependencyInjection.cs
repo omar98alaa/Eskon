@@ -12,6 +12,8 @@ namespace Eskon.Infrastructure
             services.AddTransient(typeof(IGenericRepositoryAsync<>), typeof(GenericRepositoryAsync<>));
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IBookingRepository, BookingRepository>();
+            services.AddTransient<IPaymentRepository, PaymentRepository>();
+            
             return services;
         }
     }
