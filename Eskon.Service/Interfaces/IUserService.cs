@@ -8,6 +8,7 @@ namespace Eskon.Service.Interfaces
         public Task<User> GetUserByIdAsync(Guid id);
         public Task<List<User>> GetAllUsersAsync();
         public Task<int> SaveChangesAsync();
-        public Task<User> GetUserByEmail(string email);
+        public Task<User> GetUserByEmailAsync(string email);    
+
     }
 }

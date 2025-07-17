@@ -18,9 +18,7 @@ namespace Eskon.Domian.Entities.Identity
         public DateOnly BirthDate { get; set; }
 
         public DateTime CreatedAt { get; set; }
-
         public DateTime UpdatedAt { get; set; }
-
         public DateTime? DeletedAt { get; set; }
 
         //
@@ -67,6 +65,6 @@ namespace Eskon.Domian.Entities.Identity
         public virtual ICollection<Transaction> TransactionsIn { get; set; }
 
         public virtual ICollection<Property> Properties { get; set; }
-    }
+}
 
 }
