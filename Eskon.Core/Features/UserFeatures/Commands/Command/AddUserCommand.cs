@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Eskon.Core.Features.UserFeatures.Commands;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;

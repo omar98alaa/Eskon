@@ -7,6 +7,13 @@ using Eskon.Service.Interfaces;
 using Eskon.Core.Features.UserFeatures.Commands.Command;
 using Eskon.Domian.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
+using Eskon.Core.Response;
+using Eskon.Domian.DTOs.User;
+using Eskon.Domian.Entities.Identity;
+using Eskon.Service.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace Eskon.Core.Features.UserFeatures.Commands.Handler
@@ -14,14 +21,16 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
     public class UserCommandHandler : ResponseHandler, IRequestHandler<AddUserCommand, Response<UserReadDto>>
         , IRequestHandler<SignInUserCommand, Response<string>>
     {
+        #region Fields
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IAuthenticationService _authenticationService;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly SignInManager<User> _signInManager;
+        #endregion
 
-
+        #region Constructors
         public UserCommandHandler(IUserService userService, IMapper mapper, IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager)
         {
             _userService = userService;
@@ -31,6 +40,7 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
             _roleManager = roleManager;
             _signInManager = signInManager;
         }
+        #endregion
 
         #region AddUserCommand Handler
         public async Task<Response<UserReadDto?>> Handle(AddUserCommand request, CancellationToken cancellationToken)
@@ -40,20 +50,20 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
             bool isValid = Validator.TryValidateObject(request.UserRegisterDto, validationContext, results, true);
             if (!isValid)
             {
-                var errorMessages = results.Select(r => r.ErrorMessage).ToList();
-                return BadRequest<UserReadDto?>(errorMessages);
+                var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
+                return BadRequest<UserReadDto?>(internalErrorMessages);
             }
 
             var userToAdd = _mapper.Map<User>(request.UserRegisterDto);
             var result = await _userManager.CreateAsync(userToAdd, request.UserRegisterDto.Password);
-            if (result.Succeeded)
+            if (!result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(userToAdd, "Customer");
-                var userFromDb = await _userService.GetUserByEmailAsync(request.UserRegisterDto.Email);
-                return Created(_mapper.Map<UserReadDto>(userFromDb));
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<UserReadDto?>(dbErrorMessages);
             }
-            var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
-            return BadRequest<UserReadDto?>(dbErrorMessages);
+            await _userManager.AddToRoleAsync(userToAdd, "Customer");
+            var userFromDb = await _userService.GetUserByEmailAsync(request.UserRegisterDto.Email);
+            return Created(_mapper.Map<UserReadDto>(userFromDb));
 
         }
         #endregion

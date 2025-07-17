@@ -36,8 +36,8 @@ namespace Eskon.API
             builder.Services.InjectingInfrastructureDependencies();
             builder.Services.InjectingServiceDependencies(builder.Configuration);
             builder.Services.InjectingCoreDependencies();
-
-            // Configure Idntity User Account
+          
+            // Configure Identity Account 
             builder.Services.AddIdentityApiEndpoints<User>(options =>
             {
                 options.SignIn.RequireConfirmedEmail = false;

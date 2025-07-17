@@ -26,6 +26,7 @@ namespace Eskon.API.Controllers
 
         #region Controllers
 
+
         [HttpGet("/User/List")]
         public async Task<IActionResult> GetAllUsers()
         {
