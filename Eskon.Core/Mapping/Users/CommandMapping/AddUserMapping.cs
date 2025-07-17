@@ -10,6 +10,7 @@ namespace Eskon.Core.Mapping.Users
         public void AddUserMapping()
         {
             // Source -> Destination
+
             CreateMap<UserRegisterDto, User>().ForMember(
                 dest => dest.PasswordHash, src => src.MapFrom(src => src.Password)
                 );

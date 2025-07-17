@@ -5,5 +5,5 @@ using Eskon.Domian.Entities.Identity;
 
 namespace Eskon.Core.Features.UserFeatures.Commands
 {
-    public record AddUserCommand(UserRegisterDto UserRegisteredDto) : IRequest<Response<UserReadDto>>;
+    public record AddUserCommand(UserRegisterDto UserRegisterDto) : IRequest<Response<UserReadDto>>;
 }

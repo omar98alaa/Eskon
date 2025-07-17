@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
 using Eskon.Core.Features.UserFeatures.Commands;
+using Eskon.Core.Features.UserFeatures.Commands.Command;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
 using Microsoft.AspNetCore.Http;
@@ -36,6 +37,12 @@ namespace Eskon.API.Controllers
             return NewResult(userAdded);
         }
 
+        [HttpPost("/Account/SignIn")]
+        public async Task<IActionResult> Post([FromBody] UserSignInDto userSignInDto)
+        {
+            var token = await Mediator.Send(new SignInUserCommand(userSignInDto));
+            return NewResult(token);
+        }
         #endregion
     }
 }

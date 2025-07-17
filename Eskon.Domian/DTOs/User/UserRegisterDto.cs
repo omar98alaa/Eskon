@@ -7,17 +7,19 @@ namespace Eskon.Domian.DTOs.User
     public class UserRegisterDto
     {
         [Required]
-        public string FirstName { get; set; } = string.Empty;
+        public string FirstName { get; set; }
 
         [Required]
-        public string LastName { get; set; } = string.Empty ;
+        public string LastName { get; set; }
 
         [Required]
-        public string UserName { get; set; } = string.Empty;
+        public string UserName { get; set; }
+
 
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
 
         [Required]
         [PasswordPropertyText, MinLength(8)]
