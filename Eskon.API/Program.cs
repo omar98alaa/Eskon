@@ -11,18 +11,16 @@ namespace Eskon.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddEndpointsApiExplorer();
-
             builder.Services.AddDbContext<MyDbContext>(op => op.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("dev")));
+            builder.Services.Configure<IdentitySeeder>(builder.Configuration.GetSection("IdentitySettings"));
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
@@ -39,6 +37,7 @@ namespace Eskon.API
             builder.Services.InjectingServiceDependencies(builder.Configuration);
             builder.Services.InjectingCoreDependencies();
 
+            // Configure Idntity User Account
             builder.Services.AddIdentityApiEndpoints<User>(options =>
             {
                 options.SignIn.RequireConfirmedEmail = false;
@@ -64,11 +63,18 @@ namespace Eskon.API
                 app.UseSwaggerUI(op => op.SwaggerEndpoint("/openapi/v1.json", "v1"));
             }
 
+            // Seeding the Identity Roles at the Program Start
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                await IdentitySeeder.SeedRolesAsync(roleManager);
+            }
+
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
-            app.UseAuthentication();
 
             app.MapControllers();
 

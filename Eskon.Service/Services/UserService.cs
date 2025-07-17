@@ -29,6 +29,11 @@ namespace Eskon.Service.Services
             return await _userRepository.GetAllAsync();
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _userRepository.GetUserByEmailAsync(email);
+        }
+
         public async Task<User> GetUserByIdAsync(Guid id)
         {
             return await _userRepository.GetByIdAsync(id);

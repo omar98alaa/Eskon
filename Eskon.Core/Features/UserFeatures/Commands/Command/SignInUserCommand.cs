@@ -5,5 +5,5 @@ using MediatR;
 
 namespace Eskon.Core.Features.UserFeatures.Commands.Command
 {
-    public record SignInUserCommand(UserSignInDto userLoginDto) : IRequest<Response<string>>;
+    public record SignInUserCommand(UserSignInDto UserSignInDto) : IRequest<Response<string>>;
 }

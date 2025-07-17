@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
-using System.Net;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
-using Eskon.Domian.Models;
 using Eskon.Service.Interfaces;
+using Eskon.Core.Features.UserFeatures.Commands.Command;
+using Eskon.Domian.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace Eskon.Core.Features.UserFeatures.Commands.Handler
@@ -35,21 +35,21 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
         #region AddUserCommand Handler
         public async Task<Response<UserReadDto?>> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
-            var validationContext = new ValidationContext(request.User);
+            var validationContext = new ValidationContext(request.UserRegisterDto);
             var results = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(request.User, validationContext, results, true);
+            bool isValid = Validator.TryValidateObject(request.UserRegisterDto, validationContext, results, true);
             if (!isValid)
             {
                 var errorMessages = results.Select(r => r.ErrorMessage).ToList();
                 return BadRequest<UserReadDto?>(errorMessages);
             }
 
-            var userToAdd = _mapper.Map<User>(request.UserRegisteredDto);
-            var result = await _userManager.CreateAsync(userToAdd, request.UserRegisteredDto.Password);
+            var userToAdd = _mapper.Map<User>(request.UserRegisterDto);
+            var result = await _userManager.CreateAsync(userToAdd, request.UserRegisterDto.Password);
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(userToAdd, "Client");
-                var userFromDb = await _userService.GetUserByEmail(request.UserRegisteredDto.Email);
+                var userFromDb = await _userService.GetUserByEmailAsync(request.UserRegisterDto.Email);
                 return Created(_mapper.Map<UserReadDto>(userFromDb));
             }
             var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
@@ -61,14 +61,14 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
         #region SignInUserCommand Handler
         public async Task<Response<string>> Handle(SignInUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.userLoginDto.Email);
+            var user = await _userManager.FindByEmailAsync(request.UserSignInDto.Email);
 
             if (user == null)
             {
                 return BadRequest<string>("The email you provided is not registered before, create new account");
             }
 
-            var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.userLoginDto.Password, false);
+            var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.UserSignInDto.Password, false);
              
             if(!signInResult.Succeeded)
             {

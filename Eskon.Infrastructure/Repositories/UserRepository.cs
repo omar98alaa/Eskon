@@ -3,6 +3,7 @@ using Eskon.Domian.Entities.Identity;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
 using Eskon.Infrastructure.Interfaces;
+using Eskon.Domian.Entities;
 
 namespace Eskon.Infrastructure.Repositories
 {
