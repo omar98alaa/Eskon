@@ -15,22 +15,22 @@ namespace Eskon.Domian.DTOs.User
         [Required]
         public string UserName { get; set; }
 
+
         [Required]
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
-        [PasswordPropertyText]
-        public string Password { get; set; }
 
         [Required]
+        [PasswordPropertyText, MinLength(8)]
+        public string Password { get; set; }
+
         public string Address { get; set; }
 
         [Required]
-        [RegularExpression("^\\+?[1-9]\\d{1,14}$")]
+        [RegularExpression(@"^\+?[\d\s\-().]{7,20}$",
+    ErrorMessage = "Please enter a valid phone number")]
         public string PhoneNumber { get; set; }
-
-        [Required]
         public DateOnly BirthDate { get; set; }
     }
 }
