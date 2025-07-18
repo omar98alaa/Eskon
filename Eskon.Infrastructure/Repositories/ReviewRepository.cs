@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Eskon.Infrastructure.Repositories
 {
-    class ReviewReposatory: GenericRepositoryAsync<Review>,IReviewReposatory
+    class ReviewRepository : GenericRepositoryAsync<Review>,IReviewReposatory
     {
 
         #region Fields
