@@ -10,6 +10,5 @@ namespace Eskon.Infrastructure.Interfaces
 {
     public interface IPropertyTypeRepository:IGenericRepositoryAsync<PropertyType>
     {
-        public Task<PropertyType> GetPropertyTypeByNameAsync(string name);
     }
 }

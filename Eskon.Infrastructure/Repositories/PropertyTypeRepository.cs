@@ -24,11 +24,6 @@ namespace Eskon.Infrastructure.Repositories
         {
             _PropertyTypeDbSet = myDbContext.Set<PropertyType>();
         }
-
-        public async Task<PropertyType> GetPropertyTypeByNameAsync(string name)
-        {
-            return await _PropertyTypeDbSet.SingleOrDefaultAsync(x=>x.Name==name);
-        }
         #endregion
 
     }

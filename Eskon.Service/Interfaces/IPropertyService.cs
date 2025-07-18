@@ -11,31 +11,30 @@ namespace Eskon.Service.Interfaces
     {
         #region Read
         public Task<List<Property>> GetAllPropertiesAsync();
-        public Task<Property> GetPropertyByIdAsync(Guid PropertyId);
-        public Task<List<Property>> GetPropertyByOwnerIdAsync(Guid OwnerId);
-        public Task<List<Property>> GetPropertyByAdminIdAsync(Guid AdminId);
-        public Task<List<Property>> getPropertybyCityAsync(string City, string Country);
+        public Task<Property> GetPropertyByIdAsync(Guid propertyId);
+        public Task<List<Property>> GetPropertiesPerOwnerAsync(Guid ownerId);
+        public Task<List<Property>> GetPendingPropertiesAsync(Guid adminId);
+        public Task<List<Property>> GetPropertiesbyCityandCountryAsync(string city, string country);
 
-        public Task<List<Property>> getPropertybyRatingAsync(int Rating);
+        public Task<List<Property>> GetPropertiesbyRatingAsync(decimal Rating);
 
-        public Task<List<Property>> getPropertybyPriceRangAsync(int Min, int Max);
+        public Task<List<Property>> GetPropertiesbyPriceRangAsync(decimal minPricePerNight, decimal maxPricePerNight);
         #endregion
         #region Add
         public Task<Property> AddPropertyAsync(Property property);
         #endregion
         #region Update
         public Task UpdatePropertyAsync(Property property);
-        public Task UpdateIsSuspendedPropertyAsync(Guid PropertyId,bool value);
-        public Task UpdateIsAcceptedPropertyAsync(Guid PropertyId);
-        public Task UpdateRejectionMessageAsync(Guid PropertyId,String Message);
-        public Task SetAverageRatingAsync(Guid PropertyId);
+        public Task SetPropertySuspensionStateAsync(Property property,bool value);
+        public Task SetIsAcceptedPropertyAsync(Property property);
+        public Task SetRejectionMessageAsync(Property property, String regectionMessage);
+        public Task SetAverageRatingAsync(Property property,decimal averageRating);
         #endregion
         #region Delete
         public Task RemovePropertyAsync(Property property);
-        public Task SoftRemovePropertyAsync(Property property);
         #endregion
         #region SaveChanges
-        public Task SaveChangesAsync();
+        public Task<int> SaveChangesAsync();
         #endregion
     }
 }

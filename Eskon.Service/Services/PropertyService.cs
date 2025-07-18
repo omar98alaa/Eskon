@@ -18,9 +18,10 @@ namespace Eskon.Service.Services
             return await propertyRepository.AddAsync(property);
         }
 
-        public async Task SetAverageRatingAsync(Guid PropertyId)
+        public async Task SetAverageRatingAsync(Property property,decimal AverageRating)
         {
-            await propertyRepository.SetAverageRatingAsync(PropertyId);
+            property.AverageRating = AverageRating;
+            await propertyRepository.UpdateAsync(property);
         }
 
         public async Task<List<Property>> GetAllPropertiesAsync()
@@ -28,14 +29,14 @@ namespace Eskon.Service.Services
             return await propertyRepository.GetAllAsync();
         }
 
-        public Task<List<Property>> GetPropertyByAdminIdAsync(Guid AdminId)
+        public async Task<List<Property>> GetPendingPropertiesAsync(Guid AdminId)
         {
-            return propertyRepository.GetPropertyByAdminIdAsync(AdminId);
+            return await propertyRepository.GetFilteredAsync(x => x.AssignedAdminId == AdminId && x.IsPending==true);
         }
 
-        public async Task<List<Property>> getPropertybyCityAsync(string City, string Country)
+        public async Task<List<Property>> GetPropertiesbyCityandCountryAsync(string City, string Country)
         {
-            return await propertyRepository.getPropertybyCityAsync(City, Country);
+            return await propertyRepository.GetFilteredAsync(x => x.City.Name == City && x.City.Country.Name == Country);
         }
 
         public async Task<Property> GetPropertyByIdAsync(Guid PropertyId)
@@ -43,47 +44,45 @@ namespace Eskon.Service.Services
             return await propertyRepository.GetByIdAsync(PropertyId);
         }
 
-        public async Task<List<Property>> GetPropertyByOwnerIdAsync(Guid OwnerId)
+        public async Task<List<Property>> GetPropertiesPerOwnerAsync(Guid OwnerId)
         {
-            return await propertyRepository.GetPropertyByOwnerIdAsync(OwnerId);
+            return await propertyRepository.GetFilteredAsync(x => x.OwnerId == OwnerId);
         }
 
-        public async Task<List<Property>> getPropertybyPriceRangAsync(int Min, int Max)
+        public async Task<List<Property>> GetPropertiesbyPriceRangAsync(decimal MinPricePerNight, decimal MaxPricePerNight)
         {
-            return await propertyRepository.getPropertybyPriceRangAsync(Min, Max);
+            return await propertyRepository.GetFilteredAsync(x => x.PricePerNight >= MinPricePerNight && x.PricePerNight <= MaxPricePerNight);
         }
 
-        public async Task<List<Property>> getPropertybyRatingAsync(int Rating)
+        public async Task<List<Property>> GetPropertiesbyRatingAsync(decimal Rating)
         {
-            return await propertyRepository.getPropertybyRatingAsync(Rating);
+            return await propertyRepository.GetFilteredAsync(x => x.AverageRating == Rating);
         }
+
+
+        public async Task<int> SaveChangesAsync()
+        {
+           return await propertyRepository.SaveChangesAsync();
+        }
+
 
         public async Task RemovePropertyAsync(Property property)
-        {
-            await propertyRepository.DeleteAsync(property);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await propertyRepository.SaveChangesAsync();
-        }
-
-
-        public async Task SoftRemovePropertyAsync(Property property)
         {
             await propertyRepository.SoftDeleteAsync(property);
         }
 
-        public async Task UpdateIsAcceptedPropertyAsync(Guid PropertyId)
+        public async Task SetIsAcceptedPropertyAsync(Property property)
         {
-            Property AcceptedProperty =await GetPropertyByIdAsync(PropertyId);
-            AcceptedProperty.IsAccepted = true;
+            property.IsAccepted = true;
+            property.IsPending = false;
+            property.RejectionMessage = "";
+            await propertyRepository.UpdateAsync(property);
         }
 
-        public async Task UpdateIsSuspendedPropertyAsync(Guid PropertyId, bool value)
+        public async Task SetPropertySuspensionStateAsync(Property property, bool value)
         {
-            Property AcceptedProperty = await GetPropertyByIdAsync(PropertyId);
-            AcceptedProperty.IsSuspended = value;
+             property.IsSuspended = value;
+            await propertyRepository.UpdateAsync(property);
         }
 
         public async Task UpdatePropertyAsync(Property property)
@@ -91,10 +90,12 @@ namespace Eskon.Service.Services
             await propertyRepository.UpdateAsync(property);
         }
 
-        public async Task UpdateRejectionMessageAsync(Guid PropertyId, string Message)
+        public async Task SetRejectionMessageAsync(Property property, string RejectionMessage)
         {
-            Property RefusedProperty = await GetPropertyByIdAsync(PropertyId);
-            RefusedProperty.RejectionMessage = Message;
+            property.RejectionMessage= RejectionMessage;
+            property.IsPending = false;
+            property.IsAccepted= false;
+            await propertyRepository.UpdateAsync(property);
         }
     }
 }

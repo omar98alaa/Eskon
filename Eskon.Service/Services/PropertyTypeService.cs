@@ -18,10 +18,7 @@ namespace Eskon.Service.Services
 
         propertyTypeRepository = PropertyTypeRepo;
         }
-        public async Task<PropertyType> GetPropertyTypeByNameAsync(string name)
-        {
-           return await propertyTypeRepository.GetPropertyTypeByNameAsync(name);
-        }
+       
         public async Task<PropertyType> AddPropertyType(PropertyType propertyType)
         {
             return await propertyTypeRepository.AddAsync(propertyType);
@@ -31,18 +28,12 @@ namespace Eskon.Service.Services
         {
             return await propertyTypeRepository.GetAllAsync();
         }
+        public async Task<int> SaveChangesAsync()
+        {
+            return await propertyTypeRepository.SaveChangesAsync();
+        }
 
         public async Task RemovePropertyAsync(PropertyType propertyType)
-        {
-            await propertyTypeRepository.DeleteAsync(propertyType);
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await propertyTypeRepository.SaveChangesAsync();
-        }
-
-        public async Task SoftRemovePropertyAsync(PropertyType propertyType)
         {
             await propertyTypeRepository.SoftDeleteAsync(propertyType);
         }

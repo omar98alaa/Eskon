@@ -24,39 +24,6 @@ namespace Eskon.Infrastructure.Repositories
         {
             _PropertyDbSet = myDbContext.Set<Property>();
         }
-
-        public async Task<List<Property>> GetPropertyByAdminIdAsync(Guid AdminId)
-        {
-            return await GetFiltered(x => x.AssignedAdminId == AdminId);
-        }
-
-        public async Task<List<Property>> getPropertybyCityAsync(string City, string Country)
-        {
-            return await GetFiltered(x=>x.City.Name==City&& x.City.Country.Name==Country);
-        }
-
-        public async Task<List<Property>> GetPropertyByOwnerIdAsync(Guid OwnerId)
-        {
-            return await GetFiltered(x => x.OwnerId == OwnerId);
-        }
-
-        public async Task<List<Property>> getPropertybyPriceRangAsync(int MinPrice, int MaxPrice)
-        {
-            return await GetFiltered(x => x.PricePerNight>=MinPrice&& x.PricePerNight<=MaxPrice);
-        }
-
-        public async Task<List<Property>> getPropertybyRatingAsync(int Rating)
-        {
-            return await GetFiltered(x => x.AverageRating == Rating);
-        }
-
-        public async Task SetAverageRatingAsync(Guid PropertyId)
-        {
-            Property property=await GetByIdAsync(PropertyId);
-            property.AverageRating=property.Reviews.Average(x=>x.Rating);
-        }
-
-
         #endregion
     }
 }
