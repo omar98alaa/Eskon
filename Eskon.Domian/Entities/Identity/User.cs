@@ -1,6 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Eskon.Domian.Models;
 using Microsoft.AspNetCore.Identity;
-using Eskon.Domian.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Eskon.Domian.Entities.Identity
 {
     public class User : IdentityUser<Guid>, IBaseModel
@@ -20,6 +21,10 @@ namespace Eskon.Domian.Entities.Identity
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
+
+        public string? Code { get; set; }
+        [InverseProperty(nameof(UserRefreshToken.User))]
+        public virtual ICollection<UserRefreshToken> UserRefreshTokens { get; set; } = new HashSet<UserRefreshToken>();
 
         //
         //  Navigation Properties

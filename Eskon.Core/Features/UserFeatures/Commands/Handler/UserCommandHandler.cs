@@ -1,12 +1,5 @@
 ﻿using AutoMapper;
-using MediatR;
-using System.ComponentModel.DataAnnotations;
-using Eskon.Core.Response;
-using Eskon.Domian.DTOs.User;
-using Eskon.Service.Interfaces;
 using Eskon.Core.Features.UserFeatures.Commands.Command;
-using Eskon.Domian.Entities.Identity;
-using Microsoft.AspNetCore.Identity;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
@@ -14,28 +7,36 @@ using Eskon.Service.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 
 namespace Eskon.Core.Features.UserFeatures.Commands.Handler
 {
     public class UserCommandHandler : ResponseHandler, IRequestHandler<AddUserCommand, Response<UserReadDto>>
-        , IRequestHandler<SignInUserCommand, Response<string>>
+        , IRequestHandler<SignInUserCommand, Response<TokenResponseDto>>
+        , IRequestHandler<SignOutUserCommand, Response<string>>
+        , IRequestHandler<AddOwnerRoleToUserCommand, Response<TokenResponseDto>>
+        , IRequestHandler<DeleteOwnerRoleFromUserCommand, Response<TokenResponseDto>>
+        , IRequestHandler<AddAdminRoleToUserCommand, Response<TokenResponseDto>>
+        , IRequestHandler<DeleteAdminRoleFromUserCommand, Response<TokenResponseDto>>
     {
         #region Fields
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IAuthenticationService _authenticationService;
+        private readonly IRefreshTokenService _refreshTokenService;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly SignInManager<User> _signInManager;
         #endregion
 
         #region Constructors
-        public UserCommandHandler(IUserService userService, IMapper mapper, IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager)
+        public UserCommandHandler(IUserService userService, IMapper mapper, IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager, IRefreshTokenService refreshTokenService)
         {
             _userService = userService;
             _mapper = mapper;
             _authenticationService = authenticationService;
+            _refreshTokenService = refreshTokenService;
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
@@ -69,25 +70,197 @@ namespace Eskon.Core.Features.UserFeatures.Commands.Handler
         #endregion
 
         #region SignInUserCommand Handler
-        public async Task<Response<string>> Handle(SignInUserCommand request, CancellationToken cancellationToken)
+        public async Task<Response<TokenResponseDto>> Handle(SignInUserCommand request, CancellationToken cancellationToken)
         {
             var user = await _userManager.FindByEmailAsync(request.UserSignInDto.Email);
 
             if (user == null)
             {
-                return BadRequest<string>("Incorrect email or password.");
+                return BadRequest<TokenResponseDto>("Incorrect email or password.");
             }
 
             var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.UserSignInDto.Password, false);
-             
-            if(!signInResult.Succeeded)
+
+            if (!signInResult.Succeeded)
             {
-                return BadRequest<string>("Incorrect email or password");
+                return BadRequest<TokenResponseDto>("Incorrect email or password");
+            }
+            var oldToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+            if (oldToken != null)
+            {
+                oldToken.IsRevoked = true;
+                await _refreshTokenService.SaveChangesAsync();
+            }
+            var accessToken = await _authenticationService.GenerateJWTTokenAsync(user);
+            var refreshToken = _authenticationService.GenerateRefreshToken();
+            await _refreshTokenService.SaveRefreshTokenAsync(refreshToken, user);
+            return Success(new TokenResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
+        }
+        #endregion
+
+        #region SignOutUserCommand Handler
+        public async Task<Response<string>> Handle(SignOutUserCommand request, CancellationToken cancellationToken)
+        {
+            var stored = await _refreshTokenService.GetStoredTokenAsync(request.refreshToken);
+            if (stored != null)
+            {
+                stored.IsRevoked = true;
+                await _refreshTokenService.SaveChangesAsync();
+            }
+            else
+            {
+                // ToDo
+                // track suspicious activity here
+                // for example:
+                // _logger.LogWarning("Unknown or already revoked refresh token during logout.");
+
             }
 
-            var accessToken = await _authenticationService.GetJWTToken(user);
-            return Success(accessToken);
-        } 
+            return Success("Signed out");
+        }
+        #endregion
+
+        #region Add Owner Role
+        public async Task<Response<TokenResponseDto>> Handle(AddOwnerRoleToUserCommand request, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserToBeOwnerId.ToString());
+
+            if (user == null)
+                return BadRequest<TokenResponseDto>("User Not Found");
+
+            var result = await _userManager.AddToRoleAsync(user, "Owner");
+
+            if (!result.Succeeded)
+            {
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<TokenResponseDto>(dbErrorMessages);
+            }
+
+            var newAccessToken = await _authenticationService.GenerateJWTTokenAsync(user);
+
+            var existingRefreshToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+
+            if (existingRefreshToken == null || existingRefreshToken.ExpiresAt < DateTime.UtcNow)
+            {
+                return BadRequest<TokenResponseDto>("Refresh token not found or expired. Please log in again.");
+            }
+
+            var tokenResponse = new TokenResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = existingRefreshToken.RefreshToken // reuse the existing one
+            };
+
+            return Success(tokenResponse, "User owner role added, new access token issued.");
+        }
+
+        #endregion
+
+        #region Delete Owner Role
+        public async Task<Response<TokenResponseDto>> Handle(DeleteOwnerRoleFromUserCommand request, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserToRemoveOwnerId.ToString());
+
+            if (user == null)
+                return BadRequest<TokenResponseDto>("User Not Found");
+
+            var result = await _userManager.RemoveFromRoleAsync(user, "Owner");
+
+            if (!result.Succeeded)
+            {
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<TokenResponseDto>(dbErrorMessages);
+            }
+
+            var newAccessToken = await _authenticationService.GenerateJWTTokenAsync(user);
+
+            var existingRefreshToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+
+            if (existingRefreshToken == null || existingRefreshToken.ExpiresAt < DateTime.UtcNow)
+            {
+                return BadRequest<TokenResponseDto>("Refresh token not found or expired. Please log in again.");
+            }
+
+            var tokenResponse = new TokenResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = existingRefreshToken.RefreshToken // reuse the existing one
+            };
+
+            return Success(tokenResponse, "User owner role deleted, new access token issued.");
+        }
+        #endregion
+
+        #region Add Admin Role
+        public async Task<Response<TokenResponseDto>> Handle(AddAdminRoleToUserCommand request, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserToBeAdminId.ToString());
+            if (user == null)
+                return BadRequest<TokenResponseDto>("User Not Found");
+
+            var result = await _userManager.AddToRoleAsync(user, "Admin");
+
+            if (!result.Succeeded)
+            {
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<TokenResponseDto>(dbErrorMessages);
+            }
+
+            var existingRefreshToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+            if (existingRefreshToken == null || existingRefreshToken.ExpiresAt < DateTime.UtcNow)
+            {
+                //return BadRequest<TokenResponseDto>("Refresh token not found or expired. Please log in again.");
+            }
+            var newAccessToken = await _authenticationService.GenerateJWTTokenAsync(user);
+
+
+            var tokenResponse = new TokenResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = existingRefreshToken?.RefreshToken??"" // reuse the existing one
+            };
+
+            return Success(tokenResponse, "User admin role added, new access token issued.");
+        }
+        #endregion
+
+        #region Delete Admin Role
+        public async Task<Response<TokenResponseDto>> Handle(DeleteAdminRoleFromUserCommand request, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByIdAsync(request.UserToRemoveAdminId.ToString());
+
+            if (user == null)
+                return BadRequest<TokenResponseDto>("User Not Found");
+
+            var result = await _userManager.RemoveFromRoleAsync(user, "Admin");
+
+            if (!result.Succeeded)
+            {
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<TokenResponseDto>(dbErrorMessages);
+            }
+
+            var newAccessToken = await _authenticationService.GenerateJWTTokenAsync(user);
+
+            var existingRefreshToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+
+            if (existingRefreshToken == null || existingRefreshToken.ExpiresAt < DateTime.UtcNow)
+            {
+                //return BadRequest<TokenResponseDto>("Refresh token not found or expired. Please log in again.");
+            }
+
+            var tokenResponse = new TokenResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = existingRefreshToken?.RefreshToken??"" // reuse the existing one
+            };
+
+            return Success(tokenResponse, "User admin role deleted, new access token issued.");
+        }
         #endregion
     }
 }

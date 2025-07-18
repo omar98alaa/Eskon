@@ -7,9 +7,11 @@ namespace Eskon.Service.Interfaces
 {
     public interface IAuthenticationService
     {
-        public Task<string> GetJWTToken(User user);
-        public Task<(JwtSecurityToken, string)> GenerateJWTToken(User user);
+        public Task<string> GenerateJWTTokenAsync(User user);
+        //public Task<JwtAuthResult> GenerateJWTToken(User user);
         public Task<List<Claim>> GetClaims(User user);
+
+        public string GenerateRefreshToken();
 
     }
 }

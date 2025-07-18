@@ -9,6 +9,8 @@ namespace Eskon.Domian.Entities.Identity
 
         public string Audience { get; set; }
 
+        public int RefreshTokenExpireDatePeriod { get; set; }
+
         public bool ValidateIssuer { get; set; }
 
         public bool ValidateAudience { get; set; }

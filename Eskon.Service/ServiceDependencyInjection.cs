@@ -1,8 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Eskon.Domian.Entities.Identity;
+using Eskon.Infrastructure.Context;
 using Eskon.Service.Interfaces;
 using Eskon.Service.Services;
-using Eskon.Domian.Entities.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Eskon.Service
 {
@@ -13,11 +18,58 @@ namespace Eskon.Service
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IBookingService, BookingService>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IRefreshTokenService, RefreshTokenService>();
 
-            //Authentication
             var jwtSettings = new JwtSettings();
             configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
             services.AddSingleton(jwtSettings);
+
+            #region Identity Configurations
+
+            // Configure Identity Account 
+            services.AddIdentityApiEndpoints<User>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = false;
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                //options.Lockout.MaxFailedAccessAttempts = 5;
+                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(2);
+            })
+             .AddRoles<IdentityRole<Guid>>()
+             .AddEntityFrameworkStores<MyDbContext>()
+             .AddDefaultTokenProviders();
+            #endregion
+
+
+            #region Authentication Configurations
+            //Authorization
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+              .AddJwtBearer(options =>
+              {
+                  options.SaveToken = true;
+                  options.RequireHttpsMetadata = false;
+                  options.TokenValidationParameters = new TokenValidationParameters
+                  {
+                      ValidateIssuer = jwtSettings.ValidateIssuer,
+                      ValidateAudience = jwtSettings.ValidateAudience,
+                      ValidateLifetime = jwtSettings.ValidateLifeTime,
+                      ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
+                      ValidIssuer = jwtSettings.Issuer,
+                      ValidAudience = jwtSettings.Audience,
+                      IssuerSigningKey = new SymmetricSecurityKey(
+                          Encoding.ASCII.GetBytes(jwtSettings.Secret)
+                      )
+                  };
+              }); 
+            #endregion
             return services;
         }
     }
