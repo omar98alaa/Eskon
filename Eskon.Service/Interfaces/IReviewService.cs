@@ -12,14 +12,14 @@ namespace Eskon.Service.Interfaces
     {
         public Task<List<Review>> GetPropertyReviewsAsync(Guid propId);
 
-        Task<Review> CreatePropertyReviewAsync(Review review);
+        public Task<Review> CreatePropertyReviewAsync(Review review);
 
-        Task UpdatePropertyReviewAsync(Review review); 
+        public Task UpdatePropertyReviewAsync(Review review); 
 
-        Task DeletePropertyReviewAsync(Review review);
+       public Task DeletePropertyReviewAsync(Review review);
 
 
-        Task<int> SaveChangesAsync();
+        public Task<int> SaveChangesAsync();
     }
 
 
