@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Eskon.Infrastructure.Interfaces
 {
-    public interface IReviewReposatory : IGenericRepositoryAsync<Review>
+    public interface IReviewRepository : IGenericRepositoryAsync<Review>
     {
     
     }
