@@ -13,7 +13,7 @@ namespace Eskon.Infrastructure
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IBookingRepository, BookingRepository>();
             services.AddTransient<IFavouriteRepository, FavouriteRepository>();
-            services.AddTransient<IReviewReposatory, ReviewReposatory>();
+            services.AddTransient<IReviewRepository, ReviewRepository>();
             return services;
         }
     }
