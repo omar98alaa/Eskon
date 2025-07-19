@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Eskon.Core.Features.UserFeatures.Commands;
 using Eskon.Core.Features.UserFeatures.Queries.Query;
-using Eskon.Domian.DTOs.User;
-using Eskon.Domian.Entities.Identity;
 using Eskon.API.Base;
-using Eskon.Core.Features.UserFeatures.Commands.Command;
 using Microsoft.AspNetCore.Authorization;
+using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 
 namespace Eskon.API.Controllers
 {

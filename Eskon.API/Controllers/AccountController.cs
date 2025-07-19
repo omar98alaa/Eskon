@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
-using Eskon.Core.Features.UserFeatures.Commands;
-using Eskon.Core.Features.UserFeatures.Commands.Command;
-using Eskon.Core.Features.UserFeatures.Utilities;
+using Eskon.Core.Features.AccountFeatures.Commands.Command;
+using Eskon.Core.Features.UserRolesFeatures.Utilities;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,7 +32,7 @@ namespace Eskon.API.Controllers
         public async Task<IActionResult> Post([FromBody] UserRegisterDto user)
         {
             var userToAdd = _mapper.Map<User>(user);
-            var userAdded = await Mediator.Send(new AddUserCommand(user));
+            var userAdded = await Mediator.Send(new AddUserAccountCommand(user));
             return NewResult(userAdded);
         }
 
