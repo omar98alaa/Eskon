@@ -3,7 +3,9 @@ using Eskon.Service.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Concurrent;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,14 +31,7 @@ namespace Eskon.Service.Services
         public string GenerateJWTTokenAsync(User user ,IList<string> userManagerRoles, IList<Claim> userManagerClaims)
         {
             var userAllClaims = GeneratedAllUserClaims(user, userManagerRoles, userManagerClaims);
-            bool isAdmin = false;
-            foreach (var role in userManagerRoles)
-            {
-                if(role == "Admin")
-                {
-                    isAdmin = true;
-                }
-            }
+            bool isAdmin = userManagerRoles.Contains("Admin");
 
             var jwtToken = new JwtSecurityToken(
                 _jwtSettings.Issuer,
