@@ -23,16 +23,18 @@ namespace Eskon.Infrastructure.Repositories
                 .Include(s => s.Receiver)
                 .ToListAsync();
         }
-
-        public async Task<List<Transaction>> GetAllTransactionsForOwnerAsync(Guid ownerId)
+        public async Task<List<Transaction>> GetAllTransactionsAsync()
         {
             return await _context.Transactions
-                .Where(t => t.ReceiverId == ownerId)
                 .Include(s => s.Sender)
-                .Include(s => s.Receiver)
+                .Include(s => s.Receiver).ToListAsync();
+        }
+        public async Task<List<Transaction>> GetTransactionsByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Transactions
+                .Where(t => t.CreatedAt >= startDate && t.CreatedAt <= endDate)
                 .ToListAsync();
         }
-
 
     }
 }

@@ -1,23 +1,20 @@
-﻿using System;
+﻿using Eskon.Domian.Entities.Identity;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Eskon.Domian.DTOs.Transaction
+namespace Eskon.Domain.DTOs.Transaction
 {
-    public class TransactionResponseOwnerDTO
+    public class TransactionWriteDTO
     {
         public Guid Id { get; set; }
-        public decimal Amount { get; set; }
-        public decimal Fee { get; set; }
         public decimal TotalCost { get; set; }
         public DateOnly ConfirmedDate { get; set; }
         public Guid SenderId { get; set; }
         public string SenderName { get; set; }
         public Guid ReceiverId { get; set; }
         public string ReceiverName { get; set; }
-
     }
 }
