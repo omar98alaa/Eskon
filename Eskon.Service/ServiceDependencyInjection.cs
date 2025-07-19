@@ -13,6 +13,7 @@ namespace Eskon.Service
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IBookingService, BookingService>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IPaymentService, PaymentService>();
             services.AddTransient<IFavouriteService, FavouriteService>();
             services.AddTransient<IPropertyService, PropertyService>();
             services.AddTransient<IPropertyTypeService, PropertyTypeService>();
