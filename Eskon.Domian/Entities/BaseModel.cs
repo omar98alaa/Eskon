@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Eskon.Domian.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace Eskon.Domian.Models
 {
-    public class BaseModel
+    public class BaseModel : IBaseModel
     {
         [Key]
         public Guid Id { get; set; }

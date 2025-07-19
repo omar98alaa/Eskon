@@ -29,6 +29,11 @@ namespace Eskon.Service.Services
             return await _userRepository.GetAllAsync();
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _userRepository.GetUserByEmailAsync(email);
+        }
+
         public async Task<User> GetUserByIdAsync(Guid id)
         {
             return await _userRepository.GetByIdAsync(id);
@@ -37,6 +42,11 @@ namespace Eskon.Service.Services
         public async Task<int> SaveChangesAsync()
         {
             return await _userRepository.SaveChangesAsync(); 
+        }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _userRepository.GetUserByEmailAsync(email);
         }
     }
 }
