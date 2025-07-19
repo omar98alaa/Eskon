@@ -13,6 +13,7 @@ namespace Eskon.Infrastructure.Interfaces
     public interface ITicketRepository : IGenericRepositoryAsync<Ticket>
     {
         Task<Ticket?> GetTicketByIDAsync(Guid ticketId);
-        Task<List<Ticket>> GetAllTicketsAsync();
+        Task<List<Ticket>> GetAllTicketsforUserAsync(Guid userID);
+        Task<List<Ticket>> GetAllTicketsforAdminAsync(Guid adminID);
     }
 }

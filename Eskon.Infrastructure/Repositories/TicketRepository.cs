@@ -32,9 +32,18 @@ namespace Eskon.Infrastructure.Repositories
                 .Include(t => t.Admin)
                 .FirstOrDefaultAsync(t => t.Id == ticketId);
         }
-        public async Task<List<Ticket>> GetAllTicketsAsync()
+        public async Task<List<Ticket>> GetAllTicketsforUserAsync(Guid userID)
         {
             return await _context.Tickets
+                .Where(t => t.UserId == userID)
+                .Include(t => t.User)
+                .Include(t => t.Admin)
+                .ToListAsync();
+        }
+        public async Task<List<Ticket>> GetAllTicketsforAdminAsync(Guid adminID)
+        {
+            return await _context.Tickets
+                .Where(t => t.AdminId == adminID)
                 .Include(t => t.User)
                 .Include(t => t.Admin)
                 .ToListAsync();

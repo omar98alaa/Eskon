@@ -18,7 +18,7 @@ namespace Eskon.Infrastructure.Repositories
         public async Task<List<Transaction>> GetAllTransactionsForUserAsync(Guid userId)
         {
             return await _context.Transactions
-                .Where(t => t.SenderId == userId)
+                .Where(t => t.SenderId == userId || t.ReceiverId == userId)
                 .Include(s => s.Sender)
                 .Include(s => s.Receiver)
                 .ToListAsync();

@@ -18,9 +18,13 @@ namespace Eskon.Service.Services
             return await _ticketRepository.GetByIdAsync(ticketID);
         }
 
-        public async Task<List<Ticket>> GetAllTicketsAsync()
+        public async Task<List<Ticket>> GetAllTicketsforAdminAsync(Guid adminID)
         {
-            return await _ticketRepository.GetAllAsync();
+            return await _ticketRepository.GetAllTicketsforAdminAsync(adminID);
+        }
+        public async Task<List<Ticket>> GetAllTicketsforUserAsync(Guid userID)
+        {
+            return await _ticketRepository.GetAllTicketsforUserAsync(userID);
         }
 
         public async Task<Ticket> CreateTicket(Ticket ticket)
@@ -33,13 +37,9 @@ namespace Eskon.Service.Services
             await _ticketRepository.UpdateAsync(ticket);
         }
 
-        public async Task DeleteTicket(Guid ticketID)
+        public async Task DeleteTicket(Ticket ticket)
         {
-            var ticket = await _ticketRepository.GetTicketByIDAsync(ticketID);
-            if (ticket != null)
-            {
-                await _ticketRepository.DeleteAsync(ticket); 
-            }
+            await _ticketRepository.DeleteAsync(ticket);
         }
         public async Task<int> SaveChangesAsync()
         {

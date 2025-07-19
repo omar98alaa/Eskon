@@ -11,10 +11,11 @@ namespace Eskon.Service.Interfaces
     public interface ITicketService
     {
         Task<Ticket> GetTicketByIDAsync(Guid ticketID);
-        Task<List<Ticket>> GetAllTicketsAsync();
+        Task<List<Ticket>> GetAllTicketsforUserAsync(Guid userID);
+        Task<List<Ticket>> GetAllTicketsforAdminAsync(Guid adminID);
         Task<Ticket> CreateTicket(Ticket ticket);
         Task EditTicket(Ticket ticket);
-        Task DeleteTicket(Guid ticketID);
+        Task DeleteTicket(Ticket ticket);
         Task<int> SaveChangesAsync();
 
 
