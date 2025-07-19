@@ -40,6 +40,7 @@ namespace Eskon.Infrastructure.Context
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
         #endregion
 
         #region Configurations
@@ -227,6 +228,8 @@ namespace Eskon.Infrastructure.Context
             {
                 b.HasKey(l => new { l.LoginProvider, l.ProviderKey });
             });
+
+            modelBuilder.Entity<UserRefreshToken>().Ignore(x => x.DeletedAt);
             #endregion
 
         }
