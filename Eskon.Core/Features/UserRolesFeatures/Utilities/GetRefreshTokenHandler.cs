@@ -3,7 +3,7 @@ using Eskon.Domian.DTOs.User;
 using Eskon.Service.Interfaces;
 using MediatR;
 
-namespace Eskon.Core.Features.UserFeatures.Utilities
+namespace Eskon.Core.Features.UserRolesFeatures.Utilities
 {
     public class GetRefreshTokenHandler :ResponseHandler, IRequestHandler<GetRefreshToken, Response<TokenResponseDto>>
     {
@@ -27,7 +27,7 @@ namespace Eskon.Core.Features.UserFeatures.Utilities
 
             if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt < DateTime.UtcNow)
             {
-                return BadRequest<TokenResponseDto>("Refresh token is invalid or expired. Please login again.");
+                return Unauthorized<TokenResponseDto>();
             }
 
             var user = storedToken.User;

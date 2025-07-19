@@ -1,0 +1,122 @@
+﻿using AutoMapper;
+using Eskon.Core.Features.AccountFeatures.Commands.Command;
+using Eskon.Core.Response;
+using Eskon.Domian.DTOs.User;
+using Eskon.Domian.Entities.Identity;
+using Eskon.Service.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+
+namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
+{
+    public class UserAccountCommandHandler : ResponseHandler, 
+        IRequestHandler<AddUserAccountCommand, Response<UserReadDto>>
+        , IRequestHandler<SignInUserCommand, Response<TokenResponseDto>>
+        , IRequestHandler<SignOutUserCommand, Response<string>>
+    {
+        #region Fields
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper;
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly SignInManager<User> _signInManager;
+        #endregion
+
+        #region Constructors
+        public UserAccountCommandHandler(IUserService userService, IMapper mapper, IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager, IRefreshTokenService refreshTokenService)
+        {
+            _userService = userService;
+            _mapper = mapper;
+            _authenticationService = authenticationService;
+            _refreshTokenService = refreshTokenService;
+            _userManager = userManager;
+            _roleManager = roleManager;
+            _signInManager = signInManager;
+        }
+        #endregion
+
+        #region Add User Account Command Handler
+        public async Task<Response<UserReadDto?>> Handle(AddUserAccountCommand request, CancellationToken cancellationToken)
+        {
+            var validationContext = new ValidationContext(request.UserRegisterDto);
+            var results = new List<ValidationResult>();
+            bool isValid = Validator.TryValidateObject(request.UserRegisterDto, validationContext, results, true);
+            if (!isValid)
+            {
+                var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
+                return BadRequest<UserReadDto?>(internalErrorMessages);
+            }
+
+            var userToAdd = _mapper.Map<User>(request.UserRegisterDto);
+            var result = await _userManager.CreateAsync(userToAdd, request.UserRegisterDto.Password);
+            if (!result.Succeeded)
+            {
+                var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
+                return BadRequest<UserReadDto?>(dbErrorMessages);
+            }
+            await _userManager.AddToRoleAsync(userToAdd, "Customer");
+            var userFromDb = await _userService.GetUserByEmailAsync(request.UserRegisterDto.Email);
+            return Created(_mapper.Map<UserReadDto>(userFromDb));
+
+        }
+        #endregion
+
+        #region Sign In User Command Handler
+        public async Task<Response<TokenResponseDto>> Handle(SignInUserCommand request, CancellationToken cancellationToken)
+        {
+            var user = await _userManager.FindByEmailAsync(request.UserSignInDto.Email);
+
+            if (user == null)
+            {
+                return BadRequest<TokenResponseDto>("Incorrect email or password.");
+            }
+
+            var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.UserSignInDto.Password, false);
+
+            if (!signInResult.Succeeded)
+            {
+                return BadRequest<TokenResponseDto>("Incorrect email or password");
+            }
+            var oldToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+            if (oldToken != null)
+            {
+                oldToken.IsRevoked = true;
+                await _refreshTokenService.SaveChangesAsync();
+            }
+            var accessToken = await _authenticationService.GenerateJWTTokenAsync(user);
+            var refreshToken = _authenticationService.GenerateRefreshToken();
+            await _refreshTokenService.SaveRefreshTokenAsync(refreshToken, user);
+            return Success(new TokenResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
+        }
+        #endregion
+
+        #region Sign Out User Command Handler
+        public async Task<Response<string>> Handle(SignOutUserCommand request, CancellationToken cancellationToken)
+        {
+            var stored = await _refreshTokenService.GetStoredTokenAsync(request.refreshToken);
+            if (stored != null)
+            {
+                stored.IsRevoked = true;
+                await _refreshTokenService.SaveChangesAsync();
+            }
+            else
+            {
+                // ToDo
+                // track suspicious activity here
+                // for example:
+                // _logger.LogWarning("Unknown or already revoked refresh token during logout.");
+
+            }
+
+            return Success("Signed out");
+        }
+        #endregion
+    }
+}

@@ -34,12 +34,13 @@ namespace Eskon.Service.Services
 
         public async Task<string> GenerateJWTTokenAsync(User user)
         {
+            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
             var claims = await GetClaims(user);
             var jwtToken = new JwtSecurityToken(
                 _jwtSettings.Issuer,
                 _jwtSettings.Audience,
                 claims,
-                expires: DateTime.Now.AddMinutes(8),
+                expires: isAdmin? DateTime.Now.AddMinutes(2) : DateTime.Now.AddMinutes(8),
                 signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)), SecurityAlgorithms.HmacSha256Signature));
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }

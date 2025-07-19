@@ -2,7 +2,7 @@
 using Eskon.Domian.DTOs.User;
 using MediatR;
 
-namespace Eskon.Core.Features.UserFeatures.Utilities
+namespace Eskon.Core.Features.UserRolesFeatures.Utilities
 {
     public record GetRefreshToken(string token) : IRequest<Response<TokenResponseDto>>;
 }
