@@ -15,6 +15,8 @@ namespace Eskon.Service
             services.AddTransient<IAuthenticationService, AuthenticationService>();
             services.AddTransient<IPaymentService, PaymentService>();
             services.AddTransient<IFavouriteService, FavouriteService>();
+            services.AddTransient<IPropertyService, PropertyService>();
+            services.AddTransient<IPropertyTypeService, PropertyTypeService>();
             services.AddTransient<IReviewService, ReviewService>();
 
             //Authentication
