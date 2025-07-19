@@ -2,6 +2,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 
 namespace Eskon.API.Base
 {
@@ -33,6 +35,13 @@ namespace Eskon.API.Base
                 default:
                     return new BadRequestObjectResult(response);
             }
+        }
+
+        protected Guid GetUserIdFromAuthenticatedUserToken()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = Guid.Parse(userIdClaim.Value);
+            return userId;
         }
     }
 }

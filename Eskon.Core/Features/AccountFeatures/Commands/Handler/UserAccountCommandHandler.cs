@@ -16,7 +16,6 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
         , IRequestHandler<SignOutUserCommand, Response<string>>
     {
         #region Fields
-        private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IAuthenticationService _authenticationService;
         private readonly IRefreshTokenService _refreshTokenService;
@@ -26,9 +25,8 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
         #endregion
 
         #region Constructors
-        public UserAccountCommandHandler(IUserService userService, IMapper mapper, IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager, IRefreshTokenService refreshTokenService)
+        public UserAccountCommandHandler(IMapper mapper, IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager, IRefreshTokenService refreshTokenService)
         {
-            _userService = userService;
             _mapper = mapper;
             _authenticationService = authenticationService;
             _refreshTokenService = refreshTokenService;
@@ -58,7 +56,8 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
                 return BadRequest<UserReadDto?>(dbErrorMessages);
             }
             await _userManager.AddToRoleAsync(userToAdd, "Customer");
-            var userFromDb = await _userService.GetUserByEmailAsync(request.UserRegisterDto.Email);
+            //var userFromDb = await _userService.GetUserByEmailAsync(request.UserRegisterDto.Email);
+            var userFromDb = await _userManager.FindByEmailAsync(request.UserRegisterDto.Email);
             return Created(_mapper.Map<UserReadDto>(userFromDb));
 
         }
@@ -86,7 +85,10 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
                 oldToken.IsRevoked = true;
                 await _refreshTokenService.SaveChangesAsync();
             }
-            var accessToken = await _authenticationService.GenerateJWTTokenAsync(user);
+            var userManagerClaims = await _userManager.GetClaimsAsync(user);
+            var userManagerRoles = await _userManager.GetRolesAsync(user);
+
+            var accessToken = _authenticationService.GenerateJWTTokenAsync(user, userManagerRoles, userManagerClaims);
             var refreshToken = _authenticationService.GenerateRefreshToken();
             await _refreshTokenService.SaveRefreshTokenAsync(refreshToken, user);
             return Success(new TokenResponseDto

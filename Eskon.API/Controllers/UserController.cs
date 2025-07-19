@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.API.Base;
-using Microsoft.AspNetCore.Authorization;
+using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
+using Eskon.Domian.Entities.Identity;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Eskon.API.Controllers
 {
@@ -40,21 +42,13 @@ namespace Eskon.API.Controllers
             return NewResult(response);
         }
 
-        [Authorize(Roles = "Customer, Admin")]
+        [Authorize(Roles = "Customer")]
         // Id of the user to be added to Owner Role
-        [HttpPut("/User/AddOwner/{UserToBeOwnerId:guid}")]
-        public async Task<IActionResult> AddOwnerRole([FromRoute] Guid UserToBeOwnerId)
+        [HttpPut("/User/AddOwner/")]
+        public async Task<IActionResult> AddOwnerRole()
         {
+            Guid UserToBeOwnerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddOwnerRoleToUserCommand(UserToBeOwnerId));
-            return NewResult(response);
-        }
-
-        [Authorize(Roles = "Admin")]
-        // Id of the user to be removed from Owner Role
-        [HttpPut("/User/RemoveOwner/{UserToRemoveOwnerId:guid}")] 
-        public async Task<IActionResult> DeleteOwnerRole([FromRoute] Guid UserToRemoveOwnerId)
-        {
-            var response = await Mediator.Send(new DeleteOwnerRoleFromUserCommand(UserToRemoveOwnerId));
             return NewResult(response);
         }
 

@@ -14,52 +14,51 @@ namespace Eskon.Service.Services
     {
         #region Fields
         private readonly JwtSettings _jwtSettings;
-        private readonly UserManager<User> _userManager;
         private readonly ConcurrentDictionary<string, UserRefreshToken> _UserRefreshToken;
         #endregion
 
         #region Constructors
-        public AuthenticationService(JwtSettings jwtSettings,
-                                     UserManager<User> userManager)
+        public AuthenticationService(JwtSettings jwtSettings)
         {
             _jwtSettings = jwtSettings;
-            _userManager = userManager;
             _UserRefreshToken = new ConcurrentDictionary<string, UserRefreshToken>();
         }
-
-
         #endregion
 
         #region Methods     
-
-        public async Task<string> GenerateJWTTokenAsync(User user)
+        public string GenerateJWTTokenAsync(User user ,IList<string> userManagerRoles, IList<Claim> userManagerClaims)
         {
-            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
-            var claims = await GetClaims(user);
+            var userAllClaims = GeneratedAllUserClaims(user, userManagerRoles, userManagerClaims);
+            bool isAdmin = false;
+            foreach (var role in userManagerRoles)
+            {
+                if(role == "Admin")
+                {
+                    isAdmin = true;
+                }
+            }
+
             var jwtToken = new JwtSecurityToken(
                 _jwtSettings.Issuer,
                 _jwtSettings.Audience,
-                claims,
-                expires: isAdmin? DateTime.Now.AddMinutes(2) : DateTime.Now.AddMinutes(8),
+                userAllClaims,
+                expires: isAdmin ? DateTime.Now.AddMinutes(2) : DateTime.Now.AddMinutes(8),
                 signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)), SecurityAlgorithms.HmacSha256Signature));
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
-
-        public async Task<List<Claim>> GetClaims(User user)
+        private List<Claim> GeneratedAllUserClaims(User user, IList<string> userManagerRoles, IList<Claim> userManagerClaims)
         {
-            var roles = await _userManager.GetRolesAsync(user);
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.UserName)
             };
-            foreach (var role in roles)
+            foreach (var role in userManagerRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            claims.AddRange(userClaims);
+            claims.AddRange(userManagerClaims);
             return claims;
         }
 
@@ -67,8 +66,6 @@ namespace Eskon.Service.Services
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
-
-
         #endregion
 
     }

@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Eskon.Core.Features.UserRolesFeatures.Utilities
 {
-    public record GetRefreshToken(string token) : IRequest<Response<TokenResponseDto>>;
+    public record GetNewAccessToken(string RefreshToken) : IRequest<Response<TokenResponseDto>>;
 }

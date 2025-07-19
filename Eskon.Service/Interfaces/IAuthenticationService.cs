@@ -5,10 +5,7 @@ namespace Eskon.Service.Interfaces
 {
     public interface IAuthenticationService
     {
-        public Task<string> GenerateJWTTokenAsync(User user);
-
-        public Task<List<Claim>> GetClaims(User user);
-
+        public string GenerateJWTTokenAsync(User user, IList<string> userManagerRoles, IList<Claim> userManagerClaims);
         public string GenerateRefreshToken();
 
     }

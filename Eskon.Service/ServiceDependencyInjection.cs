@@ -15,15 +15,14 @@ namespace Eskon.Service
     {
         public static IServiceCollection InjectingServiceDependencies(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<IUserService, UserService>();
             services.AddTransient<IBookingService, BookingService>();
             services.AddTransient<IAuthenticationService, AuthenticationService>();
 
-            services.AddTransient<IRefreshTokenService, RefreshTokenService>();
             services.AddTransient<IFavouriteService, FavouriteService>();
             services.AddTransient<IReviewService, ReviewService>();
 
-
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             var jwtSettings = new JwtSettings();
             configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
             services.AddSingleton(jwtSettings);

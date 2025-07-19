@@ -52,7 +52,7 @@ namespace Eskon.API.Controllers
         [HttpPost("/Account/Refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
         {
-            return NewResult(await Mediator.Send(new GetRefreshToken(refreshToken)));
+            return NewResult(await Mediator.Send(new GetNewAccessToken(refreshToken)));
         }
         #endregion
     }
