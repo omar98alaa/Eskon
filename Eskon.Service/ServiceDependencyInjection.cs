@@ -16,6 +16,7 @@ namespace Eskon.Service
             services.AddTransient<IFavouriteService, FavouriteService>();
             services.AddTransient<IPropertyService, PropertyService>();
             services.AddTransient<IPropertyTypeService, PropertyTypeService>();
+            services.AddTransient<IReviewService, ReviewService>();
 
             //Authentication
             var jwtSettings = new JwtSettings();

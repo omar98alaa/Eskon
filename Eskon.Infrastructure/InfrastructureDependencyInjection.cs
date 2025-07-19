@@ -15,6 +15,7 @@ namespace Eskon.Infrastructure
             services.AddTransient<IPropertyRepository, PropertyRepository>();
             services.AddTransient<IPropertyTypeRepository, PropertyTypeRepository>();
             services.AddTransient<IFavouriteRepository, FavouriteRepository>();
+            services.AddTransient<IReviewRepository, ReviewRepository>();
 
             return services;
         }
