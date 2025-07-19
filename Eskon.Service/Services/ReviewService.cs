@@ -1,26 +1,18 @@
 ﻿using Azure;
-using Eskon.Domian.DTOs.Review;
-using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
-using Eskon.Infrastructure.Repositories;
 using Eskon.Service.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Service.Services
 {
     class ReviewService : IReviewService
     {
         #region Fields
-        private readonly IReviewReposatory _reviewRepository;
+        private readonly IReviewRepository _reviewRepository;
         #endregion
 
         #region Constructors
-        public ReviewService(IReviewReposatory reviewRepository)
+        public ReviewService(IReviewRepository reviewRepository)
         {
             _reviewRepository = reviewRepository;
         }

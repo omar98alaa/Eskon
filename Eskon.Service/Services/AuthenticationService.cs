@@ -1,10 +1,13 @@
 ﻿using Eskon.Domian.Entities.Identity;
-using Eskon.Infrastructure.Context;
 using Eskon.Service.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Concurrent;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Eskon.Service.Services
@@ -13,58 +16,50 @@ namespace Eskon.Service.Services
     {
         #region Fields
         private readonly JwtSettings _jwtSettings;
-        private readonly UserManager<User> _userManager;
-        #endregion 
-
-        #region Constructors
-        public AuthenticationService(JwtSettings jwtSettings,
-                                     UserManager<User> userManager,
-                                     MyDbContext myDbContext)
-        {
-            _jwtSettings = jwtSettings;
-            _userManager = userManager;
-        }
-
-
+        private readonly ConcurrentDictionary<string, UserRefreshToken> _UserRefreshToken;
         #endregion
 
-        #region
-        public async Task<string> GetJWTToken(User user)
+        #region Constructors
+        public AuthenticationService(JwtSettings jwtSettings)
         {
-            var (jwtToken, accessToken) = await GenerateJWTToken(user);
-
-            return accessToken;
+            _jwtSettings = jwtSettings;
+            _UserRefreshToken = new ConcurrentDictionary<string, UserRefreshToken>();
         }
+        #endregion
 
-        public async Task<(JwtSecurityToken, string)> GenerateJWTToken(User user)
+        #region Methods     
+        public string GenerateJWTTokenAsync(User user ,IList<string> userManagerRoles, IList<Claim> userManagerClaims)
         {
-            var claims = await GetClaims(user);
+            var userAllClaims = GeneratedAllUserClaims(user, userManagerRoles, userManagerClaims);
+            bool isAdmin = userManagerRoles.Contains("Admin");
+
             var jwtToken = new JwtSecurityToken(
                 _jwtSettings.Issuer,
                 _jwtSettings.Audience,
-                claims,
-                expires: DateTime.Now.AddDays(2),
+                userAllClaims,
+                expires: isAdmin ? DateTime.Now.AddMinutes(2) : DateTime.Now.AddMinutes(8),
                 signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)), SecurityAlgorithms.HmacSha256Signature));
-            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-            return (jwtToken, accessToken);
+            return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
-
-        public async Task<List<Claim>> GetClaims(User user)
+        private List<Claim> GeneratedAllUserClaims(User user, IList<string> userManagerRoles, IList<Claim> userManagerClaims)
         {
-            var roles = await _userManager.GetRolesAsync(user);
             var claims = new List<Claim>()
             {
-                new Claim("Username",user.UserName),
-                new Claim("Email",user.Email),
-                new Claim("UserId", user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.UserName)
             };
-            foreach (var role in roles)
+            foreach (var role in userManagerRoles)
             {
-                claims.Add(new Claim("Roles", role));
+                claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            claims.AddRange(userClaims);
+            claims.AddRange(userManagerClaims);
             return claims;
+        }
+
+        public string GenerateRefreshToken()
+        {
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
         #endregion
 

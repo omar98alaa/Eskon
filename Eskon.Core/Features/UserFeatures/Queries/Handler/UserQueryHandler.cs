@@ -10,7 +10,7 @@ namespace Eskon.Core.Features.UserFeatures.Queries.Handler
 {
     public class UserQueryHandler : ResponseHandler,
                                     IRequestHandler<GetAllUsersQuery, Response<List<UserReadDto>>>,
-                                        IRequestHandler<GetUserByIdQuery, Response<User>>
+                                    IRequestHandler<GetUserByIdQuery, Response<User>>
     {
         #region Fields
         private readonly IUserService _userService;

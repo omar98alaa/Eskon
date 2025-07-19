@@ -21,7 +21,7 @@ namespace Eskon.Infrastructure.Repositories
         #endregion
 
         #region Constructors
-        public ReviewReposatory(MyDbContext myDbContext) : base(myDbContext)
+        public ReviewRepository(MyDbContext myDbContext) : base(myDbContext)
         {
             _reviewDbSet = myDbContext.Set<Review>();
         }
