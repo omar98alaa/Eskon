@@ -11,18 +11,16 @@ namespace Eskon.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddEndpointsApiExplorer();
-
             builder.Services.AddDbContext<MyDbContext>(op => op.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("dev")));
+            builder.Services.Configure<IdentitySeeder>(builder.Configuration.GetSection("IdentitySettings"));
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
@@ -36,12 +34,25 @@ namespace Eskon.API
 
             // Injecting Dependencies
             builder.Services.InjectingInfrastructureDependencies();
-            builder.Services.InjectingServiceDependencies();
+            builder.Services.InjectingServiceDependencies(builder.Configuration);
             builder.Services.InjectingCoreDependencies();
-
-            builder.Services.AddIdentity<User, IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<MyDbContext>()
-                .AddDefaultTokenProviders();
+          
+            // Configure Identity Account 
+            builder.Services.AddIdentityApiEndpoints<User>(options =>
+            {
+                options.SignIn.RequireConfirmedEmail = false;
+                options.User.RequireUniqueEmail = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                //options.Lockout.MaxFailedAccessAttempts = 5;
+                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(2);
+            })
+             .AddRoles<IdentityRole<Guid>>()
+             .AddEntityFrameworkStores<MyDbContext>()
+             .AddDefaultTokenProviders();
 
             var app = builder.Build();
 
@@ -51,6 +62,14 @@ namespace Eskon.API
                 app.MapOpenApi();
                 app.UseSwaggerUI(op => op.SwaggerEndpoint("/openapi/v1.json", "v1"));
             }
+
+            // Seeding the Identity Roles at the Program Start
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                await IdentitySeeder.SeedRolesAsync(roleManager);
+            }
+
 
             app.UseHttpsRedirection();
 
