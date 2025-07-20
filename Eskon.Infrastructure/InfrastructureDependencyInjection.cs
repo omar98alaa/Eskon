@@ -9,6 +9,9 @@ namespace Eskon.Infrastructure
         {
             services.AddScoped<IRepositoryUnitOfWork, RepositoryUnitOfWork>();
 
+            services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepositroy>();
+
             return services;
         }
     }
