@@ -20,7 +20,6 @@ namespace Eskon.Infrastructure.Generics
         Task SoftDeleteAsync(T entity);
         Task DeleteRangeAsync(ICollection<T> entities);
         Task SoftDeleteRangeAsync(ICollection<T> entities);
-        Task<int> SaveChangesAsync();
         IDbContextTransaction BeginTransaction();
         void Commit();
         void RollBack();

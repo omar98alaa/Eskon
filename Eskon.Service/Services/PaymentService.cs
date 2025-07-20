@@ -35,10 +35,5 @@ namespace Eskon.Service.Services
             payment.IsSuccessful = true;
             await _paymentRepository.UpdateAsync(payment);
         }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _paymentRepository.SaveChangesAsync();   
-        }
     }
 }

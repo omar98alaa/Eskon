@@ -2,27 +2,25 @@
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
-using Eskon.Service.Interfaces;
+using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 
 
 namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
 {
-    public class UserRolesCommandHandler : ResponseHandler , IUserRolesCommandHandler
+    public class UserRolesCommandHandler : ResponseHandler, IUserRolesCommandHandler
 
     {
         #region Fields
-        private readonly IAuthenticationService _authenticationService;
-        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         #endregion
 
         #region Constructors
-        public UserRolesCommandHandler(IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager, IRefreshTokenService refreshTokenService)
+        public UserRolesCommandHandler(IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager)
         {
-            _authenticationService = authenticationService;
-            _refreshTokenService = refreshTokenService;
+            _serviceUnitOfWork = serviceUnitOfWork;
             _userManager = userManager;
             _roleManager = roleManager;
         }
@@ -47,9 +45,9 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
             var userManagerClaims = await _userManager.GetClaimsAsync(user);
             var userManagerRoles = await _userManager.GetRolesAsync(user);
 
-            var newAccessToken = _authenticationService.GenerateJWTTokenAsync(user, userManagerRoles, userManagerClaims);
+            var newAccessToken = _serviceUnitOfWork.AuthenticationService.GenerateJWTTokenAsync(user, userManagerRoles, userManagerClaims);
 
-            var existingRefreshToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+            var existingRefreshToken = await _serviceUnitOfWork.RefreshTokenService.GetTokenByUserIdAsync(user.Id);
 
             var tokenResponse = new TokenResponseDto
             {

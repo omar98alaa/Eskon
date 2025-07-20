@@ -41,9 +41,5 @@ namespace Eskon.Service.Services
         {
             await _ticketRepository.DeleteAsync(ticket);
         }
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _ticketRepository.SaveChangesAsync();
-        }
     }
 }

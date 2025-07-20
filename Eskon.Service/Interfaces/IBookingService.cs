@@ -33,7 +33,6 @@ namespace Eskon.Service.Interfaces
         public Task SoftRemoveBookingAsync(Booking booking);
         public Task RemoveBookingAsync(Booking booking);
         #endregion
-
-        public Task<int> SaveChangesAsync();
     }
+
 }

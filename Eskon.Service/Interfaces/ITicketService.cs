@@ -1,9 +1,4 @@
 ﻿using Eskon.Domian.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Eskon.Service.Interfaces
@@ -16,8 +11,5 @@ namespace Eskon.Service.Interfaces
         Task<Ticket> CreateTicket(Ticket ticket);
         Task EditTicket(Ticket ticket);
         Task DeleteTicket(Ticket ticket);
-        Task<int> SaveChangesAsync();
-
-
     }
 }
