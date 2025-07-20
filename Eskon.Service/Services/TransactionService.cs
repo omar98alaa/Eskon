@@ -41,11 +41,6 @@ namespace Eskon.Service.Services
         {
             return await _transactionRepository.AddAsync(transaction);
         }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _transactionRepository.SaveChangesAsync();
-        }
         #endregion
     }
 }

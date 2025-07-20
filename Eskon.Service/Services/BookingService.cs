@@ -122,10 +122,5 @@ namespace Eskon.Service.Services
             var now = new DateOnly();
             return await _bookingRepository.GetFilteredAsync(b => b.PropertyId == propertyId && b.StartDate > now && b.IsPayed);
         }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _bookingRepository.SaveChangesAsync();
-        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.Models;
+﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -8,17 +6,18 @@ namespace Eskon.Service.Services
 {
     class PropertyService : IPropertyService
     {
-        private readonly IPropertyRepository propertyRepository ;
-        public PropertyService(IPropertyRepository PropertyRepo) {
+        private readonly IPropertyRepository propertyRepository;
+        public PropertyService(IPropertyRepository PropertyRepo)
+        {
 
-            propertyRepository = PropertyRepo ;
+            propertyRepository = PropertyRepo;
         }
         public async Task<Property> AddPropertyAsync(Property property)
         {
             return await propertyRepository.AddAsync(property);
         }
 
-        public async Task SetAverageRatingAsync(Property property,decimal AverageRating)
+        public async Task SetAverageRatingAsync(Property property, decimal AverageRating)
         {
             property.AverageRating = AverageRating;
             await propertyRepository.UpdateAsync(property);
@@ -31,7 +30,7 @@ namespace Eskon.Service.Services
 
         public async Task<List<Property>> GetPendingPropertiesAsync(Guid AdminId)
         {
-            return await propertyRepository.GetFilteredAsync(x => x.AssignedAdminId == AdminId && x.IsPending==true);
+            return await propertyRepository.GetFilteredAsync(x => x.AssignedAdminId == AdminId && x.IsPending == true);
         }
 
         public async Task<List<Property>> GetPropertiesbyCityandCountryAsync(string City, string Country)
@@ -59,13 +58,6 @@ namespace Eskon.Service.Services
             return await propertyRepository.GetFilteredAsync(x => x.AverageRating == Rating);
         }
 
-
-        public async Task<int> SaveChangesAsync()
-        {
-           return await propertyRepository.SaveChangesAsync();
-        }
-
-
         public async Task RemovePropertyAsync(Property property)
         {
             await propertyRepository.SoftDeleteAsync(property);
@@ -81,7 +73,7 @@ namespace Eskon.Service.Services
 
         public async Task SetPropertySuspensionStateAsync(Property property, bool value)
         {
-             property.IsSuspended = value;
+            property.IsSuspended = value;
             await propertyRepository.UpdateAsync(property);
         }
 
@@ -92,10 +84,35 @@ namespace Eskon.Service.Services
 
         public async Task SetRejectionMessageAsync(Property property, string RejectionMessage)
         {
-            property.RejectionMessage= RejectionMessage;
+            property.RejectionMessage = RejectionMessage;
             property.IsPending = false;
-            property.IsAccepted= false;
+            property.IsAccepted = false;
             await propertyRepository.UpdateAsync(property);
+        }
+
+        public Task<List<Property>> GetActivePropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Property>> GetPendingPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Property>> GetSuspendedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Property>> GetRejectedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Property>> GetAssignedPendingPropertiesAsync(Guid adminId, int pageNum, int itemsPerPage)
+        {
+            throw new NotImplementedException();
         }
     }
 }

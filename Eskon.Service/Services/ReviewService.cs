@@ -1,5 +1,4 @@
-﻿using Azure;
-using Eskon.Domian.Models;
+﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -38,7 +37,7 @@ namespace Eskon.Service.Services
 
 
         public async Task UpdatePropertyReviewAsync(Review review)
-        { 
+        {
             review.UpdatedAt = DateTime.UtcNow;
             await _reviewRepository.UpdateAsync(review);
         }
@@ -46,14 +45,7 @@ namespace Eskon.Service.Services
 
         public async Task DeletePropertyReviewAsync(Review review)
         {
-             await _reviewRepository.DeleteAsync(review);
-        }
-
-
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _reviewRepository.SaveChangesAsync();
+            await _reviewRepository.DeleteAsync(review);
         }
 
         #endregion

@@ -5,9 +5,9 @@ namespace Eskon.Service.Interfaces
 {
     public interface IRefreshTokenService
     {
-        public Task SaveRefreshTokenAsync(string token, IdentityUser<Guid> user);
+        public Task AddNewRefreshTokenForUserAsync(UserRefreshToken userRefreshToken);
+        public Task RemoveNonRevokedRefreshTokensForUser(User user);
         public Task<UserRefreshToken?> GetStoredTokenAsync(string refreshToken);
         public Task<UserRefreshToken?> GetTokenByUserIdAsync(Guid userId);
-        public Task<int> SaveChangesAsync();
     }
 }

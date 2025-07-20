@@ -34,10 +34,5 @@ namespace Eskon.Service.Services
         {
             await _favouriteRepository.DeleteAsync(favourite);
         }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _favouriteRepository.SaveChangesAsync();   
-        }
     }
 }
