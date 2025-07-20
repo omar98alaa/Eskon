@@ -17,14 +17,4 @@
     <ProjectReference Include="..\Eskon.Service\Eskon.Service.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\TransactionFeatures\Commands\Command\" />
-    <Folder Include="Features\TransactionFeatures\Commands\Handler\" />
-    <Folder Include="Features\TransactionFeatures\Queries\Handler\" />
-    <Folder Include="Features\TransactionFeatures\Queries\Query\" />
-    <Folder Include="Features\UserFeatures\Commands\" />
-    <Folder Include="Features\UserRolesFeatures\Queries\Handler\" />
-    <Folder Include="Features\UserRolesFeatures\Queries\Query\" />
-  </ItemGroup>
-
 </Project>
