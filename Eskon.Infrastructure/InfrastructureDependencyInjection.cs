@@ -20,6 +20,9 @@ namespace Eskon.Infrastructure
             services.AddTransient<IFavouriteRepository, FavouriteRepository>();
             services.AddTransient<IReviewRepository, ReviewRepository>();
 
+            services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepositroy>();
+
             return services;
         }
     }

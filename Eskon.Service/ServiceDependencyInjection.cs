@@ -27,6 +27,10 @@ namespace Eskon.Service
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+
+            services.AddScoped<INotificationTypeService, NotificationTypeService>();
+            services.AddScoped<INotificationService, NotificationService>();
+
             var jwtSettings = new JwtSettings();
             configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
             services.AddSingleton(jwtSettings);
