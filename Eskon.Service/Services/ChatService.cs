@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -20,19 +21,19 @@ namespace Eskon.Service.Services
 
         public async Task<Chat?> GetChatByIdAsync(Guid chatId)
         {
-          return await  _chatRepository.GetByIdAsync(chatId);
+            return await _chatRepository.GetByIdAsync(chatId);
         }
 
-        public async Task<List<Chat>> GetUserChatsAsync(Guid userId)
+        public async Task<List<Chat>> GetAllUserChatsAsync(User user)
         {
-          return await  _chatRepository.GetChatsForUserAsync(userId);
+            return await _chatRepository.GetChatsForUserAsync(user.Id);
         }
 
-        public async Task<bool> ChatExistsAsync(Guid user1Id, Guid user2Id)
+        public async Task<bool> ChatExistsAsync(User user1, User user2)
         {
-             return await _chatRepository.ChatExistsAsync(user1Id, user2Id);
+            return await _chatRepository.ChatExistsAsync(user1.Id, user2.Id);
         }
-           
+
     }
 
 }

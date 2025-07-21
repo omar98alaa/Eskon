@@ -1,11 +1,6 @@
 ﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Service.Services
 {
@@ -20,17 +15,26 @@ namespace Eskon.Service.Services
 
         public async Task<ChatMessage> AddMessageAsync(ChatMessage chatMessage)
         {
-            return  await _chatMessageRepository.AddAsync(chatMessage);
+            return await _chatMessageRepository.AddAsync(chatMessage);
         }
 
-        public async Task<List<ChatMessage>> GetMessagesAsync(Guid chatId)
+        public async Task<List<ChatMessage>> GetMessagesPerChatAsync(Chat chat)
         {
-           return await _chatMessageRepository.GetFilteredAsync(c=>c.ChatId==chatId);
+            return await _chatMessageRepository.GetFilteredAsync(c => c.ChatId == chat.Id);
         }
 
         public async Task<ChatMessage?> GetMessageByIdAsync(Guid messageId)
         {
-           return await _chatMessageRepository.GetByIdAsync(messageId);
+            return await _chatMessageRepository.GetByIdAsync(messageId);
+        }
+
+        public async Task UpdateMessageAsync(ChatMessage chatMessage)
+        {
+            await _chatMessageRepository.UpdateAsync(chatMessage);
+        }
+        public async Task DeleteMessageAsync(ChatMessage chatMessage)
+        {
+            await _chatMessageRepository.SoftDeleteAsync(chatMessage);
         }
     }
 

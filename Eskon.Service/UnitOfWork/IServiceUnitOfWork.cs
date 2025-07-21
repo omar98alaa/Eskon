@@ -7,6 +7,8 @@ namespace Eskon.Service.UnitOfWork
         #region Properties
         public IAuthenticationService AuthenticationService { get; }
         public IBookingService BookingService { get; }
+        public IChatService ChatService { get; }
+        public IChatMessagesService ChatMessagesService { get; }
         public IFavouriteService FavouriteService { get; }
         public IPaymentService PaymentService { get; }
         public IPropertyService PropertyService { get; }
