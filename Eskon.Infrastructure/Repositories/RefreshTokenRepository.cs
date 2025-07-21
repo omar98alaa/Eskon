@@ -21,21 +21,15 @@ namespace Eskon.Infrastructure.Repositories
         #endregion
 
         #region Actions
-        public async Task SaveRefreshTokenAsync(string token, IdentityUser<Guid> user)
+        public async Task AddRefreshTokenAsync(UserRefreshToken userRefreshToken)
         {
-            var userRefreshToken = new UserRefreshToken
-            {
-                RefreshToken = token,
-                ExpiresAt = DateTime.UtcNow.AddDays(7),
-                UserId = user.Id
-            };
-
-            var oldTokens = _refreshTokensDbSet
-                .Where(t => t.UserId == user.Id && !t.IsRevoked);
-            _refreshTokensDbSet.RemoveRange(oldTokens);
-
             _refreshTokensDbSet.Add(userRefreshToken);
-            await SaveChangesAsync();
+        }
+
+        public async Task RemoveNonRevokedRefreshTokensByUserId(Guid userId)
+        {
+            var oldTokens = _refreshTokensDbSet.Where(t => t.UserId == userId && !t.IsRevoked);
+            _refreshTokensDbSet.RemoveRange(oldTokens);
         }
 
         public async Task<UserRefreshToken?> GetStoredTokenAsync(string refreshToken)

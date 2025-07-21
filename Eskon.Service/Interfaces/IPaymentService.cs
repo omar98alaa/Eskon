@@ -18,6 +18,5 @@ namespace Eskon.Service.Interfaces
         
         #endregion
 
-        public Task<int> SaveChangesAsync();
     }
 }

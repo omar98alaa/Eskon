@@ -3,33 +3,27 @@ using Eskon.Core.Features.AccountFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
-using Eskon.Service.Interfaces;
-using MediatR;
+using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
 {
-    public class UserAccountCommandHandler : ResponseHandler, 
-        IRequestHandler<AddUserAccountCommand, Response<UserReadDto>>
-        , IRequestHandler<SignInUserCommand, Response<TokenResponseDto>>
-        , IRequestHandler<SignOutUserCommand, Response<string>>
+    public class UserAccountCommandHandler : ResponseHandler, IUserAccountCommandHandler
     {
         #region Fields
         private readonly IMapper _mapper;
-        private readonly IAuthenticationService _authenticationService;
-        private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         private readonly SignInManager<User> _signInManager;
         #endregion
 
         #region Constructors
-        public UserAccountCommandHandler(IMapper mapper, IAuthenticationService authenticationService, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager, IRefreshTokenService refreshTokenService)
+        public UserAccountCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager)
         {
             _mapper = mapper;
-            _authenticationService = authenticationService;
-            _refreshTokenService = refreshTokenService;
+            _serviceUnitOfWork = serviceUnitOfWork;
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
@@ -79,18 +73,29 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
             {
                 return BadRequest<TokenResponseDto>("Incorrect email or password");
             }
-            var oldToken = await _refreshTokenService.GetTokenByUserIdAsync(user.Id);
+            var oldToken = await _serviceUnitOfWork.RefreshTokenService.GetTokenByUserIdAsync(user.Id);
             if (oldToken != null)
             {
                 oldToken.IsRevoked = true;
-                await _refreshTokenService.SaveChangesAsync();
+                //await _serviceUnitOfWork.RefreshTokenService.SaveChangesAsync();
             }
             var userManagerClaims = await _userManager.GetClaimsAsync(user);
             var userManagerRoles = await _userManager.GetRolesAsync(user);
 
-            var accessToken = _authenticationService.GenerateJWTTokenAsync(user, userManagerRoles, userManagerClaims);
-            var refreshToken = _authenticationService.GenerateRefreshToken();
-            await _refreshTokenService.SaveRefreshTokenAsync(refreshToken, user);
+            var accessToken = _serviceUnitOfWork.AuthenticationService.GenerateJWTTokenAsync(user, userManagerRoles, userManagerClaims);
+
+            var refreshToken = _serviceUnitOfWork.AuthenticationService.GenerateRefreshToken();
+            var userRefreshToken = new UserRefreshToken
+            {
+                RefreshToken = refreshToken,
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                UserId = user.Id
+            };
+
+            await _serviceUnitOfWork.RefreshTokenService.AddNewRefreshTokenForUserAsync(userRefreshToken);
+
+            await _serviceUnitOfWork.SaveChangesAsync();
+
             return Success(new TokenResponseDto
             {
                 AccessToken = accessToken,
@@ -102,11 +107,11 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
         #region Sign Out User Command Handler
         public async Task<Response<string>> Handle(SignOutUserCommand request, CancellationToken cancellationToken)
         {
-            var stored = await _refreshTokenService.GetStoredTokenAsync(request.refreshToken);
+            var stored = await _serviceUnitOfWork.RefreshTokenService.GetStoredTokenAsync(request.refreshToken);
             if (stored != null)
             {
                 stored.IsRevoked = true;
-                await _refreshTokenService.SaveChangesAsync();
+                //await _serviceUnitOfWork.RefreshTokenService.SaveChangesAsync();
             }
             else
             {
@@ -116,6 +121,8 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
                 // _logger.LogWarning("Unknown or already revoked refresh token during logout.");
 
             }
+
+            await _serviceUnitOfWork.SaveChangesAsync();
 
             return Success("Signed out");
         }

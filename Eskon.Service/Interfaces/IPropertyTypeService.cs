@@ -7,12 +7,11 @@ using Eskon.Domian.Models;
 
 namespace Eskon.Service.Interfaces
 {
-    interface IPropertyTypeService
+    public interface IPropertyTypeService
     {
         public Task<List<PropertyType>> GetPropertyTypesAsync();
         public Task<PropertyType> AddPropertyType(PropertyType PropertyType);
         public Task UpdatePropertyType(PropertyType propertyType);
         public Task RemovePropertyAsync(PropertyType property);
-        public Task<int> SaveChangesAsync();
     }
 }

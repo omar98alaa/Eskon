@@ -17,6 +17,7 @@ namespace Eskon.Service.Interfaces
         public Task RemoveFavouriteAsync(Favourite favourite);
         #endregion
 
-        public Task<int> SaveChangesAsync();
     }
+
+
 }

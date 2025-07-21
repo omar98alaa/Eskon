@@ -1,26 +1,23 @@
 ﻿using AutoMapper;
-using MediatR;
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
-using Eskon.Service.Interfaces;
+using Eskon.Service.UnitOfWork;
 
 namespace Eskon.Core.Features.UserFeatures.Queries.Handler
 {
-    public class UserQueryHandler : ResponseHandler,
-                                    IRequestHandler<GetAllUsersQuery, Response<List<UserReadDto>>>,
-                                    IRequestHandler<GetUserByIdQuery, Response<User>>
+    public class UserQueryHandler : ResponseHandler, IUserQueryHandler
     {
         #region Fields
-        private readonly IUserService _userService;
+        private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly IMapper _mapper;
         #endregion
 
         #region Constructors
-        public UserQueryHandler(IUserService userService, IMapper mapper)
+        public UserQueryHandler(IServiceUnitOfWork serviceUnitOfWork, IMapper mapper)
         {
-            _userService = userService;
+            _serviceUnitOfWork = serviceUnitOfWork;
             _mapper = mapper;
         }
         #endregion
@@ -28,14 +25,14 @@ namespace Eskon.Core.Features.UserFeatures.Queries.Handler
         #region Handlers
         public async Task<Response<List<UserReadDto>>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
         {
-            var UsersList = await _userService.GetAllUsersAsync();
+            var UsersList = await _serviceUnitOfWork.UserService.GetAllUsersAsync();
             var UsersListDto = _mapper.Map<List<UserReadDto>>(UsersList);
             return Success(UsersListDto);
         }
 
         public async Task<Response<User>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userService.GetUserByIdAsync(request.id);
+            var user = await _serviceUnitOfWork.UserService.GetUserByIdAsync(request.id);
             if (user == null)
             {
                 return NotFound<User>(message: $"Student with id {request.id} not found");

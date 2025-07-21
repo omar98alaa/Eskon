@@ -125,11 +125,6 @@ namespace Eskon.Infrastructure.Generics
             return _myDbContext.Set<T>().AsNoTracking().AsQueryable();
         }
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _myDbContext.SaveChangesAsync();
-        }
-
         #endregion
     }
 }
