@@ -1,9 +1,8 @@
 ﻿
+using Eskon.Domian.Entities;
+using Eskon.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Eskon.Infrastructure.Context;
-using Eskon.Domian.Models;
-using Eskon.Domian.Entities;
 using System.Linq.Expressions;
 
 namespace Eskon.Infrastructure.Generics
@@ -46,7 +45,7 @@ namespace Eskon.Infrastructure.Generics
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
-            if(filter != null)
+            if (filter != null)
             {
                 query = query.Where(filter);
             }
@@ -123,6 +122,50 @@ namespace Eskon.Infrastructure.Generics
         public IQueryable<T> GetTableNoTracking()
         {
             return _myDbContext.Set<T>().AsNoTracking().AsQueryable();
+        }
+
+        public async Task<List<T>> GetPaginatedAsync(int pageNumber, int ItemsPerPage, Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _myDbContext.Set<T>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            return await query
+                .Skip(pageNumber * ItemsPerPage)
+                .Take(ItemsPerPage)
+                .ToListAsync();
+        }
+
+        public async Task<List<T>> GetPaginatedSortedAsync<TKey>(int pageNumber, int ItemsPerPage, Expression<Func<T, TKey>> sort, bool asc, Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _myDbContext.Set<T>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (asc)
+            {
+                query = query.OrderBy(sort);
+            }
+            else
+            {
+                query = query.OrderByDescending(sort);
+            }
+
+            return await query
+                .Skip(pageNumber * ItemsPerPage)
+                .Take(ItemsPerPage)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCount()
+        {
+            return await _myDbContext.Set<T>().CountAsync();
         }
 
         #endregion
