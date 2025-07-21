@@ -48,6 +48,31 @@ namespace Eskon.Service.Services
             return await propertyRepository.GetFilteredAsync(x => x.OwnerId == OwnerId);
         }
 
+        public async Task<List<Property>> GetActivePropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && p.IsAccepted && !p.IsSuspended);
+        }
+
+        public async Task<List<Property>> GetPendingPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && p.IsPending);
+        }
+
+        public async Task<List<Property>> GetSuspendedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && p.IsSuspended);
+        }
+
+        public async Task<List<Property>> GetRejectedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && !p.IsAccepted && !p.IsPending);
+        }
+
+        public async Task<List<Property>> GetAssignedPendingPropertiesAsync(Guid adminId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.AssignedAdminId == adminId && p.IsPending);
+        }
+
         public async Task<List<Property>> GetPropertiesbyPriceRangAsync(decimal MinPricePerNight, decimal MaxPricePerNight)
         {
             return await propertyRepository.GetFilteredAsync(x => x.PricePerNight >= MinPricePerNight && x.PricePerNight <= MaxPricePerNight);
@@ -88,31 +113,6 @@ namespace Eskon.Service.Services
             property.IsPending = false;
             property.IsAccepted = false;
             await propertyRepository.UpdateAsync(property);
-        }
-
-        public Task<List<Property>> GetActivePropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetPendingPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetSuspendedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetRejectedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetAssignedPendingPropertiesAsync(Guid adminId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
         }
     }
 }
