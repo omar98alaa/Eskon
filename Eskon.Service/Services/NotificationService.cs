@@ -45,7 +45,6 @@ namespace Eskon.Service.Services
         #region Update
         public async Task UpdateNotification(Notification notification)
         {
-            notification.UpdatedAt = DateTime.UtcNow;
             await _notificationRepository.UpdateAsync(notification);
         }
         public void SetNotificationAsReadAsync(Notification notification)
