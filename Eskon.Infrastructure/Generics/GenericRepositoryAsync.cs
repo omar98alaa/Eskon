@@ -154,13 +154,16 @@ namespace Eskon.Infrastructure.Generics
                 query = query.Where(filter);
             }
 
-            if (asc)
+            if (sort != null)
             {
-                query = query.OrderBy(sort);
-            }
-            else
-            {
-                query = query.OrderByDescending(sort);
+                if (asc)
+                {
+                    query = query.OrderBy(sort);
+                }
+                else
+                {
+                    query = query.OrderByDescending(sort);
+                }
             }
 
             pageNumber = Math.Max(pageNumber, 1);

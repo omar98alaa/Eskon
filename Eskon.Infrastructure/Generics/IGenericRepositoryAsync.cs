@@ -14,7 +14,7 @@ namespace Eskon.Infrastructure.Generics
         Task<List<T>> GetFilteredAsync(Expression<Func<T, bool>>? filter = null);
         Task<List<T>> GetPageAsync(int pageNumber = 1, int ItemsPerPage = 10);
         Task<List<T>> GetPaginatedAsync(int pageNumber = 1, int ItemsPerPage = 10, Expression<Func<T, bool>>? filter = null);
-        Task<List<T>> GetPaginatedSortedAsync<TKey>(Expression<Func<T, TKey>> sort, bool asc, int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
+        Task<List<T>> GetPaginatedSortedAsync<TKey>(Expression<Func<T, TKey>> sort, bool asc, int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null);
         Task<int> GetTotalCount();
         Task<T> GetByIdAsync(object id);
         Task DeleteAsync(T entity);
