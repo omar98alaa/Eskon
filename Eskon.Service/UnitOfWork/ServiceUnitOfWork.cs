@@ -40,6 +40,11 @@ namespace Eskon.Service.UnitOfWork
         private ITransactionService transactionService;
 
         private IUserService userService;
+
+        private INotificationTypeService notificationTypeService;
+
+        private INotificationService notificationService;
+
         #endregion
 
         #region Properties
@@ -64,6 +69,10 @@ namespace Eskon.Service.UnitOfWork
         public ITransactionService TransactionService => transactionService == null? new TransactionService(repositoryUnitOfWork.TransactionRepository) : transactionService;
 
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
+        public INotificationTypeService NotificationTypeService => notificationTypeService == null? new NotificationTypeService(repositoryUnitOfWork.NotificationTypeRepository) : notificationTypeService;
+
+        public INotificationService NotificationService => notificationService == null ? new NotificationService(repositoryUnitOfWork.NotificationRepository) : notificationService;
+
         #endregion
 
         #region Constructors

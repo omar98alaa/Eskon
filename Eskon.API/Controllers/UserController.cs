@@ -36,7 +36,7 @@ namespace Eskon.API.Controllers
         }
 
         [HttpGet("/User/{id}")]
-        public async Task<IActionResult> GetStudentById([FromRoute] Guid id)
+        public async Task<IActionResult> GetUserById([FromRoute] Guid id)
         {
             var response = await Mediator.Send(new GetUserByIdQuery(id));
             return NewResult(response);

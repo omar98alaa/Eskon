@@ -21,6 +21,8 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ITicketRepository TicketRepository { get; }
         public ITransactionRepository TransactionRepository { get; }
         public IUserRepository UserRepository { get; }
+        public INotificationTypeRepository NotificationTypeRepository { get; }
+        public INotificationRepository NotificationRepository { get; }
         #endregion
 
         #region Methods
