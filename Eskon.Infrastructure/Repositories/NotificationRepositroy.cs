@@ -1,4 +1,5 @@
 ﻿
+using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
@@ -27,15 +28,22 @@ namespace Eskon.Infrastructure.Repositories
             return await _notificationRepository.Where(n => n.NotificationTypeId == notificationTypeId).ToListAsync();
         }
 
-        public async Task<List<Notification>> GetAllNotificationsForSpecificRecieverIdAsync(Guid recieverId)
+        public async Task<List<Notification>> GetAllNotificationsForSpecificRecieverAsync(User recieverUser)
         {
-            return await _notificationRepository.Where(n => n.ReceiverId == recieverId).ToListAsync();
+            return await _notificationRepository.Where(n => n.ReceiverId == recieverUser.Id).ToListAsync();
         }
 
         public async Task<List<Notification>> GetAllNotificationsForSpecificRedirectionIdAsync(Guid redirectionId)
         {
             return await _notificationRepository.Where(n => n.RedirectionId == redirectionId).ToListAsync();
-        } 
+        }
+
+        #endregion
+        #region Update
+        public void SetNotificationAsReadAsync(Notification notification)
+        {
+            notification.IsRead = true;
+        }
         #endregion
         #endregion
     }

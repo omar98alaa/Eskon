@@ -8,13 +8,6 @@ namespace Eskon.Infrastructure
         public static IServiceCollection InjectingInfrastructureDependencies(this IServiceCollection services)
         {
             services.AddScoped<IRepositoryUnitOfWork, RepositoryUnitOfWork>();
-
-            services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
-            services.AddScoped<INotificationRepository, NotificationRepositroy>();
-
-            services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
-            services.AddScoped<INotificationRepository, NotificationRepositroy>();
-
             return services;
         }
     }

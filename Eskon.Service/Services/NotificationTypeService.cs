@@ -57,17 +57,8 @@ namespace Eskon.Service.Services
         {
             await _notificationTypeRepository.SoftDeleteAsync(notificationType);
         }
-
-        public async Task DeleteNotificationTypeAsync(NotificationType notificationType)
-        {
-            await _notificationTypeRepository.DeleteAsync(notificationType);
-        } 
         #endregion
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _notificationTypeRepository.SaveChangesAsync();
-        }
         #endregion
     }
 }

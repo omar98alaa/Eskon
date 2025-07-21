@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -31,9 +32,9 @@ namespace Eskon.Service.Services
         {
             return await _notificationRepository.GetAllNotificationsForSpecificNotificationTypeIdAsync(notificationTypeId);
         }
-        public async Task<List<Notification>> GetAllNotificationsForSpecificRecieverIdAsync(Guid recieverId)
-        {
-            return await _notificationRepository.GetAllNotificationsForSpecificRecieverIdAsync(recieverId);
+        public async Task<List<Notification>> GetAllNotificationsForSpecificRecieverAsync(User recieverUser)
+        { 
+            return await _notificationRepository.GetAllNotificationsForSpecificRecieverAsync(recieverUser);
         }
         public async Task<List<Notification>> GetAllNotificationsForSpecificRedirectionIdAsync(Guid redirectionId)
         {
@@ -47,24 +48,19 @@ namespace Eskon.Service.Services
             notification.UpdatedAt = DateTime.UtcNow;
             await _notificationRepository.UpdateAsync(notification);
         }
+        public void SetNotificationAsReadAsync(Notification notification)
+        {
+            _notificationRepository.SetNotificationAsReadAsync(notification);
+        }
         #endregion
 
         #region Delete
-        public async Task DeleteNotification(Notification notification)
-        {
-            await _notificationRepository.DeleteAsync(notification);
-        }
-
         public async Task SoftDeleteNotification(Notification notification)
         {
             await _notificationRepository.SoftDeleteAsync(notification);
         }
         #endregion
 
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _notificationRepository.SaveChangesAsync();
-        } 
         #endregion
 
     }

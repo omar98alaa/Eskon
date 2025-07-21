@@ -21,10 +21,7 @@ namespace Eskon.Service.Interfaces
 
         #region Delete
         public Task SoftDeleteNotificationTypeAsync(NotificationType notificationType);
-        public Task DeleteNotificationTypeAsync(NotificationType notificationType);
         #endregion
-
-        public Task<int> SaveChangesAsync();
 
     }
 }
