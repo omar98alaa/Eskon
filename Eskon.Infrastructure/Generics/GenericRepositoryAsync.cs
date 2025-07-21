@@ -1,9 +1,8 @@
 ﻿
+using Eskon.Domian.Entities;
+using Eskon.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Eskon.Infrastructure.Context;
-using Eskon.Domian.Models;
-using Eskon.Domian.Entities;
 using System.Linq.Expressions;
 
 namespace Eskon.Infrastructure.Generics
@@ -46,7 +45,7 @@ namespace Eskon.Infrastructure.Generics
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
-            if(filter != null)
+            if (filter != null)
             {
                 query = query.Where(filter);
             }
@@ -54,10 +53,13 @@ namespace Eskon.Infrastructure.Generics
             return await query.ToListAsync();
         }
 
-        public virtual async Task<List<T>> GetPageAsync(int pageNumber, int itemsPerPage)
+        public virtual async Task<List<T>> GetPageAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
+            pageNumber = Math.Max(pageNumber, 1);
+            itemsPerPage = Math.Max(itemsPerPage, 1);
+
             return await _myDbContext.Set<T>()
-                .Skip(pageNumber * itemsPerPage)
+                .Skip((pageNumber - 1) * itemsPerPage)
                 .Take(itemsPerPage)
                 .ToListAsync();
         }
@@ -123,6 +125,59 @@ namespace Eskon.Infrastructure.Generics
         public IQueryable<T> GetTableNoTracking()
         {
             return _myDbContext.Set<T>().AsNoTracking().AsQueryable();
+        }
+
+        public async Task<List<T>> GetPaginatedAsync(int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _myDbContext.Set<T>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            pageNumber = Math.Max(pageNumber, 1);
+            itemsPerPage = Math.Max(itemsPerPage, 1);
+
+            return await _myDbContext.Set<T>()
+                .Skip((pageNumber - 1) * itemsPerPage)
+                .Take(itemsPerPage)
+                .ToListAsync();
+        }
+
+        public async Task<List<T>> GetPaginatedSortedAsync<TKey>(Expression<Func<T, TKey>> sort, bool asc, int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
+        {
+            IQueryable<T> query = _myDbContext.Set<T>();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (sort != null)
+            {
+                if (asc)
+                {
+                    query = query.OrderBy(sort);
+                }
+                else
+                {
+                    query = query.OrderByDescending(sort);
+                }
+            }
+
+            pageNumber = Math.Max(pageNumber, 1);
+            itemsPerPage = Math.Max(itemsPerPage, 1);
+
+            return await _myDbContext.Set<T>()
+                .Skip((pageNumber - 1) * itemsPerPage)
+                .Take(itemsPerPage)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalCount()
+        {
+            return await _myDbContext.Set<T>().CountAsync();
         }
 
         #endregion
