@@ -21,6 +21,10 @@ namespace Eskon.Service.UnitOfWork
         private IChatMessagesService chatMessagesService;
 
         private IFavouriteService favouriteService;
+        
+        private INotificationService notificationService;
+        
+        private INotificationTypeService notificationTypeService;
 
         private IPaymentService paymentService;
 
@@ -49,6 +53,10 @@ namespace Eskon.Service.UnitOfWork
         public IChatMessagesService ChatMessagesService => chatMessagesService == null ? new ChatMessageService(repositoryUnitOfWork.ChatMessageRepository) : chatMessagesService;
 
         public IFavouriteService FavouriteService => favouriteService == null ? new FavouriteService(repositoryUnitOfWork.FavouriteRepository) : favouriteService;
+        
+        public INotificationService NotificationService => notificationService == null ? new NotificationService(repositoryUnitOfWork.NotificationRepository) : notificationService;
+        
+        public INotificationTypeService NotificationTypeService => notificationTypeService == null? new NotificationTypeService(repositoryUnitOfWork.NotificationTypeRepository) : notificationTypeService;
 
         public IPaymentService PaymentService => paymentService == null ? new PaymentService(repositoryUnitOfWork.PaymentRepository) : paymentService;
 
@@ -64,7 +72,7 @@ namespace Eskon.Service.UnitOfWork
 
         public ITransactionService TransactionService => transactionService == null ? new TransactionService(repositoryUnitOfWork.TransactionRepository) : transactionService;
 
-        public IUserService UserService => userService == null ? new UserService(repositoryUnitOfWork.UserRepository) : userService;
+        public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
         #endregion
 
         #region Constructors

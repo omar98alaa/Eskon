@@ -32,6 +32,10 @@ namespace Eskon.Infrastructure.UnitOfWork
         private ITransactionRepository transactionRepository;
 
         private IUserRepository userRepository;
+
+        private INotificationTypeRepository notificationTypeRepository;
+
+        private INotificationRepository notificationRepository;
         #endregion
 
         #region Properties
@@ -58,6 +62,8 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ITransactionRepository TransactionRepository => transactionRepository == null ? new TransactionRepository(context) : transactionRepository;
 
         public IUserRepository UserRepository => userRepository == null ? new UserRepository(context) : userRepository;
+        public INotificationTypeRepository NotificationTypeRepository => notificationTypeRepository == null ? new NotificationTypeRepository(context) : notificationTypeRepository;
+        public INotificationRepository NotificationRepository => notificationRepository == null ? new NotificationRepositroy(context) : notificationRepository;
         #endregion
 
         #region Constructors
