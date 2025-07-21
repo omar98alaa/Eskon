@@ -53,10 +53,13 @@ namespace Eskon.Infrastructure.Generics
             return await query.ToListAsync();
         }
 
-        public virtual async Task<List<T>> GetPageAsync(int pageNumber, int itemsPerPage)
+        public virtual async Task<List<T>> GetPageAsync(int pageNumber = 1, int itemsPerPage = 10)
         {
+            pageNumber = Math.Max(pageNumber, 1);
+            itemsPerPage = Math.Max(itemsPerPage, 1);
+
             return await _myDbContext.Set<T>()
-                .Skip(pageNumber * itemsPerPage)
+                .Skip((pageNumber - 1) * itemsPerPage)
                 .Take(itemsPerPage)
                 .ToListAsync();
         }
@@ -124,7 +127,7 @@ namespace Eskon.Infrastructure.Generics
             return _myDbContext.Set<T>().AsNoTracking().AsQueryable();
         }
 
-        public async Task<List<T>> GetPaginatedAsync(int pageNumber, int ItemsPerPage, Expression<Func<T, bool>>? filter = null)
+        public async Task<List<T>> GetPaginatedAsync(int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
@@ -133,13 +136,16 @@ namespace Eskon.Infrastructure.Generics
                 query = query.Where(filter);
             }
 
-            return await query
-                .Skip(pageNumber * ItemsPerPage)
-                .Take(ItemsPerPage)
+            pageNumber = Math.Max(pageNumber, 1);
+            itemsPerPage = Math.Max(itemsPerPage, 1);
+
+            return await _myDbContext.Set<T>()
+                .Skip((pageNumber - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToListAsync();
         }
 
-        public async Task<List<T>> GetPaginatedSortedAsync<TKey>(int pageNumber, int ItemsPerPage, Expression<Func<T, TKey>> sort, bool asc, Expression<Func<T, bool>>? filter = null)
+        public async Task<List<T>> GetPaginatedSortedAsync<TKey>(Expression<Func<T, TKey>> sort, bool asc, int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
@@ -157,9 +163,12 @@ namespace Eskon.Infrastructure.Generics
                 query = query.OrderByDescending(sort);
             }
 
-            return await query
-                .Skip(pageNumber * ItemsPerPage)
-                .Take(ItemsPerPage)
+            pageNumber = Math.Max(pageNumber, 1);
+            itemsPerPage = Math.Max(itemsPerPage, 1);
+
+            return await _myDbContext.Set<T>()
+                .Skip((pageNumber - 1) * itemsPerPage)
+                .Take(itemsPerPage)
                 .ToListAsync();
         }
 

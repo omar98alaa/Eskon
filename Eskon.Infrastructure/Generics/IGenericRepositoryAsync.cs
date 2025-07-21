@@ -12,9 +12,9 @@ namespace Eskon.Infrastructure.Generics
         Task UpdateRangeAsync(ICollection<T> entities);
         Task<List<T>> GetAllAsync();
         Task<List<T>> GetFilteredAsync(Expression<Func<T, bool>>? filter = null);
-        Task<List<T>> GetPageAsync(int pageNumber, int ItemsPerPage);
-        Task<List<T>> GetPaginatedAsync(int pageNumber, int ItemsPerPage, Expression<Func<T, bool>>? filter = null);
-        Task<List<T>> GetPaginatedSortedAsync<TKey>(int pageNumber, int ItemsPerPage, Expression<Func<T, TKey>> sort, bool asc, Expression<Func<T, bool>>? filter = null);
+        Task<List<T>> GetPageAsync(int pageNumber = 1, int ItemsPerPage = 10);
+        Task<List<T>> GetPaginatedAsync(int pageNumber = 1, int ItemsPerPage = 10, Expression<Func<T, bool>>? filter = null);
+        Task<List<T>> GetPaginatedSortedAsync<TKey>(Expression<Func<T, TKey>> sort, bool asc, int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
         Task<int> GetTotalCount();
         Task<T> GetByIdAsync(object id);
         Task DeleteAsync(T entity);
