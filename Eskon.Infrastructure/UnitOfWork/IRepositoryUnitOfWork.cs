@@ -1,10 +1,4 @@
 ﻿using Eskon.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Infrastructure.UnitOfWork
 {
@@ -12,6 +6,8 @@ namespace Eskon.Infrastructure.UnitOfWork
     {
         #region Properties
         public IBookingRepository BookingRepository { get; }
+        public IChatRepository ChatRepository { get; }
+        public IChatMessageRepository ChatMessageRepository { get; }
         public IFavouriteRepository FavouriteRepository { get; }
         public IPaymentRepository PaymentRepository { get; }
         public IPropertyRepository PropertyRepository { get; }

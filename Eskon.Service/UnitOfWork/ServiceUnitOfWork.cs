@@ -1,14 +1,7 @@
 ﻿using Eskon.Domian.Entities.Identity;
-using Eskon.Infrastructure.Repositories;
 using Eskon.Infrastructure.UnitOfWork;
 using Eskon.Service.Interfaces;
 using Eskon.Service.Services;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Service.UnitOfWork
 {
@@ -23,7 +16,15 @@ namespace Eskon.Service.UnitOfWork
 
         private IBookingService bookingService;
 
+        private IChatService chatService;
+
+        private IChatMessagesService chatMessagesService;
+
         private IFavouriteService favouriteService;
+        
+        private INotificationService notificationService;
+        
+        private INotificationTypeService notificationTypeService;
 
         private IPaymentService paymentService;
 
@@ -40,39 +41,38 @@ namespace Eskon.Service.UnitOfWork
         private ITransactionService transactionService;
 
         private IUserService userService;
-
-        private INotificationTypeService notificationTypeService;
-
-        private INotificationService notificationService;
-
         #endregion
 
         #region Properties
         public IAuthenticationService AuthenticationService => authenticationService == null ? new AuthenticationService(jwtSettings) : authenticationService;
 
-        public IBookingService BookingService => bookingService == null? new BookingService(repositoryUnitOfWork.BookingRepository): bookingService;
+        public IBookingService BookingService => bookingService == null ? new BookingService(repositoryUnitOfWork.BookingRepository) : bookingService;
 
-        public IFavouriteService FavouriteService => favouriteService == null? new FavouriteService(repositoryUnitOfWork.FavouriteRepository) : favouriteService;
+        public IChatService ChatService => chatService == null ? new ChatService(repositoryUnitOfWork.ChatRepository) : chatService;
 
-        public IPaymentService PaymentService => paymentService == null? new PaymentService(repositoryUnitOfWork.PaymentRepository) : paymentService;
+        public IChatMessagesService ChatMessagesService => chatMessagesService == null ? new ChatMessageService(repositoryUnitOfWork.ChatMessageRepository) : chatMessagesService;
 
-        public IPropertyService PropertyService => propertyService == null? new PropertyService(repositoryUnitOfWork.PropertyRepository) : propertyService;
-
-        public IPropertyTypeService PropertyTypeService => propertyTypeService == null? new PropertyTypeService(repositoryUnitOfWork.PropertyTypeRepository) : propertyTypeService;
-
-        public IRefreshTokenService RefreshTokenService => refreshTokenService == null? new RefreshTokenService(repositoryUnitOfWork.RefreshTokenRepository) : refreshTokenService;
-
-        public IReviewService ReviewService => reviewService == null? new ReviewService(repositoryUnitOfWork.ReviewRepository) : reviewService;
-
-        public ITicketService TicketService => ticketService == null? new TicketService(repositoryUnitOfWork.TicketRepository) : ticketService;
-
-        public ITransactionService TransactionService => transactionService == null? new TransactionService(repositoryUnitOfWork.TransactionRepository) : transactionService;
-
-        public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
+        public IFavouriteService FavouriteService => favouriteService == null ? new FavouriteService(repositoryUnitOfWork.FavouriteRepository) : favouriteService;
+        
+        public INotificationService NotificationService => notificationService == null ? new NotificationService(repositoryUnitOfWork.NotificationRepository) : notificationService;
+        
         public INotificationTypeService NotificationTypeService => notificationTypeService == null? new NotificationTypeService(repositoryUnitOfWork.NotificationTypeRepository) : notificationTypeService;
 
-        public INotificationService NotificationService => notificationService == null ? new NotificationService(repositoryUnitOfWork.NotificationRepository) : notificationService;
+        public IPaymentService PaymentService => paymentService == null ? new PaymentService(repositoryUnitOfWork.PaymentRepository) : paymentService;
 
+        public IPropertyService PropertyService => propertyService == null ? new PropertyService(repositoryUnitOfWork.PropertyRepository) : propertyService;
+
+        public IPropertyTypeService PropertyTypeService => propertyTypeService == null ? new PropertyTypeService(repositoryUnitOfWork.PropertyTypeRepository) : propertyTypeService;
+
+        public IRefreshTokenService RefreshTokenService => refreshTokenService == null ? new RefreshTokenService(repositoryUnitOfWork.RefreshTokenRepository) : refreshTokenService;
+
+        public IReviewService ReviewService => reviewService == null ? new ReviewService(repositoryUnitOfWork.ReviewRepository) : reviewService;
+
+        public ITicketService TicketService => ticketService == null ? new TicketService(repositoryUnitOfWork.TicketRepository) : ticketService;
+
+        public ITransactionService TransactionService => transactionService == null ? new TransactionService(repositoryUnitOfWork.TransactionRepository) : transactionService;
+
+        public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
         #endregion
 
         #region Constructors

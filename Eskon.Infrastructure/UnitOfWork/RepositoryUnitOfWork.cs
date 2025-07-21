@@ -11,6 +11,10 @@ namespace Eskon.Infrastructure.UnitOfWork
 
         private IBookingRepository bookingRepository;
 
+        private IChatRepository chatRepository;
+        
+        private IChatMessageRepository chatMessageRepository;
+
         private IFavouriteRepository favouriteRepository;
 
         private IPaymentRepository paymentRepository;
@@ -36,6 +40,10 @@ namespace Eskon.Infrastructure.UnitOfWork
 
         #region Properties
         public IBookingRepository BookingRepository => bookingRepository == null ? new BookingRepository(context) : bookingRepository;
+
+        public IChatRepository ChatRepository => chatRepository == null ? new ChatRepository(context) : chatRepository;
+        
+        public IChatMessageRepository ChatMessageRepository => chatMessageRepository == null ? new ChatMessageRepository(context) : chatMessageRepository;
 
         public IFavouriteRepository FavouriteRepository => favouriteRepository == null ? new FavouriteRepository(context) : favouriteRepository;
 
