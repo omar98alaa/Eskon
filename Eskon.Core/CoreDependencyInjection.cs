@@ -11,6 +11,7 @@ namespace Eskon.Core
         {
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
             services.AddAutoMapper(conf => conf.AddProfile<UserProfileMapping>());
+            services.AddAutoMapper(conf => conf.AddProfile<PropertyMappings>());
             return services;
         }
     }
