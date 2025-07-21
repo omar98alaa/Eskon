@@ -14,6 +14,7 @@ namespace Eskon.Core
             services.AddAutoMapper(conf => conf.AddProfile<UserProfileMapping>());
             services.AddAutoMapper(conf => conf.AddProfile<CityMapping>());
             services.AddAutoMapper(conf => conf.AddProfile<CountryMapper>());
+            services.AddAutoMapper(conf => conf.AddProfile<PropertyMappings>());
             return services;
         }
     }
