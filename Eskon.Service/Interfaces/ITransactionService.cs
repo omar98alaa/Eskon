@@ -8,6 +8,6 @@ namespace Eskon.Service.Interfaces
         Task<List<Transaction>> GetAllTransactionsAsync();
         Task<List<Transaction>> GetTransactionsByDateRangeAsync(DateTime StartDate, DateTime EndDate);
         Task<Transaction> CreateTransactionAsync(Transaction transaction);
-        public decimal CalculateFeesForTransactionAmount(decimal amount);
+        public decimal CalculateSystemFeesForTransaction(decimal amount);
     }
 }
