@@ -6,6 +6,7 @@ using Eskon.Domian.Entities.Identity;
 namespace Eskon.Domian.Models
 {
    public class Transaction : BaseModel
+
     {
         [Required, Range(0, double.MaxValue)]
         public decimal Amount { get; set; }
