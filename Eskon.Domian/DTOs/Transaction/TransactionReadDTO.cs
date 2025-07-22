@@ -12,7 +12,6 @@ namespace Eskon.Domian.DTOs.Transaction
         public Guid Id { get; set; }
         public decimal Amount { get; set; }
         public decimal Fee { get; set; }
-        public decimal TotalCost { get; set; }
         public DateOnly ConfirmedDate { get; set; }
         public Guid SenderId { get; set; }
         public string SenderName { get; set; }

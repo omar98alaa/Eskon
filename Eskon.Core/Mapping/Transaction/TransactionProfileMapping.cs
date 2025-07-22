@@ -14,7 +14,6 @@ public class TransactionProfile : Profile
 
         // Map for ReadDTO
         CreateMap<Transaction, TransactionReadDTO>()
-            .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.Amount + src.Fee))
             .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.FirstName + " " + src.Sender.LastName))
             .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver.FirstName + " " + src.Receiver.LastName));
     }
