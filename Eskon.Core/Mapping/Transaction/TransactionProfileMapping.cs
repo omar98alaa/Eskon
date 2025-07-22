@@ -9,15 +9,13 @@ public class TransactionProfile : Profile
     public TransactionProfile()
     {
         // Map for WriteDTO
-        CreateMap<Transaction, TransactionWriteDTO>()
-            .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.Amount + src.Fee))
-            .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.FirstName + src.Sender.LastName)) 
-            .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver.FirstName + src.Receiver.LastName));
+        // source => Destination
+        CreateMap<TransactionInputDTO, Transaction>();
 
         // Map for ReadDTO
         CreateMap<Transaction, TransactionReadDTO>()
             .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.Amount + src.Fee))
-            .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.FirstName + src.Sender.LastName))
-            .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver.FirstName + src.Receiver.LastName));
+            .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => src.Sender.FirstName + " " + src.Sender.LastName))
+            .ForMember(dest => dest.ReceiverName, opt => opt.MapFrom(src => src.Receiver.FirstName + " " + src.Receiver.LastName));
     }
 }

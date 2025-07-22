@@ -41,6 +41,11 @@ namespace Eskon.Service.Services
         {
             return await _transactionRepository.AddAsync(transaction);
         }
+
+        public decimal CalculateSystemFeesForTransaction(decimal amount)
+        {
+            return amount * 0.05m;
+        }
         #endregion
     }
 }

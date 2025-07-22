@@ -23,6 +23,9 @@ namespace Eskon.Domian.Entities.Identity
         public DateTime? DeletedAt { get; set; }
 
         public string? Code { get; set; }
+       
+        public decimal WalletAmount { get; set; } = 0;
+
         [InverseProperty(nameof(UserRefreshToken.User))]
         public virtual ICollection<UserRefreshToken> UserRefreshTokens { get; set; } = new HashSet<UserRefreshToken>();
 
