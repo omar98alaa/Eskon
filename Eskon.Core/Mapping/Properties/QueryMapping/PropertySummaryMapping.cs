@@ -2,21 +2,18 @@
 using Eskon.Domian.DTOs.Property;
 using Eskon.Domian.Models;
 
-namespace Eskon.Core.Mapping.Users
+namespace Eskon.Core.Mapping.Properties
 {
     public partial class PropertyMappings
     {
-        public void PropertyDetailsMapping()
+        public void PropertySummaryMapping()
         {
             // Source -> Destination
-            CreateMap<Property, PropertyDetailsDTO>()
+            CreateMap<Property, PropertySummaryDTO>()
                 .AfterMap((src, dest) =>
                 {
-                    dest.OwnerName = src.Owner.FirstName + ' ' + src.Owner.LastName;
-                    dest.PropertyType = src.PropertyType.Name;
                     dest.City = src.City.Name;
                     dest.Country = src.City.Country.Name;
-                    dest.ImageURLs = src.Images.Select(i => i.Url).ToList();
                 });
         }
     }

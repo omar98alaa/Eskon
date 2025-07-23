@@ -3,6 +3,7 @@ using Eskon.Core.Mapping.CountryMapping;
 using Eskon.Core.Mapping.Users;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Eskon.Core.Mapping.Properties;
 
 namespace Eskon.Core
 {
