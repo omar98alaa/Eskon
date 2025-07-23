@@ -41,6 +41,8 @@ namespace Eskon.Service.UnitOfWork
         private ITransactionService transactionService;
 
         private IUserService userService;
+
+        private IEscrowTransactionService escrowTransactionService;
         #endregion
 
         #region Properties
@@ -73,6 +75,7 @@ namespace Eskon.Service.UnitOfWork
         public ITransactionService TransactionService => transactionService == null ? new TransactionService(repositoryUnitOfWork.TransactionRepository) : transactionService;
 
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
+        public IEscrowTransactionService EscrowTransactionService => escrowTransactionService == null? new EscrowTransactionService(repositoryUnitOfWork.EscrowTransactionRepository) : escrowTransactionService;
         #endregion
 
         #region Constructors

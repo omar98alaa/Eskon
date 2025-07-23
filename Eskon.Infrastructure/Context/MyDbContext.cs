@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
+using Eskon.Domian.Entities;
 namespace Eskon.Infrastructure.Context
 {
     public class MyDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
@@ -41,6 +42,8 @@ namespace Eskon.Infrastructure.Context
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
+        public DbSet<EscrowTransaction> EscrowTransactions { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
         #endregion
 
         #region Configurations
@@ -117,7 +120,7 @@ namespace Eskon.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
-            #region Entity
+            #region Image
             // Image
             modelBuilder.Entity<Image>()
                 .HasOne(I => I.Property)
@@ -232,6 +235,105 @@ namespace Eskon.Infrastructure.Context
             modelBuilder.Entity<UserRefreshToken>().Ignore(x => x.DeletedAt);
             #endregion
 
+            #region EscrowTransaction
+            modelBuilder.Entity<EscrowTransaction>(entity =>
+            {
+                entity.HasOne(e => e.Booking)
+                    .WithMany()
+                    .HasForeignKey(e => e.BookingId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Customer)
+                    .WithMany()
+                    .HasForeignKey(e => e.CustomerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Owner)
+                    .WithMany() 
+                    .HasForeignKey(e => e.OwnerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // Monetary fields with precision
+                entity.Property(e => e.TotalAmount)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                entity.Property(e => e.EskonFee)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                entity.Property(e => e.PaymentGatewayFee)
+                    .HasColumnType("decimal(18,2)")
+                    .IsRequired();
+
+                entity.Property(e => e.TransactionReference)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                // Date columns
+                entity.Property(e => e.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                // Indexes
+                entity.HasIndex(e => e.BookingId);
+                entity.HasIndex(e => e.TransactionReference)
+                    .IsUnique();
+            });
+
+            modelBuilder.Entity<EscrowTransaction>()
+                .HasOne(t => t.Owner)
+                .WithMany(u => u.EscrowTransactionsIn)
+                .HasForeignKey(t => t.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<EscrowTransaction>()
+                .HasOne(t => t.Customer)
+                .WithMany(u => u.EscrowTransactionsOut)
+                .HasForeignKey(t => t.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            #endregion
+
+            #region PaymentMethods
+            modelBuilder.Entity<PaymentMethod>(entity =>
+            {
+                entity.HasOne(p => p.Owner)
+                    .WithMany() // Or .WithMany(h => h.PaymentMethods)
+                    .HasForeignKey(p => p.OwnerId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(p => p.Provider)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(p => p.ProviderAccountId)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+                entity.Property(p => p.BankName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(p => p.AccountHolderName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+
+                entity.Property(p => p.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()")
+                    .IsRequired();
+
+                entity.HasOne(pm => pm.Owner)
+                   .WithMany(u => u.PaymentMethods)
+                   .HasForeignKey(pm => pm.OwnerId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+                // Indexes for performance
+                entity.HasIndex(p => p.OwnerId);
+                entity.HasIndex(p => new { p.Provider, p.ProviderAccountId }).IsUnique();
+            });
+
+            #endregion
         }
 
         //

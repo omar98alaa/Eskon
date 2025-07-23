@@ -20,6 +20,7 @@ namespace Eskon.Service.UnitOfWork
         public IUserService UserService { get; }
         public INotificationTypeService NotificationTypeService { get; }
         public INotificationService NotificationService { get; }
+        public IEscrowTransactionService EscrowTransactionService { get; }
         #endregion
 
         #region Methods

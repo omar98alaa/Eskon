@@ -73,6 +73,13 @@ namespace Eskon.Domian.Entities.Identity
         public virtual ICollection<Transaction> TransactionsIn { get; set; }
 
         public virtual ICollection<Property> Properties { get; set; }
-}
+
+        public virtual ICollection<PaymentMethod> PaymentMethods { get; set; }
+        public virtual ICollection<EscrowTransaction> EscrowTransactionsIn { get; set; }
+        public virtual ICollection<EscrowTransaction> EscrowTransactionsOut { get; set; }
+
+
+
+    }
 
 }
