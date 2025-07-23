@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Eskon.Core.Mapping.Users;
+using Eskon.Core.Mapping.Properties;
 
 namespace Eskon.Core
 {

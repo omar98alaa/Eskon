@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace Eskon.Core.Mapping.Users
+namespace Eskon.Core.Mapping.Properties
 {
     public partial class PropertyMappings : Profile
     {
@@ -8,6 +8,7 @@ namespace Eskon.Core.Mapping.Users
         {
             PropertyDetailsMapping();
             PropertySummaryMapping();
+            AddPropertyMapping();
         }
 
     }
