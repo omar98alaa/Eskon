@@ -8,7 +8,6 @@ namespace Eskon.Service
         public static IServiceCollection InjectingServiceDependencies(this IServiceCollection services)
         {
             services.AddScoped<IServiceUnitOfWork, ServiceUnitOfWork>();
-
             return services;
         }
     }

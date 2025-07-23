@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Eskon.Core;
 using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Entities.Stripe;
 using Eskon.Infrastructure;
 using Eskon.Infrastructure.Context;
 using Eskon.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Stripe;
 
 namespace Eskon.API
 {
@@ -44,6 +46,13 @@ namespace Eskon.API
             var jwtSettings = new JwtSettings();
             builder.Configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
             builder.Services.AddSingleton(jwtSettings);
+            #endregion
+
+            #region Stripe Keys
+            var stripeKeys = new StripeSettings();
+            builder.Configuration.GetSection("Stripe").Bind(stripeKeys);
+            StripeConfiguration.ApiKey = stripeKeys.SecretKey;
+            builder.Services.AddSingleton(stripeKeys);
             #endregion
 
 
