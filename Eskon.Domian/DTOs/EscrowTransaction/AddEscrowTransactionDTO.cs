@@ -25,5 +25,8 @@ namespace Eskon.Domian.DTOs.EscrowTransaction
 
         [Required]
         public string TransactionReference { get; set; } = string.Empty;
+
+        [Required] 
+        public string PaymentMethod { get; set; } // "CreditCard", "PayPal", etc.
     }
 }
