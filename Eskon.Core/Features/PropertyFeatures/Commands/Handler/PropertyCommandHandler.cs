@@ -47,12 +47,15 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
                 var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
                 return BadRequest<PropertyDetailsDTO?>(internalErrorMessages);
             }
+            //check all images stored in database
+            //check City and country stored in database
             List<User> AdminUsers = _userManager.GetUsersInRoleAsync("Admin").Result.ToList();
             Random random = new Random();
             User Admin=AdminUsers[random.Next(AdminUsers.Count)];
             Property property = _mapper.Map<Property>(request.PropertyWriteDTO);
             property.OwnerId=request.ownerId;
             property.AssignedAdminId =Admin.Id;
+            //Add Images and city and country 
             await _serviceUnitOfWork.PropertyService.AddPropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
             PropertyDetailsDTO propertyDetails=_mapper.Map<PropertyDetailsDTO>(property);
@@ -65,16 +68,16 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
             if(property == null)
             {
-                return BadRequest<string>(string.Empty);
+                return NotFound<string>("Property Not Found");
             }
             if (AdminId != property.AssignedAdminId)
             {
-                return Unauthorized<string>();
+                return Forbidden<string>();
             }
       
             await _serviceUnitOfWork.PropertyService.SetIsAcceptedPropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
-            return Success<string>("PropertyAccepted");
+            return Success<string>($"Property With Id {property.Id} Accepted", $"{property.Id} Accepted");
         }
         
         public async Task<Response<string>> Handle(SetPropertyAsRejectedCommand request, CancellationToken cancellationToken)
@@ -83,16 +86,16 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
             if (property == null)
             {
-                return NotFound<string>(string.Empty);
+                return NotFound<string>("Property Not Found");
             }
 
             if (AdminId != property.AssignedAdminId)
             {
-                return Unauthorized<string>();
+                return Forbidden<string>();
             }
             await _serviceUnitOfWork.PropertyService.SetRejectionMessageAsync(property, request.rejectionMessage);
             await _serviceUnitOfWork.SaveChangesAsync();
-            return Success<string>("PropertyAccepted");
+            return Success<string>(string.Empty,request.rejectionMessage);
         }
        
         
@@ -102,16 +105,16 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
             if (property == null)
             {
-                return NotFound<string>(string.Empty);
+                return NotFound<string>("Property Not Found");
             }
             
             if (OwnerId != property.OwnerId)
             { 
-                return Unauthorized<string>();
+                return Forbidden<string>();
             }
             await _serviceUnitOfWork.PropertyService.SetPropertySuspensionStateAsync(property, request.value);
             await _serviceUnitOfWork.SaveChangesAsync();
-            return Success<string>($"PropertySuspended={request.value}");
+            return Success<string>(string.Empty,$"Property With Id {property.Id} Suspension State={request.value}");
         }
 
         public async Task<Response<PropertyDetailsDTO>> Handle(UpdatePropertyCommand request, CancellationToken cancellationToken)
@@ -127,12 +130,12 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             Guid OwnerId =request.ownerId;
             if (property == null)
             {
-                return BadRequest<PropertyDetailsDTO>(string.Empty);
+                return NotFound<PropertyDetailsDTO>("Property Not Found");
 
             }
             if (OwnerId != property.OwnerId)
             { 
-                return Unauthorized<PropertyDetailsDTO>();
+                return Forbidden<PropertyDetailsDTO>();
             }
             Property UpdatedProperty = _mapper.Map(request.propertyWriteDTO, property);
             await _serviceUnitOfWork.PropertyService.UpdatePropertyAsync(UpdatedProperty);
@@ -149,11 +152,11 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             PropertyDetailsDTO propertyDetailsDTO=_mapper.Map<PropertyDetailsDTO>(property);
             if (property == null)
             {
-                return BadRequest<PropertyDetailsDTO>(string.Empty);
+                return NotFound<PropertyDetailsDTO>("Property Not Found");
             }
             if (OwnerId != property.OwnerId)
             {
-                return Unauthorized<PropertyDetailsDTO>();
+                return Forbidden<PropertyDetailsDTO>();
             }
             await _serviceUnitOfWork.PropertyService.RemovePropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();

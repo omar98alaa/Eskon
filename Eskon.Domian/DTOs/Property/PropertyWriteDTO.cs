@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Eskon.Domian.Models;
 
 namespace Eskon.Domian.DTOs.Property
 {
@@ -42,15 +36,10 @@ namespace Eskon.Domian.DTOs.Property
 
         [Required]
         public double Latitude { get; set; }
-        [DefaultValue(false)]
-        public bool IsSuspended { get; set; }
+        public string CityName { get; set; }
 
-        //[DefaultValue(0.0)]
-        public decimal AverageRating { get; set; }
-        public string City { get; set; }
+        public string CountryName { get; set; }
 
-        public string Country { get; set; }
-
-        public List<string> Images { get; set; }
+        public List<string> ImageUrls { get; set; }
     }
 }

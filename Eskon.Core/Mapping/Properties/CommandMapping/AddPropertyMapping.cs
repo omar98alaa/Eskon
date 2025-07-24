@@ -9,14 +9,7 @@ namespace Eskon.Core.Mapping.Properties
         {
             // Source -> Destination
 
-            CreateMap<PropertyWriteDTO, Property>().AfterMap((src, des) =>
-            {
-                foreach (string Url in src.Images) {
-
-                    des.Images.Add(new Image() { Url = Url});
-                };
-                des.City=new City() { Name=src.City,Country=new Country() { Name=src.Country} };
-            });
+            CreateMap<PropertyWriteDTO, Property>();
         }
     }
 }
