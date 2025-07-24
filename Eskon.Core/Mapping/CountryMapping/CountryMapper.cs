@@ -9,7 +9,7 @@ namespace Eskon.Core.Mapping.CountryMapping
             UpdateCountryMapping();
             GetCountryMapper();
             AddCountryMapper();
-
+            CountryReadDTOMapping();
         }
     }
 }

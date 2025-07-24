@@ -24,6 +24,12 @@ namespace Eskon.Service.Services
         {
             return await _cityRepository.GetAllAsync();
         }
+
+        public async Task<List<City>> GetAllCitiesPerCountryAsync(Country country)
+        {
+            return await _cityRepository.GetFilteredAsync(c => c.CountryId == country.Id);
+        }
+
         public async Task<City> GetCityByIdAsync(Guid id)
         {
             return await _cityRepository.GetByIdAsync(id);

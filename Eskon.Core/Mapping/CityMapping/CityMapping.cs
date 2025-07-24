@@ -9,8 +9,7 @@ namespace Eskon.Core.Mapping.CityMapping
             UpdateCityMapping();
             ListCityMapping();
             GetCityMapping();
-
-
+            CityReadDTOMapping();
         }
 
     }

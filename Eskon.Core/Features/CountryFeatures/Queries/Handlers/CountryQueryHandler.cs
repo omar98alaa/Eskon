@@ -1,15 +1,14 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.CountryFeatures.Queries.Models;
 using Eskon.Core.Response;
+using Eskon.Domian.DTOs.Country;
 using Eskon.Domian.DTOs.Country_City;
 using Eskon.Service.UnitOfWork;
-using MediatR;
 
 
 namespace Eskon.Core.Features.CountryFeatures.Queries.Handlers
 {
-    public class CountryQueryHandler : ResponseHandler, IRequestHandler<GetCountryByNameQuery, Response<CountryDTO>>,
-        IRequestHandler<GetCountryListQuery, Response<List<CountryDTO>>>
+    public class CountryQueryHandler : ResponseHandler, ICountryQueryHandler
     {
         #region Fields
         private readonly IMapper _mapper;
@@ -34,10 +33,10 @@ namespace Eskon.Core.Features.CountryFeatures.Queries.Handlers
             return Success(dto);
         }
 
-        public async Task<Response<List<CountryDTO>>> Handle(GetCountryListQuery request, CancellationToken cancellationToken)
+        public async Task<Response<List<CountryReadDTO>>> Handle(GetCountryListQuery request, CancellationToken cancellationToken)
         {
             var countries = await _unitOfWork.CountryService.GetCountryListAsync();
-            var dtoList = _mapper.Map<List<CountryDTO>>(countries);
+            var dtoList = _mapper.Map<List<CountryReadDTO>>(countries);
             return Success(dtoList);
         }
     }

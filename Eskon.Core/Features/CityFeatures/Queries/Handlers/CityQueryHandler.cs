@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.CityFeatures.Queries.Models;
 using Eskon.Core.Response;
+using Eskon.Domian.DTOs.City;
 using Eskon.Domian.DTOs.CityDTO;
 using Eskon.Service.UnitOfWork;
-using MediatR;
 
 
 namespace Eskon.Core.Features.CityFeatures.Queries.Handlers
 {
-    public class CityQueryHandler : ResponseHandler,
-     IRequestHandler<GetCityByNameQuery, Response<CityDTO>>,
-     IRequestHandler<GetCityListQuery, Response<List<CityDTO>>>
+    public class CityQueryHandler : ResponseHandler, ICItyQueryHandler
     {
         #region Fields
         private readonly IMapper _mapper;
@@ -35,10 +33,17 @@ namespace Eskon.Core.Features.CityFeatures.Queries.Handlers
             return Success(cityDto);
         }
 
-        public async Task<Response<List<CityDTO>>> Handle(GetCityListQuery request, CancellationToken cancellationToken)
+        public async Task<Response<List<CityReadDTO>>> Handle(GetCityListQuery request, CancellationToken cancellationToken)
         {
-            var cities = await _unitOfWork.CityService.GetAllCitiesAsync();
-            var citiesDto = _mapper.Map<List<CityDTO>>(cities);
+            var country = await _unitOfWork.CountryService.GetCountryByNameAsync(request.countryName);
+
+            if(country == null)
+            {
+                return NotFound<List<CityReadDTO>>(message: "Country not found");
+            }
+
+            var cities = await _unitOfWork.CityService.GetAllCitiesPerCountryAsync(country);
+            var citiesDto = _mapper.Map<List<CityReadDTO>>(cities);
             return Success(citiesDto);
         }
     }

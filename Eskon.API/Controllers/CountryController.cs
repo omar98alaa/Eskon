@@ -18,32 +18,32 @@ namespace Eskon.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("/countries")]
+        [HttpGet]
         public async Task<IActionResult> GetAllCountries()
         {
             var result = await Mediator.Send(new GetCountryListQuery());
             return NewResult(result);
         }
 
-        [HttpGet("/country/{name}")]
+        [HttpGet("{name}")]
         public async Task<IActionResult> GetCountryByName(string name)
         {
             var result = await Mediator.Send(new GetCountryByNameQuery(name));
             return NewResult(result);
         }
 
-        [HttpPost("/add/country")]
+        [HttpPost]
         public async Task<IActionResult> AddCountry([FromBody] AddCountryCommand command)
         {
             var result = await Mediator.Send(command);
             return NewResult(result);
         }
 
-        [HttpPut("/Edit/country/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Edit(Guid id, [FromBody] CountryUpdateDTO dto)
         {
             var result = await Mediator.Send(new EditCountryCommand(id, dto));
-            return Ok(result);
+            return NewResult(result);
         }
 
 

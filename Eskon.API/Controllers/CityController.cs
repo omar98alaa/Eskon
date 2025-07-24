@@ -18,10 +18,10 @@ namespace Eskon.API.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("/cities")]
-        public async Task<IActionResult> GetAllCities()
+        [HttpGet]
+        public async Task<IActionResult> GetAllCitiesPerCountry([FromQuery] string countryName)
         {
-            var result = await Mediator.Send(new GetCityListQuery());
+            var result = await Mediator.Send(new GetCityListQuery(countryName));
             return NewResult(result);
         }
 
@@ -32,7 +32,7 @@ namespace Eskon.API.Controllers
             return NewResult(result);
         }
 
-        [HttpPost("/add/city")]
+        [HttpPost]
         //[Authorize("Admin")]
         public async Task<IActionResult> AddCity([FromBody] CityDTO city)
         {
@@ -40,7 +40,7 @@ namespace Eskon.API.Controllers
             return NewResult(result);
         }
 
-        [HttpPut("/edit/city/{name}")]
+        [HttpPut("{name}")]
         public async Task<IActionResult> Edit(string name, [FromBody] CityUpdateDTO dto)
         {
             var result = await Mediator.Send(new EditCityCommand(name, dto));
@@ -48,8 +48,7 @@ namespace Eskon.API.Controllers
         }
 
 
-
-        [HttpDelete("delete/city/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await Mediator.Send(new DeleteCityCommand(id));

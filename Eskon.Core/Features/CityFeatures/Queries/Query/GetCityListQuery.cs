@@ -1,8 +1,8 @@
 ﻿using Eskon.Core.Response;
-using Eskon.Domian.DTOs.CityDTO;
+using Eskon.Domian.DTOs.City;
 using MediatR;
 
 namespace Eskon.Core.Features.CityFeatures.Queries.Models
 {
-    public record GetCityListQuery : IRequest<Response<List<CityDTO>>>;
+    public record GetCityListQuery(string countryName) : IRequest<Response<List<CityReadDTO>>>;
 }
