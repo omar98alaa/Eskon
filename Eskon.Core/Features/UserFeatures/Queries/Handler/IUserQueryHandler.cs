@@ -7,5 +7,5 @@ using MediatR;
 namespace Eskon.Core.Features.UserFeatures.Queries.Handler
 {
     public interface IUserQueryHandler : IRequestHandler<GetAllUsersQuery, Response<List<UserReadDto>>>,
-                                         IRequestHandler<GetUserByIdQuery, Response<User>>;
+                                         IRequestHandler<GetUserByIdQuery, Response<UserReadDto>>;
 }

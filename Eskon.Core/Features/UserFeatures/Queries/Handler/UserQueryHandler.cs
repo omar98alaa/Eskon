@@ -30,14 +30,14 @@ namespace Eskon.Core.Features.UserFeatures.Queries.Handler
             return Success(UsersListDto);
         }
 
-        public async Task<Response<User>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Response<UserReadDto>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
         {
             var user = await _serviceUnitOfWork.UserService.GetUserByIdAsync(request.id);
             if (user == null)
             {
-                return NotFound<User>(message: $"Student with id {request.id} not found");
+                return NotFound<UserReadDto>(message: $"Student with id {request.id} not found");
             }
-            return Success(user);
+            return Success(_mapper.Map<UserReadDto>(user));
         }
         #endregion
     }
