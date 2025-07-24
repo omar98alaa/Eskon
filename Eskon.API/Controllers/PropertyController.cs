@@ -88,47 +88,47 @@ namespace Eskon.API.Controllers
         }
 
         [Authorize(Roles = "Owner")]
-        [HttpPatch("Owner/Suspend/{id}")]
-        public async Task<IActionResult> SetIsSuspendedProperty([FromRoute]Guid id,bool value)
+        [HttpPatch("Owner/Suspend/{propertyId:guid}")]
+        public async Task<IActionResult> SetPropertySuspensionState([FromRoute]Guid propertyId,[FromQuery]bool state)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new SetIsSuspendedPropertyCommand(id,value,ownerId));
+            var response = await Mediator.Send(new SetIsSuspendedPropertyCommand(propertyId,state,ownerId));
             return NewResult(response);
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPatch("Admin/Accept/{id}")]
-        public async Task<IActionResult> SetPropertyAsAccepted([FromRoute] Guid id)
+        [HttpPatch("Admin/Accept/{propertyId:guid}")]
+        public async Task<IActionResult> SetPropertyAsAccepted([FromRoute] Guid propertyId)
         {
             Guid AdminId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new SetPropertyAsAcceptedCommand(id, AdminId));
+            var response = await Mediator.Send(new SetPropertyAsAcceptedCommand(propertyId, AdminId));
             return NewResult(response);
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPatch("Admin/Reject/{id}")]
-        public async Task<IActionResult> SetPropertyAsRejected([FromRoute] Guid id,string RejectionMessage)
+        [HttpPatch("Admin/Reject/{propertyId:guid}")]
+        public async Task<IActionResult> SetPropertyAsRejected([FromRoute] Guid propertyId, string RejectionMessage)
         {
             Guid AdminId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new SetPropertyAsRejectedCommand(id, RejectionMessage, AdminId));
+            var response = await Mediator.Send(new SetPropertyAsRejectedCommand(propertyId, RejectionMessage, AdminId));
             return NewResult(response);
         }
 
         [Authorize(Roles = "Owner")]
-        [HttpPut("Owner/{id}")]
-        public async Task<IActionResult> UpdateProperty([FromRoute] Guid id, PropertyWriteDTO propertyWriteDTO)
+        [HttpPut("Owner/{propertyId:guid}")]
+        public async Task<IActionResult> UpdateProperty([FromRoute] Guid propertyId, PropertyWriteDTO propertyWriteDTO)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new UpdatePropertyCommand(id,propertyWriteDTO,ownerId));
+            var response = await Mediator.Send(new UpdatePropertyCommand(propertyId, propertyWriteDTO,ownerId));
             return NewResult(response);
         }
 
         [Authorize(Roles = "Owner")]
-        [HttpDelete("Owner/{id}")]
-        public async Task<IActionResult> DeleteProperty([FromRoute] Guid id)
+        [HttpDelete("Owner/{propertyId:guid}")]
+        public async Task<IActionResult> DeleteProperty([FromRoute] Guid propertyId)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new DeletePropertyCommand(id, ownerId));
+            var response = await Mediator.Send(new DeletePropertyCommand(propertyId, ownerId));
             return NewResult(response);
         }
         #endregion
