@@ -1,11 +1,9 @@
-using AutoMapper;
 using Eskon.Core;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Infrastructure;
 using Eskon.Infrastructure.Context;
 using Eskon.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

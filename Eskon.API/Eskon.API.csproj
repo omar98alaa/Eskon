@@ -24,8 +24,4 @@
 		<ProjectReference Include="..\Eskon.Domian\Eskon.Domian.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="wwwroot\" />
-	</ItemGroup>
-
 </Project>
