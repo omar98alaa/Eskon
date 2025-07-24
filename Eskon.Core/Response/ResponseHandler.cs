@@ -78,26 +78,35 @@ namespace Eskon.Core.Response
 
     #endregion
 
-    #region Error Responses
-    public Response<T> Unauthorized<T>()
-    {
-        return new Response<T>()
+        #region Error Responses
+        public Response<T> Unauthorized<T>()
         {
-            StatusCode = System.Net.HttpStatusCode.Unauthorized,
-            Succeeded = true,
-            Message = "UnAuthorized"
-        };
-    }
-    public Response<T> BadRequest<T>(string Message = null)
-    {
-        return new Response<T>()
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.Unauthorized,
+                Succeeded = false,
+                Message = "UnAuthorized"
+            };
+        }
+        public Response<T> Forbidden<T>()
         {
-            StatusCode = System.Net.HttpStatusCode.BadRequest,
-            Succeeded = false,
-            Message = Message == null ? "Bad Request" : Message,
-
-        };
-    }
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.Forbidden,
+                Succeeded = false,
+                Message = "Forbidden"
+            };
+        }
+        public Response<T> BadRequest<T>(string Message = null)
+        {
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.BadRequest,
+                Succeeded = false,
+                Message = Message == null ? "Bad Request" : Message,
+                
+            };
+        }
 
     public Response<T> BadRequest<T>(List<string>? ErrorsList = null, string? Message = null)
     {
