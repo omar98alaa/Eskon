@@ -107,7 +107,7 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
         #region Sign Out User Command Handler
         public async Task<Response<string>> Handle(SignOutUserCommand request, CancellationToken cancellationToken)
         {
-            var stored = await _serviceUnitOfWork.RefreshTokenService.GetStoredTokenAsync(request.refreshToken);
+            var stored = await _serviceUnitOfWork.RefreshTokenService.GetStoredTokenAsync(request.CurrentRefreshToken.CurrentRefreshToken);
             if (stored != null)
             {
                 stored.IsRevoked = true;

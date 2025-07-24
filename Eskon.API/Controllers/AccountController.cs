@@ -2,6 +2,7 @@
 using Eskon.API.Base;
 using Eskon.Core.Features.AccountFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Utilities;
+using Eskon.Domian.DTOs.RefreshToken;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +29,7 @@ namespace Eskon.API.Controllers
 
         #region Actions
 
-        [HttpPost("/Account/Register")]
+        [HttpPost("Register")]
         public async Task<IActionResult> Post([FromBody] UserRegisterDto user)
         {
             var userToAdd = _mapper.Map<User>(user);
@@ -36,23 +37,23 @@ namespace Eskon.API.Controllers
             return NewResult(userAdded);
         }
 
-        [HttpPost("/Account/SignIn")]
+        [HttpPost("SignIn")]
         public async Task<IActionResult> Post([FromBody] UserSignInDto userSignInDto)
         {
             var token = await Mediator.Send(new SignInUserCommand(userSignInDto));
             return NewResult(token);
         }
 
-        [HttpPost("/Account/SignOut")]
-        public async Task<IActionResult> SignOut([FromBody] string refreshToken)
+        [HttpPost("SignOut")]
+        public async Task<IActionResult> SignOut([FromBody] CurrentRefreshTokenDTO CurrentRefreshToken)
         {
-            return NewResult(await Mediator.Send(new SignOutUserCommand(refreshToken)));
+            return NewResult(await Mediator.Send(new SignOutUserCommand(CurrentRefreshToken)));
         }
 
-        [HttpPost("/Account/Refresh")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        [HttpPost("Refresh")]
+        public async Task<IActionResult> RefreshToken([FromBody] CurrentRefreshTokenDTO CurrentRefreshToken)
         {
-            return NewResult(await Mediator.Send(new GetNewAccessToken(refreshToken)));
+            return NewResult(await Mediator.Send(new GetNewAccessToken(CurrentRefreshToken)));
         }
         #endregion
     }

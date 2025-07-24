@@ -4,6 +4,7 @@ using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
@@ -63,7 +64,15 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
         #region Add Admin Role
         public async Task<Response<string>> Handle(AddAdminRoleToUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(request.UserToBeAdminId.ToString());
+            var validationContext = new ValidationContext(request.AdminRole.Email);
+            var results = new List<ValidationResult>();
+            bool isValid = Validator.TryValidateObject(request.AdminRole.Email, validationContext, results, true);
+            if (!isValid)
+            {
+                var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
+                return BadRequest<string?>(internalErrorMessages);
+            }
+            var user = await _userManager.FindByEmailAsync(request.AdminRole.Email);
             if (user == null)
                 return NotFound<string>("User Not Found");
 
@@ -82,7 +91,16 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
         #region Delete Admin Role
         public async Task<Response<string>> Handle(DeleteAdminRoleFromUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(request.UserToRemoveAdminId.ToString());
+            var validationContext = new ValidationContext(request.AdminRole.Email);
+            var results = new List<ValidationResult>();
+            bool isValid = Validator.TryValidateObject(request.AdminRole.Email, validationContext, results, true);
+            if (!isValid)
+            {
+                var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
+                return BadRequest<string?>(internalErrorMessages);
+            }
+
+            var user = await _userManager.FindByEmailAsync(request.AdminRole.Email);
 
             if (user == null)
                 return NotFound<string>("User Not Found");
