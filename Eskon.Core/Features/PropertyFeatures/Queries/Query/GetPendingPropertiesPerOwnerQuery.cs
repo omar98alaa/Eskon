@@ -1,4 +1,5 @@
 ﻿using Eskon.Core.Response;
+using Eskon.Domain.Utilities;
 using Eskon.Domian.DTOs.Property;
 using MediatR;
 
