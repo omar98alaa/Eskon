@@ -3,11 +3,8 @@ using Eskon.API.Base;
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Domian.DTOs.Roles;
-using Eskon.Domian.Entities.Identity;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Eskon.API.Controllers
 {

@@ -2,7 +2,6 @@
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
-using Eskon.Domian.Entities.Identity;
 using Eskon.Service.UnitOfWork;
 
 namespace Eskon.Core.Features.UserFeatures.Queries.Handler
@@ -35,7 +34,7 @@ namespace Eskon.Core.Features.UserFeatures.Queries.Handler
             var user = await _serviceUnitOfWork.UserService.GetUserByIdAsync(request.id);
             if (user == null)
             {
-                return NotFound<UserReadDto>(message: $"Student with id {request.id} not found");
+                return NotFound<UserReadDto>(message: $"User with id {request.id} not found");
             }
             return Success(_mapper.Map<UserReadDto>(user));
         }
