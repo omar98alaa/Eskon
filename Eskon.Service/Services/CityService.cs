@@ -1,11 +1,6 @@
 ﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Service.Services
 {
@@ -36,7 +31,7 @@ namespace Eskon.Service.Services
 
         public async Task<City> GetCityByNameAsync(string name)
         {
-          return await _cityRepository.GetCityByNameAsync(name);
+            return await _cityRepository.GetCityByNameAsync(name);
         }
 
         public async Task UpdateCityAsync(City city)
@@ -48,10 +43,7 @@ namespace Eskon.Service.Services
         {
             await _cityRepository.DeleteAsync(city);
         }
-        public async Task AddCityAsync(List<City> cities)
-        {
-            await _cityRepository.AddRangeAsync(cities);
-        }
+
 
         #endregion
     }

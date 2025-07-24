@@ -28,6 +28,10 @@ namespace Eskon.Infrastructure.UnitOfWork
         private ITransactionRepository transactionRepository;
 
         private IUserRepository userRepository;
+        private IImageRepository imageRepository;
+        private ICityRepository cityRepository;
+        private ICountryRepository countryRepository;
+       
         #endregion
 
         #region Properties
@@ -50,6 +54,12 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ITransactionRepository TransactionRepository => transactionRepository == null ? new TransactionRepository(context) : transactionRepository;
 
         public IUserRepository UserRepository => userRepository == null ? new UserRepository(context) : userRepository;
+
+        public ICityRepository CityRepository => cityRepository== null? new CityRepository(context): cityRepository;
+
+        public ICountryRepository CountryRepository => countryRepository == null ? new CountryRepository(context) : countryRepository;
+
+
         #endregion
 
         #region Constructors

@@ -1,8 +1,8 @@
-﻿using Eskon.API.Base;
+﻿using AutoMapper;
+using Eskon.API.Base;
 using Eskon.Core.Features.Country_CityFeatures.Commands.Commands;
 using Eskon.Core.Features.CountryFeatures.Queries.Models;
-using Eskon.Domian.DTOs.Country_City;
-using MediatR;
+using Eskon.Domian.DTOs.Country;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eskon.API.Controllers
@@ -11,40 +11,41 @@ namespace Eskon.API.Controllers
     [ApiController]
     public class CountryController : BaseController
     {
-        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-        public CountryController(IMediator mediator)
+        public CountryController(IMapper mapper)
         {
-            _mediator = mediator;
+            _mapper = mapper;
         }
 
         [HttpGet("/countries")]
         public async Task<IActionResult> GetAllCountries()
         {
-            var result = await _mediator.Send(new GetCountryListQuery());
+            var result = await Mediator.Send(new GetCountryListQuery());
             return NewResult(result);
         }
 
         [HttpGet("/country/{name}")]
         public async Task<IActionResult> GetCountryByName(string name)
         {
-            var result = await _mediator.Send(new GetCountryByNameQuery(name));
+            var result = await Mediator.Send(new GetCountryByNameQuery(name));
             return NewResult(result);
         }
 
         [HttpPost("/add/country")]
         public async Task<IActionResult> AddCountry([FromBody] AddCountryCommand command)
         {
-            var result = await _mediator.Send(command);
+            var result = await Mediator.Send(command);
             return NewResult(result);
         }
 
         [HttpPut("/Edit/country/{id}")]
-        public async Task<IActionResult> Edit(string name, [FromBody] CountryDTO dto)
+        public async Task<IActionResult> Edit(int id, [FromBody] CountryUpdateDTO dto)
         {
-            var result = await _mediator.Send(new EditCountryCommand(name, dto));
+            var result = await Mediator.Send(new EditCountryCommand(id, dto));
             return Ok(result);
         }
+
 
 
 

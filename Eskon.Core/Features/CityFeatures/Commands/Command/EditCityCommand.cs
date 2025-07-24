@@ -5,7 +5,7 @@ using MediatR;
 namespace Eskon.Core.Features.CityFeatures.Commands.Commands
 {
  
-   public record EditCityCommand(Guid id, CityUpdateDTO CityUpdateDTO) :IRequest<Response<CityUpdateDTO>>;
+   public record EditCityCommand(CityUpdateDTO CityUpdateDTO) :IRequest<Response<CityUpdateDTO>>;
 
 
 }

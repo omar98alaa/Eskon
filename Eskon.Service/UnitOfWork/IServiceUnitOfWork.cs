@@ -16,6 +16,10 @@ namespace Eskon.Service.UnitOfWork
         public ITicketService TicketService { get; }
         public ITransactionService TransactionService { get; }
         public IUserService UserService { get; }
+        public ICityService CityService { get; }
+        public ICountryService CountryService { get; }
+
+        
         #endregion
 
         #region Methods

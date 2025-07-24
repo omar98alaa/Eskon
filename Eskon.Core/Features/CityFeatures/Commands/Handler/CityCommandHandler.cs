@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.CityFeatures.Commands.Commands;
-using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.CityDTO;
-using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Models;
-using Eskon.Service.Interfaces;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 
@@ -16,17 +13,14 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
         IRequestHandler<EditCityCommand, Response<CityUpdateDTO>>
     {
         #region fields
-        private readonly ICityService _cityService;
-        private readonly ICountryService _countryService;
         private readonly IMapper _mapper;
         private readonly IServiceUnitOfWork _unitofwork;
         #endregion
 
         #region constructor
-        public CityCommandHandler(ICityService cityService, ICountryService countryService, IMapper mapper, IServiceUnitOfWork unitofwork)
+        public CityCommandHandler(IMapper mapper, IServiceUnitOfWork unitofwork)
         {
-            _cityService = cityService;
-            _countryService = countryService;
+
             _mapper = mapper;
             _unitofwork = unitofwork;
         }
@@ -34,18 +28,18 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
         #endregion
         public async Task<Response<CityDTO>> Handle(AddCityCommand request, CancellationToken cancellationToken)
         {
-            var country = await _countryService.GetCountryByNameAsync(request.CountryName);
+            var country = await _unitofwork.CountryService.GetCountryByNameAsync(request.CityDTO.CountryName);
 
             if (country == null)
                 return NotFound<CityDTO>("Country not found");
 
             var city = new City
             {
-                Name = request.name,
+                Name = request.CityDTO.Name,
                 CountryId = country.Id
             };
 
-            var addedCity = await _cityService.AddCityAsync(city);
+            var addedCity = await _unitofwork.CityService.AddCityAsync(city);
             await _unitofwork.SaveChangesAsync();
 
             var result = _mapper.Map<CityDTO>(addedCity);
@@ -54,12 +48,12 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
 
         public async Task<Response<CityDTO>> Handle(DeleteCityCommand request, CancellationToken cancellationToken)
         {
-            var city = await _cityService.GetCityByIdAsync(request.id);
+            var city = await _unitofwork.CityService.GetCityByIdAsync(request.id);
             if (city == null)
-              return NotFound<CityDTO>("City not found");
-            
+                return NotFound<CityDTO>("City not found");
+
             city.DeletedAt = DateTime.UtcNow;
-            await _cityService.DeleteCityAsync(city);
+            await _unitofwork.CityService.DeleteCityAsync(city);
             await _unitofwork.SaveChangesAsync();
 
             var result = _mapper.Map<CityDTO>(city);
@@ -69,7 +63,7 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
 
         public async Task<Response<CityUpdateDTO>> Handle(EditCityCommand request, CancellationToken cancellationToken)
         {
-            var city = await _cityService.GetCityByIdAsync(request.id);
+            var city = await _unitofwork.CityService.GetCityByIdAsync(request.CityUpdateDTO.Id);
             if (city == null)
                 return NotFound<CityUpdateDTO>("City is not found");
 
@@ -77,7 +71,7 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
             city.CountryId = request.CityUpdateDTO.CountryId;
             city.UpdatedAt = DateTime.UtcNow;
 
-            await _cityService.UpdateCityAsync(city);
+            await _unitofwork.CityService.UpdateCityAsync(city);
             await _unitofwork.SaveChangesAsync();
 
             var dto = _mapper.Map<CityUpdateDTO>(city);

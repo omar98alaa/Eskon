@@ -1,7 +1,7 @@
-﻿using Eskon.API.Base;
+﻿using AutoMapper;
+using Eskon.API.Base;
 using Eskon.Core.Features.ImageFeatures.Commands.Command;
 using Eskon.Core.Features.ImageFeatures.Commands.Commands;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eskon.API.Controllers
@@ -10,12 +10,12 @@ namespace Eskon.API.Controllers
     [ApiController]
     public class ImagesController : BaseController
     {
-            private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-     public ImagesController(IMediator mediator)
-     {
-         _mediator = mediator;
-      }
+        public ImagesController(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
 
         [HttpPost("upload/image")]
         public async Task<IActionResult> UploadImage(IFormFile? file)
@@ -23,20 +23,20 @@ namespace Eskon.API.Controllers
             if (file == null || file.Length == 0)
                 return NotFound("No file uploaded.");
 
-            var result = await _mediator.Send(new UploadImageCommand(file));
+            var result = await Mediator.Send(new UploadImageCommand(file));
 
-            return NewResult(result); 
+            return NewResult(result);
         }
 
         [HttpDelete("delete/{fileName}")]
         public async Task<IActionResult> DeleteImage(string fileName)
         {
             var command = new DeleteImageCommand(fileName);
-            var result = await _mediator.Send(command);
+            var result = await Mediator.Send(command);
 
-            return NewResult(result); 
+            return NewResult(result);
         }
     }
 
-    }
+}
 

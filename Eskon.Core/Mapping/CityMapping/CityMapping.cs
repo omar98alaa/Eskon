@@ -1,9 +1,4 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Core.Mapping.CityMapping
 {
@@ -14,7 +9,8 @@ namespace Eskon.Core.Mapping.CityMapping
             UpdateCityMapping();
             ListCityMapping();
             GetCityMapping();
-        
+
+
         }
 
     }

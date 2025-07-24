@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using Eskon.Core.Features.Country_CityFeatures.Commands.Commands;
 using Eskon.Core.Features.CountryFeatures.Queries.Models;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.Country_City;
-using Eskon.Service.Interfaces;
+using Eskon.Service.UnitOfWork;
 using MediatR;
 
 
@@ -13,19 +12,20 @@ namespace Eskon.Core.Features.CountryFeatures.Queries.Handlers
         IRequestHandler<GetCountryListQuery, Response<List<CountryDTO>>>
     {
         #region Fields
-        private readonly ICountryService _countryService;
         private readonly IMapper _mapper;
+        private readonly IServiceUnitOfWork _unitOfWork;
 
         #endregion
 
-        public CountryQueryHandler(ICountryService countryService, IMapper mapper)
+        public CountryQueryHandler(IMapper mapper, IServiceUnitOfWork unitOfWork)
         {
-            _countryService = countryService;
+
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
         public async Task<Response<CountryDTO>> Handle(GetCountryByNameQuery request, CancellationToken cancellationToken)
         {
-            var country = await _countryService.GetCountryByNameAsync(request.Name);
+            var country = await _unitOfWork.CountryService.GetCountryByNameAsync(request.Name);
 
             if (country == null)
                 return Response<CountryDTO>.Fail("Country not found");
@@ -36,7 +36,7 @@ namespace Eskon.Core.Features.CountryFeatures.Queries.Handlers
 
         public async Task<Response<List<CountryDTO>>> Handle(GetCountryListQuery request, CancellationToken cancellationToken)
         {
-            var countries = await _countryService.GetCountryListAsync();
+            var countries = await _unitOfWork.CountryService.GetCountryListAsync();
             var dtoList = _mapper.Map<List<CountryDTO>>(countries);
             return Response<List<CountryDTO>>.Success(dtoList);
         }

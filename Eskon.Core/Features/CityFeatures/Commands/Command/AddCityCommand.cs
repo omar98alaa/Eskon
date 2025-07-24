@@ -5,5 +5,5 @@ using MediatR;
 
 namespace Eskon.Core.Features.CityFeatures.Commands.Commands
 {
-    public record AddCityCommand(string name,string CountryName) : IRequest<Response<CityDTO>>;
+    public record AddCityCommand(CityDTO CityDTO) : IRequest<Response<CityDTO>>;
 }

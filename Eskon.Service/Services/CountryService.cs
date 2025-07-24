@@ -1,16 +1,10 @@
 ﻿using Eskon.Domian.Models;
-using Eskon.Infrastructure.Generics;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Service.Services
 {
-    public class CountryService :ICountryService
+    public class CountryService : ICountryService
     {
         #region Fields
         private readonly ICountryRepository _countryRepository;
@@ -46,12 +40,12 @@ namespace Eskon.Service.Services
 
         public async Task UpdateCountryAsync(Country country)
         {
-           await _countryRepository.UpdateAsync(country);
+            await _countryRepository.UpdateAsync(country);
         }
 
         public async Task DeleteCountryAsync(Country country)
         {
-           await _countryRepository.DeleteAsync(country);
+            await _countryRepository.DeleteAsync(country);
         }
 
         #endregion

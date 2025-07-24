@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Eskon.Domian.DTOs.City;
 using Eskon.Domian.DTOs.CityDTO;
 using Eskon.Domian.Models;
 
