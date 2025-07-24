@@ -83,8 +83,17 @@ namespace Eskon.Core.Response
             return new Response<T>()
             {
                 StatusCode = System.Net.HttpStatusCode.Unauthorized,
-                Succeeded = true,
+                Succeeded = false,
                 Message = "UnAuthorized"
+            };
+        }
+        public Response<T> Forbidden<T>()
+        {
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.Forbidden,
+                Succeeded = false,
+                Message = "Forbidden"
             };
         }
         public Response<T> BadRequest<T>(string Message = null)
