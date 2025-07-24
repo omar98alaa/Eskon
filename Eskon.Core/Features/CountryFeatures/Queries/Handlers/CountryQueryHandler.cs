@@ -28,17 +28,17 @@ namespace Eskon.Core.Features.CountryFeatures.Queries.Handlers
             var country = await _unitOfWork.CountryService.GetCountryByNameAsync(request.Name);
 
             if (country == null)
-                return Response<CountryDTO>.Fail("Country not found");
+                return NotFound<CountryDTO>("Country not found");
 
             var dto = _mapper.Map<CountryDTO>(country);
-            return Response<CountryDTO>.Success(dto);
+            return Success(dto);
         }
 
         public async Task<Response<List<CountryDTO>>> Handle(GetCountryListQuery request, CancellationToken cancellationToken)
         {
             var countries = await _unitOfWork.CountryService.GetCountryListAsync();
             var dtoList = _mapper.Map<List<CountryDTO>>(countries);
-            return Response<List<CountryDTO>>.Success(dtoList);
+            return Success(dtoList);
         }
     }
 }

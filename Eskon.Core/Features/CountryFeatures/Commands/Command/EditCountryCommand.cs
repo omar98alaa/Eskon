@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Eskon.Core.Features.Country_CityFeatures.Commands.Commands
 {
-    public record EditCountryCommand(int Id, CountryUpdateDTO CountryUpdateDTO)
+    public record EditCountryCommand(Guid Id, CountryUpdateDTO CountryUpdateDTO)
         : IRequest<Response<CountryUpdateDTO>>;
 
 }

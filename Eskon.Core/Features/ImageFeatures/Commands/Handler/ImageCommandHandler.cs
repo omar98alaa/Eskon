@@ -22,7 +22,7 @@ namespace Eskon.Core.Features.ImageFeatures.Commands.Handler
         public async Task<Response<string>> Handle(DeleteImageCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(request.FileName))
-                return NotFound<string>("File name is required");
+                return BadRequest<string>("File name is required");
 
             var uploadsFolder = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads", "images");
             var filePath = Path.Combine(uploadsFolder, request.FileName);

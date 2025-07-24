@@ -40,7 +40,7 @@ namespace Eskon.API.Controllers
         }
 
         [HttpPut("/Edit/country/{id}")]
-        public async Task<IActionResult> Edit(int id, [FromBody] CountryUpdateDTO dto)
+        public async Task<IActionResult> Edit(Guid id, [FromBody] CountryUpdateDTO dto)
         {
             var result = await Mediator.Send(new EditCountryCommand(id, dto));
             return Ok(result);

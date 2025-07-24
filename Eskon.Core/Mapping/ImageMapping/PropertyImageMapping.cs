@@ -6,7 +6,7 @@ namespace Eskon.Core.Mapping.PropertyImageMapping
     {
         public PropertyImageMapping()
         {
-            UploadPropertyImageMapping();
+
             ReadPropertyImage();
 
         }

@@ -33,6 +33,14 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
             if (country == null)
                 return NotFound<CityDTO>("Country not found");
 
+            var existingCity = await _unitofwork.CityService.GetCityByNameAsync(request.CityDTO.Name);
+
+            if (existingCity.CountryId == country.Id)
+            {
+                var existCity = _mapper.Map<CityDTO>(existingCity);
+                return BadRequest<CityDTO>("City already exists in this country");
+            }
+
             var city = new City
             {
                 Name = request.CityDTO.Name,
@@ -63,19 +71,32 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
 
         public async Task<Response<CityUpdateDTO>> Handle(EditCityCommand request, CancellationToken cancellationToken)
         {
-            var city = await _unitofwork.CityService.GetCityByIdAsync(request.CityUpdateDTO.Id);
-            if (city == null)
-                return NotFound<CityUpdateDTO>("City is not found");
+            var dto = request.CityUpdateDTO;
 
-            city.Name = request.CityUpdateDTO.Name;
-            city.CountryId = request.CityUpdateDTO.CountryId;
+            var city = await _unitofwork.CityService.GetCityByNameAsync(request.name);
+            if (city == null)
+                return NotFound<CityUpdateDTO>("City not found");
+
+            var country = await _unitofwork.CountryService.GetCountryByNameAsync(dto.CountryName);
+            if (country == null)
+                return NotFound<CityUpdateDTO>("Country not found");
+
+            var existingCity = await _unitofwork.CityService.GetCityByNameAsync(dto.Name);
+
+            if (existingCity != null && existingCity.Id != city.Id && existingCity.CountryId == country.Id)
+                return BadRequest<CityUpdateDTO>(null, "This city already exists in this country");
+
+            city.Name = dto.Name;
+            city.CountryId = country.Id;
             city.UpdatedAt = DateTime.UtcNow;
 
             await _unitofwork.CityService.UpdateCityAsync(city);
             await _unitofwork.SaveChangesAsync();
 
-            var dto = _mapper.Map<CityUpdateDTO>(city);
-            return Success(dto, "City updated successfully");
+            return Success(dto, "City updated");
+
+
+
         }
     }
 }

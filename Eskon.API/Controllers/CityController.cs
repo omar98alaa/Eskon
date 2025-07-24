@@ -40,12 +40,13 @@ namespace Eskon.API.Controllers
             return NewResult(result);
         }
 
-        [HttpPut("/edit/city/{id}")]
-        public async Task<IActionResult> Edit(Guid id, [FromBody] CityUpdateDTO dto)
+        [HttpPut("/edit/city/{name}")]
+        public async Task<IActionResult> Edit(string name, [FromBody] CityUpdateDTO dto)
         {
-            var result = await Mediator.Send(new EditCityCommand(dto));
+            var result = await Mediator.Send(new EditCityCommand(name, dto));
             return NewResult(result);
         }
+
 
 
         [HttpDelete("delete/city/{id}")]
