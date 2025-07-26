@@ -68,6 +68,15 @@ namespace Eskon.API.Controllers
             return NewResult(response);
         }
 
+        [Authorize(Roles = "Root")]
+        // Get the admins list
+        [HttpGet("AdminsList")]
+        public async Task<IActionResult> GetAllAdmins()
+        {
+            var response = await Mediator.Send(new GetAllAdminsQuery());
+            return NewResult(response);
+        }
+
         #endregion
 
     }

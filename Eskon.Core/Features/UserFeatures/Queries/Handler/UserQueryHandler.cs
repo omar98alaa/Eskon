@@ -2,7 +2,9 @@
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.User;
+using Eskon.Domian.Entities.Identity;
 using Eskon.Service.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
 
 namespace Eskon.Core.Features.UserFeatures.Queries.Handler
 {
@@ -11,13 +13,15 @@ namespace Eskon.Core.Features.UserFeatures.Queries.Handler
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
         #endregion
 
         #region Constructors
-        public UserQueryHandler(IServiceUnitOfWork serviceUnitOfWork, IMapper mapper)
+        public UserQueryHandler(IServiceUnitOfWork serviceUnitOfWork, IMapper mapper, UserManager<User> userManager)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _mapper = mapper;
+            _userManager = userManager;
         }
         #endregion
 
@@ -37,6 +41,13 @@ namespace Eskon.Core.Features.UserFeatures.Queries.Handler
                 return NotFound<UserReadDto>(message: $"User with id {request.id} not found");
             }
             return Success(_mapper.Map<UserReadDto>(user));
+        }
+
+        public async Task<Response<List<AdminsReadDTO>>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
+        {
+            var AdminsList = _mapper.Map<List<AdminsReadDTO>>(await _userManager.GetUsersInRoleAsync("Admin"));
+            return Success(AdminsList);
+           
         }
         #endregion
     }

@@ -8,8 +8,14 @@ namespace Eskon.Core.Mapping.Users
     {
         public UserProfileMapping()
         {
-            GetUserListMapping();
+            #region Commands
             AddUserMapping();
+            #endregion
+
+            #region Queries
+            GetUserListMapping();
+            GetAdminListMapping(); 
+            #endregion
         }
 
     }

@@ -5,6 +5,7 @@ using Eskon.Core.Features.UserRolesFeatures.Utilities;
 using Eskon.Domian.DTOs.RefreshToken;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +45,7 @@ namespace Eskon.API.Controllers
             return NewResult(token);
         }
 
+        [Authorize]
         [HttpPost("SignOut")]
         public async Task<IActionResult> SignOut([FromBody] CurrentRefreshTokenDTO CurrentRefreshToken)
         {
