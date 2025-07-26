@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Response;
+using Eskon.Domain.Utilities;
 using Eskon.Domian.DTOs.User;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Service.UnitOfWork;
@@ -43,10 +44,16 @@ namespace Eskon.Core.Features.UserFeatures.Queries.Handler
             return Success(_mapper.Map<UserReadDto>(user));
         }
 
-        public async Task<Response<List<AdminsReadDTO>>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
+        public async Task<Response<Paginated<AdminsReadDTO>>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
         {
-            var AdminsList = _mapper.Map<List<AdminsReadDTO>>(await _userManager.GetUsersInRoleAsync("Admin"));
-            return Success(AdminsList);
+            var AdminUsersPaginated = await _serviceUnitOfWork.UserService.GetUsersByRolePaginated(pageNumber: request.pageNumber, itemsPerPage: request.itemsPerPage, role: "Admin");
+            var AdminsList = _mapper.Map<List<AdminsReadDTO>>(AdminUsersPaginated.Data);
+            return Success(new Paginated<AdminsReadDTO>
+                (data: AdminsList, 
+                pageNumber: AdminUsersPaginated.PageNumber, 
+                pageSize: AdminUsersPaginated.PageSize,
+                totalRecords: AdminUsersPaginated.TotalRecords
+                ));
            
         }
         #endregion

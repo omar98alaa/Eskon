@@ -70,6 +70,8 @@ namespace Eskon.Domian.Entities.Identity
         public virtual ICollection<Transaction> TransactionsIn { get; set; }
 
         public virtual ICollection<Property> Properties { get; set; }
+
+        public virtual ICollection<UserRoles> UserRoles { get; set; } = new List<UserRoles>();
 }
 
 }

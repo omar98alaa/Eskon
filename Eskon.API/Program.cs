@@ -61,7 +61,7 @@ namespace Eskon.API
                 //options.Lockout.MaxFailedAccessAttempts = 5;
                 //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(2);
             })
-             .AddRoles<IdentityRole<Guid>>()
+             .AddRoles<Role>()
              .AddEntityFrameworkStores<MyDbContext>()
              .AddDefaultTokenProviders();
             #endregion
@@ -106,7 +106,7 @@ namespace Eskon.API
             // Seeding the Identity Roles at the Program Start
             using (var scope = app.Services.CreateScope())
             {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 await IdentitySeeder.SeedRolesAsync(roleManager);
             }
 

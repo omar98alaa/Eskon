@@ -15,12 +15,12 @@ namespace Eskon.Core.Features.AccountFeatures.Commands.Handler
         private readonly IMapper _mapper;
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly SignInManager<User> _signInManager;
         #endregion
 
         #region Constructors
-        public UserAccountCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager)
+        public UserAccountCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, RoleManager<Role> roleManager, SignInManager<User> signInManager)
         {
             _mapper = mapper;
             _serviceUnitOfWork = serviceUnitOfWork;

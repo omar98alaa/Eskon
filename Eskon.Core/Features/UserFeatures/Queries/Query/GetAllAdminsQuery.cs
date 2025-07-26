@@ -5,5 +5,5 @@ using MediatR;
 
 namespace Eskon.Core.Features.UserFeatures.Queries.Query
 {
-    public record GetAllAdminsQuery : IRequest<Response<List<AdminsReadDTO>>>;
+    public record GetAllAdminsQuery(int pageNumber, int itemsPerPage) : IRequest<Response<Paginated<AdminsReadDTO>>>;
 }

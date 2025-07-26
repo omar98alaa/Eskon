@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.Models;
 namespace Eskon.Infrastructure.Context
 {
-    public class MyDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+    public class MyDbContext : IdentityDbContext<User, Role, Guid ,
+                        IdentityUserClaim<Guid>, UserRoles,
+                        IdentityUserLogin<Guid>,
+                        IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         // To migrate
         //Add-Migration InitialCreate -OutputDir Migrations/
@@ -41,6 +44,8 @@ namespace Eskon.Infrastructure.Context
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRoles> UserRoles { get; set; }
         #endregion
 
         #region Configurations
@@ -230,8 +235,22 @@ namespace Eskon.Infrastructure.Context
             });
 
             modelBuilder.Entity<UserRefreshToken>().Ignore(x => x.DeletedAt);
+
             #endregion
 
+            #region UserRoles
+            modelBuilder.Entity<UserRoles>()
+                    .HasOne(ur => ur.User)
+                    .WithMany(u => u.UserRoles)
+                    .HasForeignKey(ur => ur.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserRoles>()
+                 .HasOne(ur => ur.Role)
+                 .WithMany(r => r.UserRoles)
+                 .HasForeignKey(ur => ur.RoleId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            #endregion
         }
 
         //

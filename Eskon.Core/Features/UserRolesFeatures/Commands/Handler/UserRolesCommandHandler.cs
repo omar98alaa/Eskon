@@ -15,15 +15,13 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
         #endregion
 
         #region Constructors
-        public UserRolesCommandHandler(IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, SignInManager<User> signInManager)
+        public UserRolesCommandHandler(IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _userManager = userManager;
-            _roleManager = roleManager;
         }
         #endregion
 

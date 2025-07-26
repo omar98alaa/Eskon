@@ -4,16 +4,19 @@ using Eskon.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Eskon.Infrastructure.Migrations
+namespace Askon.Infrastructure.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250726135710_AddingUserRolesTableInDbSet")]
+    partial class AddingUserRolesTableInDbSet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -189,21 +192,6 @@ namespace Eskon.Infrastructure.Migrations
                     b.ToTable("UserRefreshToken");
                 });
 
-            modelBuilder.Entity("Eskon.Domian.Entities.Identity.UserRoles", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
             modelBuilder.Entity("Eskon.Domian.Models.Booking", b =>
                 {
                     b.Property<Guid>("Id")
@@ -346,6 +334,9 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("CountryId");
 
                     b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Name", "CountryId")
                         .IsUnique();
 
                     b.ToTable("Cities");
@@ -857,6 +848,21 @@ namespace Eskon.Infrastructure.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -876,6 +882,21 @@ namespace Eskon.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.Property<Guid>("UserRolesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserRolesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("RoleUser");
+                });
+
             modelBuilder.Entity("Eskon.Domian.Entities.Identity.UserRefreshToken", b =>
                 {
                     b.HasOne("Eskon.Domian.Entities.Identity.User", "User")
@@ -883,25 +904,6 @@ namespace Eskon.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Eskon.Domian.Entities.Identity.UserRoles", b =>
-                {
-                    b.HasOne("Eskon.Domian.Entities.Identity.Role", "Role")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Eskon.Domian.Entities.Identity.User", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
@@ -1153,6 +1155,21 @@ namespace Eskon.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.HasOne("Eskon.Domian.Entities.Identity.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Eskon.Domian.Entities.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("Eskon.Domian.Entities.Identity.User", null)
@@ -1162,9 +1179,19 @@ namespace Eskon.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Eskon.Domian.Entities.Identity.Role", b =>
+            modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.Navigation("UserRoles");
+                    b.HasOne("Eskon.Domian.Entities.Identity.Role", null)
+                        .WithMany()
+                        .HasForeignKey("UserRolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Eskon.Domian.Entities.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Eskon.Domian.Entities.Identity.User", b =>
@@ -1198,8 +1225,6 @@ namespace Eskon.Infrastructure.Migrations
                     b.Navigation("User2Chats");
 
                     b.Navigation("UserRefreshTokens");
-
-                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Chat", b =>

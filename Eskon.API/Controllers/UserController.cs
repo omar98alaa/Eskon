@@ -26,6 +26,7 @@ namespace Eskon.API.Controllers
         #region Controllers
 
 
+        #region Read Controllers
         [HttpGet("List")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -39,6 +40,18 @@ namespace Eskon.API.Controllers
             var response = await Mediator.Send(new GetUserByIdQuery(id));
             return NewResult(response);
         }
+
+        [Authorize(Roles = "Root")]
+        // Get the admins list
+        [HttpGet("AdminsList")]
+        public async Task<IActionResult> GetAllAdmins([FromQuery] int pageNumber, [FromQuery] int itemsPerPage)
+        {
+            var response = await Mediator.Send(new GetAllAdminsQuery(
+                                            itemsPerPage: itemsPerPage,
+                                            pageNumber: pageNumber));
+            return NewResult(response);
+        } 
+        #endregion
 
         [Authorize(Roles = "Customer")]
         // Id of the user to be added to Owner Role
@@ -65,15 +78,6 @@ namespace Eskon.API.Controllers
         public async Task<IActionResult> DeleteAdminRole([FromBody] AdminRoleDTO AdminRole)
         {
             var response = await Mediator.Send(new DeleteAdminRoleFromUserCommand(AdminRole));
-            return NewResult(response);
-        }
-
-        [Authorize(Roles = "Root")]
-        // Get the admins list
-        [HttpGet("AdminsList")]
-        public async Task<IActionResult> GetAllAdmins()
-        {
-            var response = await Mediator.Send(new GetAllAdminsQuery());
             return NewResult(response);
         }
 
