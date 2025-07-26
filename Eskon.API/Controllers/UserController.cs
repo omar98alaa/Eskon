@@ -2,11 +2,9 @@
 using Eskon.API.Base;
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
-using Eskon.Domian.Entities.Identity;
-using MediatR;
+using Eskon.Domian.DTOs.Roles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Eskon.API.Controllers
 {
@@ -28,23 +26,36 @@ namespace Eskon.API.Controllers
         #region Controllers
 
 
-        [HttpGet("/User/List")]
+        #region Read Controllers
+        [HttpGet("List")]
         public async Task<IActionResult> GetAllUsers()
         {
             var response = await Mediator.Send(new GetAllUsersQuery());
             return NewResult(response);
         }
 
-        [HttpGet("/User/{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetUserById([FromRoute] Guid id)
         {
             var response = await Mediator.Send(new GetUserByIdQuery(id));
             return NewResult(response);
         }
 
+        [Authorize(Roles = "Root")]
+        // Get the admins list
+        [HttpGet("AdminsList")]
+        public async Task<IActionResult> GetAllAdmins([FromQuery] int pageNumber, [FromQuery] int itemsPerPage)
+        {
+            var response = await Mediator.Send(new GetAllAdminsQuery(
+                                            itemsPerPage: itemsPerPage,
+                                            pageNumber: pageNumber));
+            return NewResult(response);
+        } 
+        #endregion
+
         [Authorize(Roles = "Customer")]
         // Id of the user to be added to Owner Role
-        [HttpPut("/User/AddOwner/")]
+        [HttpPut("AddOwner")]
         public async Task<IActionResult> AddOwnerRole()
         {
             Guid UserToBeOwnerId = GetUserIdFromAuthenticatedUserToken();
@@ -54,19 +65,19 @@ namespace Eskon.API.Controllers
 
         [Authorize(Roles = "Root")]
         // Id of the user to be added to Admin Role
-        [HttpPut("/User/AddAdmin/{UserToBeAdminId:guid}")]
-        public async Task<IActionResult> AddAdminRole([FromRoute] Guid UserToBeAdminId)
+        [HttpPut("AddAdmin")]
+        public async Task<IActionResult> AddAdminRole([FromBody] AdminRoleDTO AdminRole)
         {
-            var response = await Mediator.Send(new AddAdminRoleToUserCommand(UserToBeAdminId));
+            var response = await Mediator.Send(new AddAdminRoleToUserCommand(AdminRole));
             return NewResult(response);
         }
 
         [Authorize(Roles = "Root")]
         // Id of the user to be removed from Admin Role
-        [HttpPut("/User/RemoveAdmin/{UserToRemoveAdminId:guid}")]
-        public async Task<IActionResult> DeleteAdminRole([FromRoute] Guid UserToRemoveAdminId)
+        [HttpPut("RemoveAdmin")]
+        public async Task<IActionResult> DeleteAdminRole([FromBody] AdminRoleDTO AdminRole)
         {
-            var response = await Mediator.Send(new DeleteAdminRoleFromUserCommand(UserToRemoveAdminId));
+            var response = await Mediator.Send(new DeleteAdminRoleFromUserCommand(AdminRole));
             return NewResult(response);
         }
 

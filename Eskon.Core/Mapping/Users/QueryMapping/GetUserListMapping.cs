@@ -12,5 +12,12 @@ namespace Eskon.Core.Mapping.Users
             CreateMap<User, UserReadDto>();
 
         }
+
+        public void GetAdminListMapping()
+        {
+            // Source -> Destination
+            CreateMap<User, AdminsReadDTO>().ReverseMap();
+
+        }
     }
 }

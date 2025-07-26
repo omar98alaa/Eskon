@@ -25,7 +25,7 @@ namespace Eskon.Core.Features.UserRolesFeatures.Utilities
         #region Actions
         public async Task<Response<TokenResponseDto>> Handle(GetNewAccessToken request, CancellationToken cancellationToken)
         {
-            var storedToken = await _serviceUnitOfWork.RefreshTokenService.GetStoredTokenAsync(request.RefreshToken);
+            var storedToken = await _serviceUnitOfWork.RefreshTokenService.GetStoredTokenAsync(request.RefreshToken.CurrentRefreshToken);
 
             if (storedToken == null || storedToken.IsRevoked || storedToken.ExpiresAt < DateTime.UtcNow)
             {

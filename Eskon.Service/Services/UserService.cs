@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Eskon.Domain.Utilities;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
@@ -42,6 +43,11 @@ namespace Eskon.Service.Services
         public async Task<User> GetUserByEmail(string email)
         {
             return await _userRepository.GetUserByEmailAsync(email);
+        }
+
+        public async Task<Paginated<User>> GetUsersByRolePaginated(int pageNumber, int itemsPerPage, string role)
+        {
+            return await _userRepository.GetPaginatedAsync(pageNumber, itemsPerPage, filter: u => u.UserRoles.Any(r => r.Role.NormalizedName == role.ToUpperInvariant()));
         }
     }
 }

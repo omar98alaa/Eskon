@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Entities.Identity;
+﻿using Eskon.Domain.Utilities;
+using Eskon.Domian.Entities.Identity;
 
 namespace Eskon.Service.Interfaces
 {
@@ -8,6 +9,7 @@ namespace Eskon.Service.Interfaces
         public Task<User> GetUserByIdAsync(Guid id);
         public Task<List<User>> GetAllUsersAsync();
         public Task<User> GetUserByEmailAsync(string email);
+        public Task<Paginated<User>> GetUsersByRolePaginated(int pageNumber, int itemsPerPage, string role);
 
     }
 }
