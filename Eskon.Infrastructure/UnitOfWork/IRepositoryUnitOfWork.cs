@@ -1,10 +1,4 @@
 ﻿using Eskon.Infrastructure.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Eskon.Infrastructure.UnitOfWork
 {
@@ -12,7 +6,13 @@ namespace Eskon.Infrastructure.UnitOfWork
     {
         #region Properties
         public IBookingRepository BookingRepository { get; }
+        public IChatRepository ChatRepository { get; }
+        public IChatMessageRepository ChatMessageRepository { get; }
+        public ICityRepository CityRepository { get; }
+        public ICountryRepository CountryRepository { get; }
         public IFavouriteRepository FavouriteRepository { get; }
+        public INotificationRepository NotificationRepository { get; }
+        public INotificationTypeRepository NotificationTypeRepository { get; }
         public IPaymentRepository PaymentRepository { get; }
         public IPropertyRepository PropertyRepository { get; }
         public IPropertyTypeRepository PropertyTypeRepository { get; }
@@ -21,10 +21,6 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ITicketRepository TicketRepository { get; }
         public ITransactionRepository TransactionRepository { get; }
         public IUserRepository UserRepository { get; }
-        public ICityRepository CityRepository { get; }
-        public ICountryRepository CountryRepository { get; }
-
-        
         #endregion
 
         #region Methods
