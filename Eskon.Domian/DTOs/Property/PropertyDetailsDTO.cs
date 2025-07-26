@@ -1,16 +1,9 @@
-﻿using Eskon.Domian.Models;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Eskon.Domian.DTOs.Property
+﻿namespace Eskon.Domian.DTOs.Property
 {
     public class PropertyDetailsDTO
     {
+        public Guid Id { get; set; }
+
         public string Title { get; set; }
 
         public string Description { get; set; }

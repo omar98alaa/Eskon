@@ -8,6 +8,8 @@ namespace Eskon.Domian.DTOs.Property
 {
     public class PropertySummaryDTO
     {
+        public Guid Id { get; set; }
+
         public string Title { get; set; }
 
         public int MaxGuests { get; set; }
