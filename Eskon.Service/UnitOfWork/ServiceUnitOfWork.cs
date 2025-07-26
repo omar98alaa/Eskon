@@ -41,6 +41,10 @@ namespace Eskon.Service.UnitOfWork
         private ITransactionService transactionService;
 
         private IUserService userService;
+        private ICityService cityService;
+        private ICountryService countryService;
+        private IImageService imageService;
+        private IFileService fileService;
         #endregion
 
         #region Properties
@@ -73,6 +77,11 @@ namespace Eskon.Service.UnitOfWork
         public ITransactionService TransactionService => transactionService == null ? new TransactionService(repositoryUnitOfWork.TransactionRepository) : transactionService;
 
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
+
+        public ICityService CityService => cityService == null ? new CityService(repositoryUnitOfWork.CityRepository) : cityService;
+
+        public ICountryService CountryService => countryService == null ? new CountryService(repositoryUnitOfWork.CountryRepository) : countryService;
+
         #endregion
 
         #region Constructors

@@ -296,6 +296,9 @@ namespace Eskon.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
+                    b.HasIndex("Name", "CountryId")
+                        .IsUnique();
+
                     b.ToTable("Cities");
                 });
 

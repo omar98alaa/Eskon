@@ -100,6 +100,9 @@ namespace Eskon.Infrastructure.Context
                 .WithMany(cntry => cntry.Cities)
                 .HasForeignKey(cty => cty.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<City>()
+        .HasIndex(cty => new { cty.Name, cty.CountryId })
+        .IsUnique();
             #endregion
 
             #region Favourite

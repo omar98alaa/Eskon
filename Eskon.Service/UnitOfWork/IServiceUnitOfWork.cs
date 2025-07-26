@@ -9,7 +9,11 @@ namespace Eskon.Service.UnitOfWork
         public IBookingService BookingService { get; }
         public IChatService ChatService { get; }
         public IChatMessagesService ChatMessagesService { get; }
+        public ICityService CityService { get; }
+        public ICountryService CountryService { get; }
         public IFavouriteService FavouriteService { get; }
+        public INotificationService NotificationService { get; }
+        public INotificationTypeService NotificationTypeService { get; }
         public IPaymentService PaymentService { get; }
         public IPropertyService PropertyService { get; }
         public IPropertyTypeService PropertyTypeService { get; }
@@ -18,8 +22,6 @@ namespace Eskon.Service.UnitOfWork
         public ITicketService TicketService { get; }
         public ITransactionService TransactionService { get; }
         public IUserService UserService { get; }
-        public INotificationTypeService NotificationTypeService { get; }
-        public INotificationService NotificationService { get; }
         #endregion
 
         #region Methods

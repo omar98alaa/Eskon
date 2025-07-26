@@ -1,0 +1,11 @@
+﻿using Eskon.Core.Response;
+using Eskon.Domian.DTOs.CityDTO;
+using MediatR;
+
+namespace Eskon.Core.Features.CityFeatures.Commands.Commands
+{
+ 
+   public record EditCityCommand(string name,CityUpdateDTO CityUpdateDTO) :IRequest<Response<CityUpdateDTO>>;
+
+
+}
