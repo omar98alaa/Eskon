@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Eskon.Core.Features.AccountFeatures.Commands.Command
 {
-    public record SignOutUserCommand(CurrentRefreshTokenDTO CurrentRefreshToken) : IRequest<Response<string>>;
+    public record SignOutUserCommand(CurrentRefreshTokenDTO CurrentRefreshToken, Guid userId) : IRequest<Response<string>>;
 }

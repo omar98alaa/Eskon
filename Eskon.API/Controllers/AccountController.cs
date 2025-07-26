@@ -49,7 +49,8 @@ namespace Eskon.API.Controllers
         [HttpPost("SignOut")]
         public async Task<IActionResult> SignOut([FromBody] CurrentRefreshTokenDTO CurrentRefreshToken)
         {
-            return NewResult(await Mediator.Send(new SignOutUserCommand(CurrentRefreshToken)));
+            var userId = GetUserIdFromAuthenticatedUserToken();
+            return NewResult(await Mediator.Send(new SignOutUserCommand(CurrentRefreshToken, userId)));
         }
 
         [HttpPost("Refresh")]
