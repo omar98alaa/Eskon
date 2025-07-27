@@ -51,7 +51,8 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             //check City and country stored in database
             List<User> AdminUsers = _userManager.GetUsersInRoleAsync("Admin").Result.ToList();
             Random random = new Random();
-            User Admin=AdminUsers[random.Next(AdminUsers.Count)];
+            var idx = random.Next(AdminUsers.Count);
+            User Admin=AdminUsers[idx];
             Property property = _mapper.Map<Property>(request.PropertyWriteDTO);
             property.OwnerId=request.ownerId;
             property.AssignedAdminId =Admin.Id;

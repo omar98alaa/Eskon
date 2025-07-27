@@ -3,6 +3,7 @@ using Eskon.Domian.Models;
 using Eskon.Domian.Utilities;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
+using System.Linq.Expressions;
 
 namespace Eskon.Service.Services
 {
@@ -32,7 +33,27 @@ namespace Eskon.Service.Services
 
         public async Task<Paginated<Property>> GetFilteredActivePropertiesPaginatedAsync(int pageNum, int itemsPerPage, PropertySearchFilters psf)
         {
-            return await propertyRepository.GetPaginatedAsync(
+
+            Expression<Func<Property, dynamic>> sort = null;
+
+            switch (psf.SortBy?.ToUpperInvariant())
+            {
+                case "RATING":
+                    sort = p => p.AverageRating;
+                    break;
+
+                case "CREATEDATE":
+                    sort = p => p.CreatedAt;
+                    break;
+
+                case "PRICE":
+                    sort = p => p.PricePerNight;
+                    break;
+            }
+
+            return await propertyRepository.GetPaginatedSortedAsync(
+                sort,
+                psf.Asc,
                 pageNum,
                 itemsPerPage,
                 filter: p => p.IsAccepted &&

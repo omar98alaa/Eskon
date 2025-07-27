@@ -32,6 +32,8 @@ namespace Eskon.API.Controllers
             [FromQuery] string? cityName,
             [FromQuery] string? countryName,
             [FromQuery] int? Guests,
+            [FromQuery] string? SortBy,
+            [FromQuery] bool asc = false,
             [FromQuery] int pageNum = 1,
             [FromQuery] int itemsPerPage = 10
             )
@@ -42,7 +44,9 @@ namespace Eskon.API.Controllers
                 maxPricePerNight = maxPricePerNight,
                 CityName = cityName,
                 CountryName = countryName,
-                Guests = Guests
+                Guests = Guests,
+                SortBy = SortBy,
+                Asc = asc
             };
 
             var response = await Mediator.Send(new GetFilteredActivePropertiesPaginated(pageNum, itemsPerPage, propertySearchFilters));
