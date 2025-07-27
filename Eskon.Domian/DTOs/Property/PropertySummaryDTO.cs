@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Eskon.Domian.DTOs.Property
+﻿namespace Eskon.Domian.DTOs.Property
 {
     public class PropertySummaryDTO
     {
+        public Guid Id { get; set; }
+
         public string Title { get; set; }
 
         public int MaxGuests { get; set; }

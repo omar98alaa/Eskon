@@ -3,6 +3,7 @@ using Eskon.API.Base;
 using Eskon.Core.Features.PropertyFeatures.Commands.Command;
 using Eskon.Core.Features.PropertyFeatures.Queries.Query;
 using Eskon.Domian.DTOs.Property;
+using Eskon.Domian.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,33 @@ namespace Eskon.API.Controllers
         #endregion
 
         #region Controllers
-        // Get All
+        [HttpGet]
+        public async Task<IActionResult> GetFilteredActivePropertiesPaginated(
+            [FromQuery] decimal? minPricePerNight,
+            [FromQuery] decimal? maxPricePerNight,
+            [FromQuery] string? cityName,
+            [FromQuery] string? countryName,
+            [FromQuery] int? Guests,
+            [FromQuery] string? SortBy,
+            [FromQuery] bool asc = false,
+            [FromQuery] int pageNum = 1,
+            [FromQuery] int itemsPerPage = 10
+            )
+        {
+            var propertySearchFilters = new PropertySearchFilters()
+            {
+                minPricePerNight = minPricePerNight,
+                maxPricePerNight = maxPricePerNight,
+                CityName = cityName,
+                CountryName = countryName,
+                Guests = Guests,
+                SortBy = SortBy,
+                Asc = asc
+            };
+
+            var response = await Mediator.Send(new GetFilteredActivePropertiesPaginated(pageNum, itemsPerPage, propertySearchFilters));
+            return NewResult(response);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPropertyById([FromRoute] Guid id)
