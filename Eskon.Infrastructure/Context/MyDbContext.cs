@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Entities.Identity;
+﻿using Eskon.Domian.Entities;
+using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -275,7 +276,7 @@ namespace Eskon.Infrastructure.Context
         private void SetTimestamps()
         {
             var entries = ChangeTracker.Entries()
-                .Where(e => e.Entity is BaseModel &&
+                .Where(e => e.Entity is IBaseModel &&
                             (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             var now = DateTime.UtcNow;
@@ -284,10 +285,10 @@ namespace Eskon.Infrastructure.Context
             {
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Property(nameof(BaseModel.CreatedAt)).CurrentValue = now;
+                    entry.Property(nameof(IBaseModel.CreatedAt)).CurrentValue = now;
                 }
 
-                entry.Property(nameof(BaseModel.UpdatedAt)).CurrentValue = now;
+                entry.Property(nameof(IBaseModel.UpdatedAt)).CurrentValue = now;
             }
         }
         #endregion
