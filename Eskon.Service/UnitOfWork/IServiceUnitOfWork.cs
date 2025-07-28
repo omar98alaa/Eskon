@@ -12,6 +12,8 @@ namespace Eskon.Service.UnitOfWork
         public ICityService CityService { get; }
         public ICountryService CountryService { get; }
         public IFavouriteService FavouriteService { get; }
+        public IFileService FileService { get; }
+        public IImageService ImageService { get; }
         public INotificationService NotificationService { get; }
         public INotificationTypeService NotificationTypeService { get; }
         public IPaymentService PaymentService { get; }

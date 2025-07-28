@@ -4,6 +4,8 @@ namespace Eskon.Service.Interfaces
 {
     public interface IFileService
     {
-        Task<string> UploadImageAsync(IFormFile file);
+        Task<string> SaveImageToFolderAsync(IFormFile file);
+
+        Task<bool> DeleteImageFromFolderAsync(string fileName);
     }
 }
