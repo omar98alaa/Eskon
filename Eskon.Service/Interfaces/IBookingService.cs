@@ -19,6 +19,7 @@ namespace Eskon.Service.Interfaces
         public Task<List<Booking>> GetBookingHistoryPerCustomerAsync(Guid customerId);
         public Task<List<Booking>> GetBookingHistoryPerPropertyAsync(Guid propertyId);
         public Task<List<Booking>> GetUpcomingBookingsPerPropertyAsync(Guid propertyId);
+        public Task<List<Booking>> GetPendingBookingsPerPropertyAsync(Guid propertyId);
         #endregion
 
         #region Update
