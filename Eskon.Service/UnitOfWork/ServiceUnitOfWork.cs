@@ -20,8 +20,16 @@ namespace Eskon.Service.UnitOfWork
 
         private IChatMessagesService chatMessagesService;
 
+        private ICityService cityService;
+
+        private ICountryService countryService;
+
         private IFavouriteService favouriteService;
-        
+
+        private IFileService fileService;
+
+        private IImageService imageService;
+
         private INotificationService notificationService;
         
         private INotificationTypeService notificationTypeService;
@@ -39,14 +47,6 @@ namespace Eskon.Service.UnitOfWork
         private ITicketService ticketService;
 
         private IUserService userService;
-
-        private ICityService cityService;
-
-        private ICountryService countryService;
-
-        private IImageService imageService;
-
-        private IFileService fileService;
         #endregion
 
         #region Properties
@@ -57,6 +57,10 @@ namespace Eskon.Service.UnitOfWork
         public IChatService ChatService => chatService == null ? new ChatService(repositoryUnitOfWork.ChatRepository) : chatService;
 
         public IChatMessagesService ChatMessagesService => chatMessagesService == null ? new ChatMessageService(repositoryUnitOfWork.ChatMessageRepository) : chatMessagesService;
+
+        public ICityService CityService => cityService == null ? new CityService(repositoryUnitOfWork.CityRepository) : cityService;
+
+        public ICountryService CountryService => countryService == null ? new CountryService(repositoryUnitOfWork.CountryRepository) : countryService;
 
         public IFavouriteService FavouriteService => favouriteService == null ? new FavouriteService(repositoryUnitOfWork.FavouriteRepository) : favouriteService;
         
@@ -77,11 +81,6 @@ namespace Eskon.Service.UnitOfWork
         public ITicketService TicketService => ticketService == null ? new TicketService(repositoryUnitOfWork.TicketRepository) : ticketService;
 
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
-
-        public ICityService CityService => cityService == null ? new CityService(repositoryUnitOfWork.CityRepository) : cityService;
-
-        public ICountryService CountryService => countryService == null ? new CountryService(repositoryUnitOfWork.CountryRepository) : countryService;
-
         #endregion
 
         #region Constructors
