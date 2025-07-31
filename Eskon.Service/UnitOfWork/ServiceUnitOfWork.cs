@@ -38,12 +38,14 @@ namespace Eskon.Service.UnitOfWork
 
         private ITicketService ticketService;
 
-        private ITransactionService transactionService;
-
         private IUserService userService;
+
         private ICityService cityService;
+
         private ICountryService countryService;
+
         private IImageService imageService;
+
         private IFileService fileService;
         #endregion
 
@@ -73,8 +75,6 @@ namespace Eskon.Service.UnitOfWork
         public IReviewService ReviewService => reviewService == null ? new ReviewService(repositoryUnitOfWork.ReviewRepository) : reviewService;
 
         public ITicketService TicketService => ticketService == null ? new TicketService(repositoryUnitOfWork.TicketRepository) : ticketService;
-
-        public ITransactionService TransactionService => transactionService == null ? new TransactionService(repositoryUnitOfWork.TransactionRepository) : transactionService;
 
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
 

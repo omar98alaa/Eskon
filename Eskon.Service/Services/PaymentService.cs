@@ -27,12 +27,12 @@ namespace Eskon.Service.Services
 
         public async Task<List<Payment>> GetPaymentsPerUser(Guid userId)
         {
-            return await _paymentRepository.GetFilteredAsync(f => f.UserId == userId);
+            return await _paymentRepository.GetFilteredAsync(f => f.CustomerId == userId);
         }
 
         public async Task SetPaymentAsSuccessful(Payment payment)
         {
-            payment.IsSuccessful = true;
+            payment.State = "SUCCESS";
             await _paymentRepository.UpdateAsync(payment);
         }
     }

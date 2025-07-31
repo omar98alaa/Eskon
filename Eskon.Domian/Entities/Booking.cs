@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Eskon.Domian.Entities.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Eskon.Domian.Models
 {
@@ -41,5 +41,9 @@ namespace Eskon.Domian.Models
         //[ForeignKey(nameof(Property))]
         public Guid PropertyId { get; set; }
         public virtual Property Property { get; set; }
+
+        [ForeignKey(nameof(Payment))]
+        public Guid? PaymentId { get; set; }
+        public virtual Payment? Payment { get; set; }
     }
 }
