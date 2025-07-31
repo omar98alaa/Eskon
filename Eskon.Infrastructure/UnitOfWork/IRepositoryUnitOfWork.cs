@@ -11,6 +11,7 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ICityRepository CityRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IFavouriteRepository FavouriteRepository { get; }
+        public IImageRepository ImageRepository { get; }
         public INotificationRepository NotificationRepository { get; }
         public INotificationTypeRepository NotificationTypeRepository { get; }
         public IPaymentRepository PaymentRepository { get; }

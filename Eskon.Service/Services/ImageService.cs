@@ -1,32 +1,36 @@
-﻿using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.Models;
+﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
-using Eskon.Infrastructure.Repositories;
 using Eskon.Service.Interfaces;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 
 namespace Eskon.Service.Services
 {
     public class ImageService : IImageService
     {
-        private readonly IFileService _fileService;
+        private readonly IImageRepository _imageRepository;
 
-        public ImageService(IFileService fileService)
-            {
-                _fileService = fileService;
-            }
-
-        public async Task<string> UploadImageAndGetUrlAsync(IFormFile file)
+        public ImageService(IImageRepository imageRepository)
         {
-            var url = await _fileService.UploadImageAsync(file);
-            return url;
+            this._imageRepository = imageRepository;
         }
 
+        public async Task AddImageAsync(Image image)
+        {
+            await _imageRepository.AddAsync(image);
+        }
+
+        public async Task DeleteImageAsync(Image image)
+        {
+            await _imageRepository.DeleteAsync(image);
+        }
+
+        public async Task<Image?> GetImageByIdAsync(Guid Id)
+        {
+            return await _imageRepository.GetByIdAsync(Id);
+        }
+
+        public async Task<Image?> GetImageByNameAsync(string imageName)
+        {
+            return (await _imageRepository.GetFilteredAsync(i => i.Url == imageName)).FirstOrDefault();
+        }
     }
 }
