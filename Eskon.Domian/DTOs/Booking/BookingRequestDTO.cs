@@ -2,7 +2,7 @@
 
 namespace Eskon.Domian.DTOs.Booking
 {
-    public class BookingWriteDTO
+    public class BookingRequestDTO
     {
         [Required]
         public Guid PropertyId { get; set; }

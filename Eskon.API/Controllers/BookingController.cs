@@ -25,7 +25,7 @@ namespace Eskon.API.Controllers
         #region Actions
         [Authorize]
         [HttpPost("Customer")]
-        public async Task<IActionResult> MakeABookingRequest([FromBody] BookingWriteDTO bookingWriteDTO)
+        public async Task<IActionResult> MakeABookingRequest([FromBody] BookingRequestDTO bookingWriteDTO)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddNewBookingCommand(userId, bookingWriteDTO));

@@ -116,7 +116,7 @@ namespace Eskon.Service.Services
             return await _bookingRepository.GetFilteredAsync(b => b.UserId == customerId && !b.IsPending && !b.IsAccepted);
         }
 
-        public async Task<List<Booking>> GetUpcomingBookingsPerPropertyAsync(Guid propertyId)
+        public async Task<List<Booking>> GetAcceptedBookingsPerPropertyAsync(Guid propertyId)
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
             return await _bookingRepository.GetFilteredAsync(b => b.PropertyId == propertyId && b.StartDate > now && b.IsAccepted);

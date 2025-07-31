@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.BookingFeatures.Commands.Command;
 using Eskon.Core.Response;
+using Eskon.Domian.DTOs.Booking;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 using System.ComponentModel.DataAnnotations;
@@ -22,14 +23,21 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         }
         #endregion
 
+        #region Helpers
+        bool IsOverlappingBooking(Booking booking, DateOnly startDate, DateOnly endDate)
+        {
+            return booking.EndDate >= startDate && booking.StartDate <= endDate;
+        }
+        #endregion
+
         #region Handlers
         public async Task<Response<Booking>> Handle(AddNewBookingCommand request, CancellationToken cancellationToken)
         {
-            var bookingDTO = request.bookingWriteDTO;
+            var bookingRequestDTO = request.bookingRequestDTO;
 
-            var validationContext = new ValidationContext(bookingDTO);
+            var validationContext = new ValidationContext(bookingRequestDTO);
             var results = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(bookingDTO, validationContext, results, true);
+            bool isValid = Validator.TryValidateObject(bookingRequestDTO, validationContext, results, true);
             if (!isValid)
             {
                 var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
@@ -45,9 +53,9 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             }
 
             // Check booking start date is at least 3 days later
-            var now = DateOnly.FromDateTime(DateTime.UtcNow);
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            if(bookingDTO.StartDate < now.AddDays(3))
+            if(bookingRequestDTO.StartDate < today.AddDays(3))
             {
                 return BadRequest<Booking>("Cannot make reservation less than 3 days ahead");
             }
@@ -59,9 +67,9 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             }
 
             // Check overlapping with accepted bookings
-            var acceptedBookings = await _serviceUnitOfWork.BookingService.GetUpcomingBookingsPerPropertyAsync(property.Id);
+            var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(property.Id);
 
-            var overlappingBookingsExist = acceptedBookings.Any(b => b.EndDate >= bookingDTO.StartDate && b.StartDate <= bookingDTO.EndDate);
+            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, bookingRequestDTO.StartDate, bookingRequestDTO.EndDate));
 
             if (overlappingBookingsExist)
             {
@@ -72,8 +80,8 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             var newBooking = new Booking()
             {
                 PropertyId = request.propertyId,
-                StartDate = bookingDTO.StartDate,
-                EndDate = bookingDTO.EndDate
+                StartDate = bookingRequestDTO.StartDate,
+                EndDate = bookingRequestDTO.EndDate
             };
 
             await _serviceUnitOfWork.BookingService.AddBookingAsync(newBooking);
@@ -107,8 +115,8 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             await _serviceUnitOfWork.SaveChangesAsync();
 
             // Check overlapping bookings
-            var acceptedBookings = await _serviceUnitOfWork.BookingService.GetUpcomingBookingsPerPropertyAsync(booking.PropertyId);
-            var overlappingBookingsExist = acceptedBookings.Any(b => b.EndDate >= booking.StartDate && b.StartDate <= booking.EndDate);
+            var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(booking.PropertyId);
+            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
 
             // Auto reject booking if overlapping
             if (overlappingBookingsExist)
@@ -121,7 +129,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             // Get and reject all overlapping pending bookings
             var pendingBookings = await _serviceUnitOfWork.BookingService.GetPendingBookingsPerPropertyAsync(booking.PropertyId);
-            var overlappingPendingBookings = pendingBookings.FindAll(b => b.EndDate >= booking.StartDate && b.StartDate <= booking.EndDate);
+            var overlappingPendingBookings = pendingBookings.FindAll(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
 
             foreach(var pendingBooking in overlappingPendingBookings)
             {
