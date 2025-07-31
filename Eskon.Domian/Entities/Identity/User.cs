@@ -18,6 +18,8 @@ namespace Eskon.Domian.Entities.Identity
         [DataType(DataType.Date)]
         public DateOnly BirthDate { get; set; }
 
+        public string? stripeAccountId { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public DateTime? DeletedAt { get; set; }
@@ -62,12 +64,6 @@ namespace Eskon.Domian.Entities.Identity
 
         //  ResolvedTickets
         public virtual ICollection<Ticket> ResolvedTickets { get; set; }
-
-        //  Transactions Out
-        public virtual ICollection<Transaction> TransactionsOut { get; set; }
-
-        //  Transactions In
-        public virtual ICollection<Transaction> TransactionsIn { get; set; }
 
         public virtual ICollection<Property> Properties { get; set; }
 

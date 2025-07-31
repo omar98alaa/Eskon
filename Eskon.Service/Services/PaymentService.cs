@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Eskon.Domian.Models;
+﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -25,14 +24,14 @@ namespace Eskon.Service.Services
             return payment;
         }
 
-        public async Task<List<Payment>> GetPaymentsPerUser(Guid userId)
+        public async Task<List<Payment>> GetPaymentsPerCustomer(Guid customerId)
         {
-            return await _paymentRepository.GetFilteredAsync(f => f.UserId == userId);
+            return await _paymentRepository.GetFilteredAsync(f => f.CustomerId == customerId);
         }
 
         public async Task SetPaymentAsSuccessful(Payment payment)
         {
-            payment.IsSuccessful = true;
+            payment.State = "SUCCESS";
             await _paymentRepository.UpdateAsync(payment);
         }
     }
