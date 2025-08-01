@@ -140,6 +140,64 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             return Success($"Booking with ID: {booking.Id} accepted", message: $"Booking with ID: {booking.Id} accepted");
         }
+
+        public async Task<Response<string>> Handle(SetBookingAsRejectedCommand request, CancellationToken cancellationToken)
+        {
+            // Check booking exists
+            var booking = await _serviceUnitOfWork.BookingService.GetBookingById(request.bookingId);
+            if (booking == null)
+            {
+                return NotFound<string>("Booking does not exist");
+            }
+
+            // Check same owner
+            if (booking.Property.OwnerId != request.ownerId)
+            {
+                return Forbidden<string>();
+            }
+
+            // Check if booking is not pending
+            if (!booking.IsPending)
+            {
+                return BadRequest<string>("Booking already processed");
+            }
+
+            // Set booking as rejected and save it
+            await _serviceUnitOfWork.BookingService.SetBookingAsRejectedAsync(booking);
+
+            await _serviceUnitOfWork.SaveChangesAsync();
+
+            return Success($"Booking with ID: {booking.Id} rejected", message: $"Booking with ID: {booking.Id} rejected");
+        }
+
+        public async Task<Response<string>> Handle(CancelBookingCommand request, CancellationToken cancellationToken)
+        {
+            // Check booking exists
+            var booking = await _serviceUnitOfWork.BookingService.GetBookingById(request.bookingId);
+            if (booking == null)
+            {
+                return NotFound<string>("Booking does not exist");
+            }
+
+            // Check same customer
+            if (booking.Property.OwnerId != request.customerId)
+            {
+                return Forbidden<string>();
+            }
+
+            // Check if booking is payed
+            if (booking.IsPayed)
+            {
+                return BadRequest<string>("Booking already paid");
+            }
+
+            // Delete booking
+            await _serviceUnitOfWork.BookingService.RemoveBookingAsync(booking);
+
+            await _serviceUnitOfWork.SaveChangesAsync();
+
+            return Success($"Booking with ID: {booking.Id} removed", message: $"Booking with ID: {booking.Id} removed");
+        }
         #endregion
     }
 }

@@ -22,7 +22,7 @@ namespace Eskon.API.Controllers
         }
         #endregion
 
-        #region Actions
+        #region POST
         [Authorize]
         [HttpPost("Customer")]
         public async Task<IActionResult> MakeABookingRequest([FromBody] BookingRequestDTO bookingWriteDTO)
@@ -31,13 +31,35 @@ namespace Eskon.API.Controllers
             var response = await Mediator.Send(new AddNewBookingCommand(userId, bookingWriteDTO));
             return NewResult(response);
         }
+        #endregion
 
+        #region PATCH
         [Authorize(Roles = "Owner")]
         [HttpPatch("Owner/Accept/{bookingId:guid}")]
         public async Task<IActionResult> AcceptBooking([FromRoute] Guid bookingId)
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetBookingAsAcceptedCommand(bookingId, ownerId));
+            return NewResult(response);
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpPatch("Owner/Reject/{bookingId:guid}")]
+        public async Task<IActionResult> RejectBooking([FromRoute] Guid bookingId)
+        {
+            var ownerId = GetUserIdFromAuthenticatedUserToken();
+            var response = await Mediator.Send(new SetBookingAsRejectedCommand(bookingId, ownerId));
+            return NewResult(response);
+        }
+        #endregion
+
+        #region DELETE
+        [Authorize]
+        [HttpDelete("Customer/Cancel/{bookingId:guid}")]
+        public async Task<IActionResult> CancelBooking([FromRoute] Guid bookingId)
+        {
+            var customerId = GetUserIdFromAuthenticatedUserToken();
+            var response = await Mediator.Send(new CancelBookingCommand(bookingId, customerId));
             return NewResult(response);
         }
         #endregion
