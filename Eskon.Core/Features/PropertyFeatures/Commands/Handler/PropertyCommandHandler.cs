@@ -1,44 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
-using Eskon.Core.Response;
-using Eskon.Service.Interfaces;
-using MediatR;
 using Eskon.Core.Features.PropertyFeatures.Commands.Command;
+using Eskon.Core.Response;
 using Eskon.Domian.DTOs.Property;
-using System.ComponentModel.DataAnnotations;
-using Eskon.Domian.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Http;
-using System.Net;
-using Azure.Core;
-using Eskon.Service.UnitOfWork;
 using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Models;
+using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 
 
 namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
 {
-    public class PropertyCommandHandler: ResponseHandler, IPropertyCommandHandler
+    public class PropertyCommandHandler : ResponseHandler, IPropertyCommandHandler
     {
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         #endregion
-        public PropertyCommandHandler(IMapper mapper,IServiceUnitOfWork serviceUnitOfWork,UserManager<User> userManager) { 
-            _serviceUnitOfWork=serviceUnitOfWork;
-            _mapper=mapper;
-            _userManager=userManager;
+        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager)
+        {
+            _serviceUnitOfWork = serviceUnitOfWork;
+            _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<Response<PropertyDetailsDTO>> Handle(AddPropertyCommand request, CancellationToken cancellationToken)
         {
-            
+
             var validationContext = new ValidationContext(request.PropertyWriteDTO);
             var results = new List<ValidationResult>();
             bool isValid = Validator.TryValidateObject(request.PropertyWriteDTO, validationContext, results, true);
@@ -47,118 +36,171 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
                 var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
                 return BadRequest<PropertyDetailsDTO?>(internalErrorMessages);
             }
-            //check all images stored in database
-            //check City and country stored in database
-            List<User> AdminUsers = _userManager.GetUsersInRoleAsync("Admin").Result.ToList();
+
+            // Check city exists
+            var city = await _serviceUnitOfWork.CityService.GetCityByIdAsync(request.PropertyWriteDTO.CityId);
+            if (city == null) 
+            {
+                return NotFound<PropertyDetailsDTO>("City Not Found");
+            }
+
+            //Image Check
+            var imagesUrls = request.PropertyWriteDTO.ImageUrls;
+            var images = await _serviceUnitOfWork.ImageService.GetImagesByNameAsync(imagesUrls);
+            if(images.Count != imagesUrls.Count)
+            {
+                return NotFound<PropertyDetailsDTO>("One or more images were not found");
+            }
+
+            // Assign an admin randomly
+            List<User> AdminUsers = (await _userManager.GetUsersInRoleAsync("Admin")).ToList();
             Random random = new Random();
             var idx = random.Next(AdminUsers.Count);
-            User Admin=AdminUsers[idx];
+            User Admin = AdminUsers[idx];
+
+            // Populate new property object
             Property property = _mapper.Map<Property>(request.PropertyWriteDTO);
-            property.OwnerId=request.ownerId;
-            property.AssignedAdminId =Admin.Id;
-            //Add Images and city and country 
+            property.OwnerId = request.ownerId;
+            property.AssignedAdminId = Admin.Id;
+            property.Images = images;
+
             await _serviceUnitOfWork.PropertyService.AddPropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
-            PropertyDetailsDTO propertyDetails=_mapper.Map<PropertyDetailsDTO>(property);
-            return Created<PropertyDetailsDTO>(propertyDetails);
+            
+            PropertyDetailsDTO propertyDetails = _mapper.Map<PropertyDetailsDTO>(property);
+            
+            return Created(propertyDetails);
         }
 
         public async Task<Response<string>> Handle(SetPropertyAsAcceptedCommand request, CancellationToken cancellationToken)
         {
-            Guid AdminId=request.adminId ;
+            // Check Property exists
             Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
-            if(property == null)
+            if (property == null)
             {
                 return NotFound<string>("Property Not Found");
             }
+            // Check Property Admin
+            Guid AdminId = request.adminId;
             if (AdminId != property.AssignedAdminId)
             {
                 return Forbidden<string>();
             }
-      
+            // Set Property Accepted and SaveChanges
             await _serviceUnitOfWork.PropertyService.SetIsAcceptedPropertyAsync(property);
+
             await _serviceUnitOfWork.SaveChangesAsync();
+
             return Success<string>($"Property With Id {property.Id} Accepted", $"{property.Id} Accepted");
         }
-        
+
         public async Task<Response<string>> Handle(SetPropertyAsRejectedCommand request, CancellationToken cancellationToken)
         {
-            Guid AdminId=request.adminId;
+            // Check Property exists
             Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
             if (property == null)
             {
                 return NotFound<string>("Property Not Found");
             }
-
+            // Check Property Admin
+            Guid AdminId = request.adminId;
             if (AdminId != property.AssignedAdminId)
             {
                 return Forbidden<string>();
             }
+            // Set RejectionMessage and save chanes
             await _serviceUnitOfWork.PropertyService.SetRejectionMessageAsync(property, request.rejectionMessage);
             await _serviceUnitOfWork.SaveChangesAsync();
-            return Success<string>(string.Empty,request.rejectionMessage);
+            return Success<string>(string.Empty, request.rejectionMessage);
         }
-       
-        
+
+
         public async Task<Response<string>> Handle(SetIsSuspendedPropertyCommand request, CancellationToken cancellationToken)
         {
-            Guid OwnerId=request.ownerId;
+            Guid OwnerId = request.ownerId;
             Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
+            // Check Property exists
             if (property == null)
             {
                 return NotFound<string>("Property Not Found");
             }
-            
+            // Check Property Owner
             if (OwnerId != property.OwnerId)
-            { 
+            {
                 return Forbidden<string>();
             }
+            // Set Suspension State
             await _serviceUnitOfWork.PropertyService.SetPropertySuspensionStateAsync(property, request.value);
             await _serviceUnitOfWork.SaveChangesAsync();
-            return Success<string>(string.Empty,$"Property With Id {property.Id} Suspension State={request.value}");
+            return Success<string>(string.Empty, $"Property With Id {property.Id} Suspension State={request.value}");
         }
 
         public async Task<Response<PropertyDetailsDTO>> Handle(UpdatePropertyCommand request, CancellationToken cancellationToken)
         {
             var validation = new ValidationContext(request.propertyWriteDTO);
             var results = new List<ValidationResult>();
-            bool isValid = Validator.TryValidateObject(request.propertyWriteDTO,validation,results,true);
-            if (!isValid) { 
-                var internalErrorMessages = results.Select(r=>r.ErrorMessage).ToList();
+            bool isValid = Validator.TryValidateObject(request.propertyWriteDTO, validation, results, true);
+            if (!isValid)
+            {
+                var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
                 return BadRequest<PropertyDetailsDTO>(internalErrorMessages);
             }
-            Property property =await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
-            Guid OwnerId =request.ownerId;
+            // Check Property exists
+            Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
             if (property == null)
             {
                 return NotFound<PropertyDetailsDTO>("Property Not Found");
 
             }
+            // Check Property Owner
+            Guid OwnerId = request.ownerId;
             if (OwnerId != property.OwnerId)
-            { 
+            {
                 return Forbidden<PropertyDetailsDTO>();
             }
-            Property UpdatedProperty = _mapper.Map(request.propertyWriteDTO, property);
-            await _serviceUnitOfWork.PropertyService.UpdatePropertyAsync(UpdatedProperty);
+            // Check city exists
+            var city = await _serviceUnitOfWork.CityService.GetCityByIdAsync(request.propertyWriteDTO.CityId);
+            if (city == null)
+            {
+                return NotFound<PropertyDetailsDTO>("City Not Found");
+            }
+            //Image Check
+            var imagesUrls = request.propertyWriteDTO.ImageUrls;
+            var images = await _serviceUnitOfWork.ImageService.GetImagesByNameAsync(imagesUrls);
+            if (images.Count != imagesUrls.Count)
+            {
+                return NotFound<PropertyDetailsDTO>("One or more images were not found");
+            }
+           
+            property = _mapper.Map(request.propertyWriteDTO, property);
+            //Set Property As Pending
+            await _serviceUnitOfWork.PropertyService.SetPropertyAsPendingAsync(property);
+            //Add Images
+            property.Images= images;
+            //Update Property
+            await _serviceUnitOfWork.PropertyService.UpdatePropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
-            PropertyDetailsDTO propertyDetailsDTO = _mapper.Map<PropertyDetailsDTO>(UpdatedProperty);  
-            return Success<PropertyDetailsDTO>(propertyDetailsDTO);
+            PropertyDetailsDTO propertyDetailsDTO = _mapper.Map<PropertyDetailsDTO>(property);
+            return Success(propertyDetailsDTO);
         }
-        
+
         public async Task<Response<PropertyDetailsDTO>> Handle(DeletePropertyCommand request, CancellationToken cancellationToken)
         {
 
-            Guid OwnerId=request.ownerId;
+            Guid OwnerId = request.ownerId;
             Property property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.id);
-            PropertyDetailsDTO propertyDetailsDTO=_mapper.Map<PropertyDetailsDTO>(property);
+            PropertyDetailsDTO propertyDetailsDTO = _mapper.Map<PropertyDetailsDTO>(property);
+            // Check Property exists
             if (property == null)
             {
                 return NotFound<PropertyDetailsDTO>("Property Not Found");
             }
+            // Check Property Owner
             if (OwnerId != property.OwnerId)
             {
                 return Forbidden<PropertyDetailsDTO>();
             }
+            // Soft Delete and SaveChanges
             await _serviceUnitOfWork.PropertyService.RemovePropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
             return Success<PropertyDetailsDTO>(propertyDetailsDTO);
