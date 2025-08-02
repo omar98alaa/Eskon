@@ -15,6 +15,9 @@ namespace Eskon.Domian.Models
         [Required]
         public DateOnly EndDate { get; set; }
 
+        [Required, Range(1, int.MaxValue)]
+        public int Guests { get; set; }
+
         [Required]
         public decimal TotalPrice { get; set; }
 

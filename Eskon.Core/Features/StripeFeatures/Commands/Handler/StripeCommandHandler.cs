@@ -133,6 +133,13 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 return BadRequest<string>("Booking is not payed");
             }
 
+            var aDayBefore = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
+            
+            if(booking.StartDate >= aDayBefore)
+            {
+                return BadRequest<string>("Booking already started and cannot be refunded");
+            }
+
             _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment.StripeChargeId);
             return Success<string>("Refund request is created...");
         }

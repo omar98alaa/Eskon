@@ -73,6 +73,15 @@ namespace Eskon.API.Controllers
             var response = await Mediator.Send(new CancelBookingCommand(bookingId, customerId));
             return NewResult(response);
         }
+
+        [Authorize]
+        [HttpDelete("Customer/Refund/{bookingId:guid}")]
+        public async Task<IActionResult> RefundBooking([FromRoute] Guid bookingId, CreateStripePaymentRefundCommand createStripePaymentRefundCommand)
+        {
+            var cusotmerId = GetUserIdFromAuthenticatedUserToken();
+            var response = await Mediator.Send(new CreateStripePaymentRefundCommand(bookingId, cusotmerId));
+            return NewResult(response);
+        }
         #endregion
     }
 }

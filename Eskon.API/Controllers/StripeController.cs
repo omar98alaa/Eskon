@@ -87,7 +87,7 @@ namespace Eskon.API.Controllers
 
                     if (charge != null)
                     {
-                        foreach (var refund in charge.Refunds.Data)
+                        foreach (var refund in charge.Refunds)
                         {
                             if (refund.Status == "succeeded")
                             {
@@ -97,6 +97,7 @@ namespace Eskon.API.Controllers
 
                                 var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(refund.ChargeId);
                                 await _unitOfWork.PaymentService.SetPaymentAsRefunded(payment);
+                                await _unitOfWork.BookingService.SoftRemoveBookingAsync(payment.Booking);
                                 await _unitOfWork.SaveChangesAsync();
                             }
                         } 

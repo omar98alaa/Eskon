@@ -90,7 +90,8 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 PropertyId = request.propertyId,
                 StartDate = bookingRequestDTO.StartDate,
                 EndDate = bookingRequestDTO.EndDate,
-                TotalPrice = property.PricePerNight * days
+                TotalPrice = property.PricePerNight * days,
+                Guests = request.bookingRequestDTO.Guests
             };
 
             await _serviceUnitOfWork.BookingService.AddBookingAsync(newBooking);
