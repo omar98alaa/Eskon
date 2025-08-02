@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
+using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Domian.DTOs.Roles;
@@ -56,10 +57,10 @@ namespace Eskon.API.Controllers
         [Authorize(Roles = "Customer")]
         // Id of the user to be added to Owner Role
         [HttpPut("AddOwner")]
-        public async Task<IActionResult> AddOwnerRole()
+        public async Task<IActionResult> AddOwnerRole([FromBody]OwnerRoleDTO ownerRoleDTO)
         {
             Guid UserToBeOwnerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new AddOwnerRoleToUserCommand(UserToBeOwnerId));
+            var response = await Mediator.Send(new CreateStripeConnectedAccountAndFillLinkCommand(UserToBeOwnerId, ownerRoleDTO));
             return NewResult(response);
         }
 

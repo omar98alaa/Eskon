@@ -30,10 +30,21 @@ namespace Eskon.Service.Services
             return await _paymentRepository.GetFilteredAsync(f => f.CustomerId == userId);
         }
 
-        public async Task SetPaymentAsSuccessful(Payment payment)
+        public async Task SetPaymentAsSuccess(Payment payment)
         {
             payment.State = "SUCCESS";
             await _paymentRepository.UpdateAsync(payment);
+        }
+
+        public async Task SetPaymentAsFailed(Payment payment)
+        {
+            payment.State = "FAILED";
+            await _paymentRepository.UpdateAsync(payment);
+        }
+
+        public Payment GetPaymentByChargedId(string chargedId)
+        {
+            return _paymentRepository.GetPaymentByChargedId(chargedId);
         }
     }
 }

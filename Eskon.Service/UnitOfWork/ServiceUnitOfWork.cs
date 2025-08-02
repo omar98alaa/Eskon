@@ -1,4 +1,5 @@
 ﻿using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Stripe;
 using Eskon.Infrastructure.UnitOfWork;
 using Eskon.Service.Interfaces;
 using Eskon.Service.Services;
@@ -11,6 +12,8 @@ namespace Eskon.Service.UnitOfWork
         private readonly IRepositoryUnitOfWork repositoryUnitOfWork;
 
         private readonly JwtSettings jwtSettings;
+
+        private readonly StripeSettings stripeSettings;
 
         private IAuthenticationService authenticationService;
 
@@ -47,6 +50,8 @@ namespace Eskon.Service.UnitOfWork
         private IImageService imageService;
 
         private IFileService fileService;
+
+        private IStripeService stripeService;
         #endregion
 
         #region Properties
@@ -82,13 +87,16 @@ namespace Eskon.Service.UnitOfWork
 
         public ICountryService CountryService => countryService == null ? new CountryService(repositoryUnitOfWork.CountryRepository) : countryService;
 
+        public IStripeService StripeService => stripeService == null ? new StripeService(stripeSettings) : stripeService;
+
         #endregion
 
         #region Constructors
-        public ServiceUnitOfWork(IRepositoryUnitOfWork repositoryUnitOfWork, JwtSettings jwtSettings)
+        public ServiceUnitOfWork(IRepositoryUnitOfWork repositoryUnitOfWork, JwtSettings jwtSettings, StripeSettings stripeSettings)
         {
             this.repositoryUnitOfWork = repositoryUnitOfWork;
             this.jwtSettings = jwtSettings;
+            this.stripeSettings = stripeSettings;
         }
         #endregion
 

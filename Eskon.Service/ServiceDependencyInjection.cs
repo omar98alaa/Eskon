@@ -13,7 +13,6 @@ namespace Eskon.Service
             services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IFileService, FileService>();
 
-
             return services;
         }
     }
