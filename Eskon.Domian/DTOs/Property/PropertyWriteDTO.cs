@@ -36,10 +36,11 @@ namespace Eskon.Domian.DTOs.Property
 
         [Required]
         public double Latitude { get; set; }
-        public string CityName { get; set; }
 
-        public string CountryName { get; set; }
+        [Required]
+        public Guid CityId { get; set; }
 
+        [Required]
         public List<string> ImageUrls { get; set; }
     }
 }
