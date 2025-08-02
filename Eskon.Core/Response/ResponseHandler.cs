@@ -89,14 +89,6 @@ namespace Eskon.Core.Response
             };
         }
 
-        public Response<T> BadRequest<T>(string Message = null)
-        {
-            return new Response<T>()
-            {
-                StatusCode = System.Net.HttpStatusCode.BadRequest,
-                Succeeded = false,
-                Message = Message == null ? "Bad Request" : Message,
-
         public Response<T> Forbidden<T>()
         {
             return new Response<T>()
@@ -113,7 +105,7 @@ namespace Eskon.Core.Response
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
                 Succeeded = false,
                 Message = Message == null ? "Bad Request" : Message,
-                
+
             };
         }
 
@@ -125,16 +117,6 @@ namespace Eskon.Core.Response
                 Succeeded = false,
                 Message = Message == null ? "Bad Request" : Message,
                 Errors = ErrorsList,
-            };
-        }
-
-        public Response<T> Forbidden<T>()
-        {
-            return new Response<T>()
-            {
-                StatusCode = System.Net.HttpStatusCode.Forbidden,
-                Succeeded = false,
-                Message = "Forbidden"
             };
         }
 
