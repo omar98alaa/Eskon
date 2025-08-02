@@ -1,9 +1,9 @@
-﻿using Eskon.Domain.Utilities;
+﻿using System.Linq.Expressions;
+using Eskon.Domain.Utilities;
 using Eskon.Domian.Models;
 using Eskon.Domian.Utilities;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
-using System.Linq.Expressions;
 
 namespace Eskon.Service.Services
 {
@@ -58,11 +58,11 @@ namespace Eskon.Service.Services
                 itemsPerPage,
                 filter: p => p.IsAccepted &&
                              !p.IsSuspended &&
-                             ((psf.CityName != null)? p.City.Name == psf.CityName : true) && 
-                             ((psf.CountryName != null)? p.City.Country.Name == psf.CountryName : true) && 
-                             ((psf.Guests != null)? p.MaxGuests >= psf.Guests : true) && 
-                             ((psf.minPricePerNight != null)? p.PricePerNight >= psf.minPricePerNight : true) && 
-                             ((psf.maxPricePerNight != null)? p.PricePerNight <= psf.maxPricePerNight : true)
+                             ((psf.CityName != null) ? p.City.Name == psf.CityName : true) &&
+                             ((psf.CountryName != null) ? p.City.Country.Name == psf.CountryName : true) &&
+                             ((psf.Guests != null) ? p.MaxGuests >= psf.Guests : true) &&
+                             ((psf.minPricePerNight != null) ? p.PricePerNight >= psf.minPricePerNight : true) &&
+                             ((psf.maxPricePerNight != null) ? p.PricePerNight <= psf.maxPricePerNight : true)
                 );
         }
 
@@ -121,6 +121,14 @@ namespace Eskon.Service.Services
             property.IsAccepted = true;
             property.IsPending = false;
             property.RejectionMessage = "";
+            await propertyRepository.UpdateAsync(property);
+        }
+
+        public async Task SetPropertyAsPendingAsync(Property property)
+        {
+            property.IsPending = true;
+            property.IsAccepted = false;
+            property.RejectionMessage = string.Empty;
             await propertyRepository.UpdateAsync(property);
         }
 

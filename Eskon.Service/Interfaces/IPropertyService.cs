@@ -28,6 +28,7 @@ namespace Eskon.Service.Interfaces
         public Task UpdatePropertyAsync(Property property);
         public Task SetPropertySuspensionStateAsync(Property property, bool value);
         public Task SetIsAcceptedPropertyAsync(Property property);
+        public Task SetPropertyAsPendingAsync(Property property);
         public Task SetRejectionMessageAsync(Property property, String regectionMessage);
         public Task SetAverageRatingAsync(Property property, decimal averageRating);
         #endregion
