@@ -3,7 +3,7 @@ using Eskon.Core.Features.BookingFeatures.Commands.Handler;
 using Eskon.Core.Features.BookingFeatures.Queries.Query;
 using Eskon.Core.Response;
 using Eskon.Domain.Utilities;
-using Eskon.Domian.DTOs.Booking;
+using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 

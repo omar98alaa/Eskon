@@ -1,7 +1,7 @@
 ﻿using Eskon.Core.Features.BookingFeatures.Queries.Query;
 using Eskon.Core.Response;
 using Eskon.Domain.Utilities;
-using Eskon.Domian.DTOs.Booking;
+using Eskon.Domian.DTOs.BookingDTOs;
 using MediatR;
 
 

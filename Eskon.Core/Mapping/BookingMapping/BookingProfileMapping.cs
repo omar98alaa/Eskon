@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Eskon.Domian.DTOs.Booking;
+using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
 
 namespace Eskon.Core.Mapping.BookingMapping

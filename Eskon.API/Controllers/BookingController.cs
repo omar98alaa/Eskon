@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
-using Eskon.Core.Features.BookingFeatures.Commands.Command;
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.DTOs.StripeDTOs;
 using Eskon.Core.Features.BookingFeatures.Queries.Query;
-using Eskon.Domian.DTOs.Booking;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Eskon.Core.Features.BookingFeatures.Commands.Command;
 
 namespace Eskon.API.Controllers
 {
