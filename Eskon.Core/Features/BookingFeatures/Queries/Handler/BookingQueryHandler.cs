@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Eskon.Core.Features.BookingFeatures.Commands.Handler;
 using Eskon.Core.Features.BookingFeatures.Queries.Query;
 using Eskon.Core.Response;
 using Eskon.Domain.Utilities;
@@ -48,11 +47,14 @@ namespace Eskon.Core.Features.BookingFeatures.Queries.Handler
                     break;
                 default:
                     return BadRequest<Paginated<BookingReadDTO>>("Invalid status.");
-       
+
             }
 
-            var bookingsDTO = _mapper.Map<Paginated<BookingReadDTO>>(bookings);
-            return Success(bookingsDTO);
+            var bookingsDTO = _mapper.Map<List<BookingReadDTO>>(bookings.Data);
+
+            var paginatedResponse = new Paginated<BookingReadDTO>(bookingsDTO, bookings.PageNumber, bookings.PageSize, bookings.TotalRecords);
+
+            return Success(paginatedResponse);
         }
 
         public async Task<Response<Paginated<BookingReadDTO>>> Handle(GetCustomerBookingsQuery request, CancellationToken cancellationToken)
@@ -78,11 +80,13 @@ namespace Eskon.Core.Features.BookingFeatures.Queries.Handler
                     break;
                 default:
                     return BadRequest<Paginated<BookingReadDTO>>("Invalid status.");
-                    break;
             }
 
-            Paginated<BookingReadDTO> bookingsDTO = _mapper.Map<Paginated<BookingReadDTO>>(bookings);
-            return Success(bookingsDTO);
+            var bookingsDTO = _mapper.Map<List<BookingReadDTO>>(bookings.Data);
+
+            var paginatedResponse = new Paginated<BookingReadDTO>(bookingsDTO, bookings.PageNumber, bookings.PageSize, bookings.TotalRecords);
+
+            return Success(paginatedResponse);
         }
 
         public async Task<Response<Paginated<BookingReadDTO>>> Handle(GetPropertyBookingsQuery request, CancellationToken cancellationToken)
@@ -107,13 +111,14 @@ namespace Eskon.Core.Features.BookingFeatures.Queries.Handler
                     break;
                 default:
                     return BadRequest<Paginated<BookingReadDTO>>("Invalid status.");
-                    break;
             }
 
-            Paginated<BookingReadDTO> bookingsDTO = _mapper.Map<Paginated<BookingReadDTO>>(bookings);
-            return Success(bookingsDTO);
+            var bookingsDTO = _mapper.Map<List<BookingReadDTO>>(bookings.Data);
+
+            var paginatedResponse = new Paginated<BookingReadDTO>(bookingsDTO, bookings.PageNumber, bookings.PageSize, bookings.TotalRecords);
+
+            return Success(paginatedResponse);
         }
-        
     }
 }
 
