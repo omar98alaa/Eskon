@@ -1,6 +1,6 @@
 ﻿using Eskon.Core.Response;
-using Eskon.Domian.DTOs.RefreshToken;
-using Eskon.Domian.DTOs.User;
+using Eskon.Domian.DTOs.RefreshTokenDTOs;
+using Eskon.Domian.DTOs.UserDTOs;
 using MediatR;
 
 namespace Eskon.Core.Features.UserRolesFeatures.Utilities

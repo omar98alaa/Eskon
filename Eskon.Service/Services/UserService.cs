@@ -40,6 +40,11 @@ namespace Eskon.Service.Services
             return await _userRepository.GetByIdAsync(id);
         }
 
+        public async Task<User> GetUserByStripeAccountIdAsync(string stripeAccountId)
+        {
+            return await _userRepository.GetUserByStripeAccountIdAsync(stripeAccountId);
+        }
+
         public async Task<User> GetUserByEmail(string email)
         {
             return await _userRepository.GetUserByEmailAsync(email);
@@ -48,6 +53,11 @@ namespace Eskon.Service.Services
         public async Task<Paginated<User>> GetUsersByRolePaginated(int pageNumber, int itemsPerPage, string role)
         {
             return await _userRepository.GetPaginatedAsync(pageNumber, itemsPerPage, filter: u => u.UserRoles.Any(r => r.Role.NormalizedName == role.ToUpperInvariant()));
+        }
+
+        public async Task<bool> SetUserStripeAccountIdAsync(Guid userId, string stripeAccountId)
+        {
+            return await _userRepository.SetUserStripeAccountIdAsync(userId, stripeAccountId);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Eskon.Core.Response;
 using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.DTOs.User;
+using Eskon.Domian.DTOs.UserDTOs;
 
 namespace Eskon.Core.Features.UserFeatures.Queries.Query
 {

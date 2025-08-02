@@ -43,7 +43,6 @@ namespace Eskon.Infrastructure.Context
         public DbSet<PropertyType> PropertyTypes { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
         public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
@@ -66,6 +65,11 @@ namespace Eskon.Infrastructure.Context
                 .HasOne(b => b.Property)
                 .WithMany(p => p.Bookings)
                 .HasForeignKey(b => b.PropertyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Payment)
+                .WithOne(p => p.Booking)
                 .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
@@ -153,10 +157,16 @@ namespace Eskon.Infrastructure.Context
             #region Payment
             // Payment
             modelBuilder.Entity<Payment>()
-                .HasOne(p => p.User)
+                .HasOne(p => p.Customer)
                 .WithMany(u => u.Payments)
-                .HasForeignKey(p => p.UserId)
+                .HasForeignKey(p => p.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Booking)
+                .WithOne(u => u.Payment)
+                .OnDelete(DeleteBehavior.Restrict);
+
             #endregion
 
             #region Property
@@ -216,21 +226,6 @@ namespace Eskon.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
-            #region Transactions
-            // Transaction
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Sender)
-                .WithMany(u => u.TransactionsOut)
-                .HasForeignKey(t => t.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Receiver)
-                .WithMany(u => u.TransactionsIn)
-                .HasForeignKey(t => t.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict);
-            #endregion
-
             #region Identity
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<IdentityUserLogin<Guid>>(b =>
@@ -243,6 +238,9 @@ namespace Eskon.Infrastructure.Context
             #endregion
 
             #region UserRoles
+            modelBuilder.Entity<UserRoles>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
+
             modelBuilder.Entity<UserRoles>()
                     .HasOne(ur => ur.User)
                     .WithMany(u => u.UserRoles)

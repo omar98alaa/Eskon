@@ -1,5 +1,5 @@
 ﻿
-using Eskon.Domian.DTOs.User;
+using Eskon.Domian.DTOs.UserDTOs;
 using Eskon.Domian.Entities.Identity;
 using Microsoft.Data.SqlClient;
 

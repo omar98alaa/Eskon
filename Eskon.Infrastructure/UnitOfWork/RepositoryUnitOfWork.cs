@@ -39,8 +39,6 @@ namespace Eskon.Infrastructure.UnitOfWork
 
         private ITicketRepository ticketRepository;
 
-        private ITransactionRepository transactionRepository;
-
         private IUserRepository userRepository;
         #endregion
 
@@ -74,8 +72,6 @@ namespace Eskon.Infrastructure.UnitOfWork
         public IReviewRepository ReviewRepository => reviewRepository == null ? new ReviewRepository(context) : reviewRepository;
 
         public ITicketRepository TicketRepository => ticketRepository == null ? new TicketRepository(context) : ticketRepository;
-
-        public ITransactionRepository TransactionRepository => transactionRepository == null ? new TransactionRepository(context) : transactionRepository;
 
         public IUserRepository UserRepository => userRepository == null ? new UserRepository(context) : userRepository;
         #endregion

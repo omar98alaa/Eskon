@@ -20,7 +20,6 @@ namespace Eskon.Infrastructure.UnitOfWork
         public IRefreshTokenRepository RefreshTokenRepository { get; }
         public IReviewRepository ReviewRepository { get; }
         public ITicketRepository TicketRepository { get; }
-        public ITransactionRepository TransactionRepository { get; }
         public IUserRepository UserRepository { get; }
         #endregion
 

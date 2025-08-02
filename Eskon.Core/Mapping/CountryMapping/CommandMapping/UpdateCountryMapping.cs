@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Eskon.Domian.DTOs.Country;
+using Eskon.Domian.DTOs.CountryDTOs;
 using Eskon.Domian.Models;
 
 namespace Eskon.Core.Mapping.CountryMapping

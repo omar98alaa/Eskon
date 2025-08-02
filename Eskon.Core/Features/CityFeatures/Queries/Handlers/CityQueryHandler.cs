@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.CityFeatures.Queries.Models;
 using Eskon.Core.Response;
-using Eskon.Domian.DTOs.City;
-using Eskon.Domian.DTOs.CityDTO;
+using Eskon.Domian.DTOs.CityDTOs;
+using Eskon.Domian.DTOs.CityDTOs;
 using Eskon.Service.UnitOfWork;
 
 

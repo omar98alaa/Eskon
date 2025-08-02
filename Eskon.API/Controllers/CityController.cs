@@ -2,7 +2,7 @@
 using Eskon.API.Base;
 using Eskon.Core.Features.CityFeatures.Commands.Commands;
 using Eskon.Core.Features.CityFeatures.Queries.Models;
-using Eskon.Domian.DTOs.CityDTO;
+using Eskon.Domian.DTOs.CityDTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eskon.API.Controllers

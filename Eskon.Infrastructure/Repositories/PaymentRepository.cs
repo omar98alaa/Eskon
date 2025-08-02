@@ -21,7 +21,10 @@ namespace Eskon.Infrastructure.Repositories
         #endregion
 
         #region Methods
-
+        public Payment GetPaymentByChargedId(string chargedId)
+        {
+            return _paymentDbSet.SingleOrDefault(p => p.StripeChargeId == chargedId);
+        }
         #endregion
     }
 }
