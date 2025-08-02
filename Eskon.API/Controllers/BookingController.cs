@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
 using Eskon.Core.Features.BookingFeatures.Commands.Command;
+using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Domian.DTOs.BookingDTOs;
+using Eskon.Domian.DTOs.StripeDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -49,6 +51,15 @@ namespace Eskon.API.Controllers
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetBookingAsRejectedCommand(bookingId, ownerId));
+            return NewResult(response);
+        }
+
+        [Authorize]
+        [HttpPatch("Customer/Pay/{bookingId:guid}")]
+        public async Task<IActionResult> PayBooking([FromRoute] Guid bookingId, CreateStripeCheckoutRequestDTO createStripeCheckoutRequestDTO)
+        {
+            var cusotmerId = GetUserIdFromAuthenticatedUserToken();
+            var response = await Mediator.Send(new CreateStripeCheckoutLinkCommand(bookingId, cusotmerId, createStripeCheckoutRequestDTO));
             return NewResult(response);
         }
         #endregion

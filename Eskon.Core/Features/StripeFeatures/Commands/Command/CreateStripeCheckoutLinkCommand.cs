@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Eskon.Core.Features.StripeFeatures.Commands.Command
 {
-    public record CreateStripeCheckoutLinkCommand(CreateStripeCheckoutRequestDTO RequestDTO) : IRequest<Response<string>>;
+    public record CreateStripeCheckoutLinkCommand(Guid bookingId, Guid customerId, CreateStripeCheckoutRequestDTO RequestDTO) : IRequest<Response<string>>;
 }

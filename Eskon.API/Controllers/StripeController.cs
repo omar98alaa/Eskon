@@ -53,6 +53,9 @@ namespace Eskon.API.Controllers
                     if (payment != null)
                     {
                         await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
+
+                        await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
+                        
                         await _unitOfWork.SaveChangesAsync();
                     }
                 }

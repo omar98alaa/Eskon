@@ -8,10 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
 {
-    public class StripeCommandHandler : ResponseHandler, 
-                                    IRequestHandler<CreateStripeAccountCommand, Response<string>>,
-                                    IRequestHandler<CreateStripeConnectedAccountLinkForOwnerCommand, Response<string>>,
-                                    IRequestHandler<CreateStripeCheckoutLinkCommand, Response<string>>
+    public class StripeCommandHandler : ResponseHandler, IStripeCommandHandler
     {
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
@@ -24,7 +21,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
         }
         #endregion
 
-        #region strip account handlers
+        #region stripe account handlers
         public async Task<Response<string>> Handle(CreateStripeAccountCommand request, CancellationToken cancellationToken)
         {
             User user = await _serviceUnitOfWork.UserService.GetUserByIdAsync(request.userId);
@@ -42,7 +39,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
 
             if(string.IsNullOrEmpty(AccountId))
             {
-                return BadRequest<string>("Error creating a stripe account");
+                throw new Exception("Error creating a stripe account");
             }
 
             return Created<string>(AccountId);
@@ -67,7 +64,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
 
             if (string.IsNullOrEmpty(connectedAccountFillLink))
             {
-                return BadRequest<string>("Error creating a stripe account fill link");
+                throw new Exception("Error creating a stripe account fill link");
             }
 
             return Success(connectedAccountFillLink);
@@ -85,11 +82,17 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
                 return BadRequest<string>(internalErrorMessages);
             }
-            Booking userBooking = await  _serviceUnitOfWork.BookingService.GetBookingById(request.RequestDTO.BookingId);
+            
+            Booking userBooking = await  _serviceUnitOfWork.BookingService.GetBookingById(request.bookingId);
 
             if(userBooking == null)
             {
                 return NotFound<string>("Booking does not exists");
+            }
+
+            if(userBooking.UserId != request.customerId)
+            {
+                return Forbidden<string>();
             }
 
             if(!userBooking.IsAccepted)
@@ -104,7 +107,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
 
             if (string.IsNullOrEmpty(checkoutSessionLink))
             {
-                return BadRequest<string>("Can not create checkout session");
+                throw new Exception("Can not create checkout session");
             }
 
             return Success(checkoutSessionLink);
