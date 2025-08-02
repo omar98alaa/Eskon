@@ -9,7 +9,7 @@ namespace Eskon.Service.Interfaces
         #endregion
 
         #region Read
-        public Task<List<Payment>> GetPaymentsPerUser(Guid userId);
+        public Task<List<Payment>> GetPaymentsPerCustomer(Guid customerId);
 
         public Payment GetPaymentByChargedId(string chargedId);
 
