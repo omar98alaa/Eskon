@@ -1,16 +1,13 @@
-﻿using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.Models;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Eskon.Domian.Models;
 
 namespace Eskon.Service.Interfaces
 {
     public interface IImageService
     {
-        Task<string> UploadImageAndGetUrlAsync(IFormFile file);
+        Task<Image?> GetImageByIdAsync(Guid Id);
+        Task<Image?> GetImageByNameAsync(string imageName);
+        Task<List<Image>> GetImagesByNameAsync(List<string> imagesNames);
+        Task AddImageAsync(Image image);
+        Task DeleteImageAsync(Image image);
     }
 }

@@ -8,28 +8,23 @@ namespace Eskon.Service.Services
     {
         #region Field
         private readonly IWebHostEnvironment _env;
+        private readonly string webRootPath;
         #endregion
 
         #region Constructor
         public FileService(IWebHostEnvironment env)
         {
             _env = env;
+            webRootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
         }
         #endregion
 
 
-        public async Task<string> UploadImageAsync(IFormFile file)
+        public async Task<string> SaveImageToFolderAsync(IFormFile file)
         {
-            if (file == null || file.Length == 0)
-                throw new ArgumentException("Invalid file");
-
-            var webRootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             var uploadsFolder = Path.Combine(webRootPath, "uploads", "images");
 
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
+            Directory.CreateDirectory(uploadsFolder);
 
             var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
             var filePath = Path.Combine(uploadsFolder, fileName);
@@ -39,7 +34,24 @@ namespace Eskon.Service.Services
                 await file.CopyToAsync(stream);
             }
 
-            return $"/uploads/images/{fileName}";
+            return fileName;
+        }
+
+        public async Task<bool> DeleteImageFromFolderAsync(string fileName)
+        {
+            var uploadsFolder = Path.Combine(webRootPath, "uploads", "images");
+
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            try
+            {
+                File.Delete(filePath);
+            }catch
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

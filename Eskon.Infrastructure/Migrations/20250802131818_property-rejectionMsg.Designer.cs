@@ -4,16 +4,19 @@ using Eskon.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Eskon.Infrastructure.Migrations
+namespace Askon.Infrastructure.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250802131818_property-rejectionMsg")]
+    partial class propertyrejectionMsg
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,9 +148,6 @@ namespace Eskon.Infrastructure.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("stripeAccountId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -222,9 +222,6 @@ namespace Eskon.Infrastructure.Migrations
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("Guests")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsAccepted")
                         .HasColumnType("bit");
 
@@ -233,9 +230,6 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.Property<bool>("IsPending")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("uniqueidentifier");
@@ -253,10 +247,6 @@ namespace Eskon.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PaymentId")
-                        .IsUnique()
-                        .HasFilter("[PaymentId] IS NOT NULL");
 
                     b.HasIndex("PropertyId");
 
@@ -526,44 +516,27 @@ namespace Eskon.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("BookingAmount")
+                    b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Fees")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("IsRefund")
+                    b.Property<bool>("IsSuccessful")
                         .HasColumnType("bit");
-
-                    b.Property<DateOnly?>("MaximumRefundDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("State")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("StripeChargeId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Payments");
                 });
@@ -775,6 +748,48 @@ namespace Eskon.Infrastructure.Migrations
                     b.ToTable("Tickets");
                 });
 
+            modelBuilder.Entity("Eskon.Domian.Models.Transaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateOnly>("ConfirmedDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Fee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsRefund")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("ReceiverId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Transactions");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -895,11 +910,6 @@ namespace Eskon.Infrastructure.Migrations
 
             modelBuilder.Entity("Eskon.Domian.Models.Booking", b =>
                 {
-                    b.HasOne("Eskon.Domian.Models.Payment", "Payment")
-                        .WithOne("Booking")
-                        .HasForeignKey("Eskon.Domian.Models.Booking", "PaymentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Eskon.Domian.Models.Property", "Property")
                         .WithMany("Bookings")
                         .HasForeignKey("PropertyId")
@@ -911,8 +921,6 @@ namespace Eskon.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Payment");
 
                     b.Navigation("Property");
 
@@ -1018,13 +1026,13 @@ namespace Eskon.Infrastructure.Migrations
 
             modelBuilder.Entity("Eskon.Domian.Models.Payment", b =>
                 {
-                    b.HasOne("Eskon.Domian.Entities.Identity.User", "Customer")
+                    b.HasOne("Eskon.Domian.Entities.Identity.User", "User")
                         .WithMany("Payments")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Property", b =>
@@ -1100,6 +1108,25 @@ namespace Eskon.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Eskon.Domian.Models.Transaction", b =>
+                {
+                    b.HasOne("Eskon.Domian.Entities.Identity.User", "Receiver")
+                        .WithMany("TransactionsIn")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Eskon.Domian.Entities.Identity.User", "Sender")
+                        .WithMany("TransactionsOut")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Eskon.Domian.Entities.Identity.Role", null)
@@ -1163,6 +1190,10 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.Navigation("Tickets");
 
+                    b.Navigation("TransactionsIn");
+
+                    b.Navigation("TransactionsOut");
+
                     b.Navigation("User1Chats");
 
                     b.Navigation("User2Chats");
@@ -1190,12 +1221,6 @@ namespace Eskon.Infrastructure.Migrations
             modelBuilder.Entity("Eskon.Domian.Models.NotificationType", b =>
                 {
                     b.Navigation("Notifications");
-                });
-
-            modelBuilder.Entity("Eskon.Domian.Models.Payment", b =>
-                {
-                    b.Navigation("Booking")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Property", b =>

@@ -3,6 +3,7 @@ using Eskon.Domian.Stripe;
 using Eskon.Infrastructure.UnitOfWork;
 using Eskon.Service.Interfaces;
 using Eskon.Service.Services;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Eskon.Service.UnitOfWork
 {
@@ -12,8 +13,10 @@ namespace Eskon.Service.UnitOfWork
         private readonly IRepositoryUnitOfWork repositoryUnitOfWork;
 
         private readonly JwtSettings jwtSettings;
-
+        
         private readonly StripeSettings stripeSettings;
+        
+        private readonly IWebHostEnvironment env;
 
         private IAuthenticationService authenticationService;
 
@@ -68,7 +71,11 @@ namespace Eskon.Service.UnitOfWork
         public ICountryService CountryService => countryService == null ? new CountryService(repositoryUnitOfWork.CountryRepository) : countryService;
 
         public IFavouriteService FavouriteService => favouriteService == null ? new FavouriteService(repositoryUnitOfWork.FavouriteRepository) : favouriteService;
-        
+
+        public IFileService FileService => fileService == null ? new FileService(env) : fileService;
+
+        public IImageService ImageService => imageService == null ? new ImageService(repositoryUnitOfWork.ImageRepository) : imageService;
+
         public INotificationService NotificationService => notificationService == null ? new NotificationService(repositoryUnitOfWork.NotificationRepository) : notificationService;
         
         public INotificationTypeService NotificationTypeService => notificationTypeService == null? new NotificationTypeService(repositoryUnitOfWork.NotificationTypeRepository) : notificationTypeService;
@@ -90,12 +97,14 @@ namespace Eskon.Service.UnitOfWork
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
         #endregion
 
+
         #region Constructors
-        public ServiceUnitOfWork(IRepositoryUnitOfWork repositoryUnitOfWork, JwtSettings jwtSettings, StripeSettings stripeSettings)
+        public ServiceUnitOfWork(IRepositoryUnitOfWork repositoryUnitOfWork, JwtSettings jwtSettings, StripeSettings stripeSettings, IWebHostEnvironment env)
         {
             this.repositoryUnitOfWork = repositoryUnitOfWork;
             this.jwtSettings = jwtSettings;
             this.stripeSettings = stripeSettings;
+            this.env = env;
         }
         #endregion
 

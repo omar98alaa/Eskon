@@ -130,7 +130,7 @@ namespace Eskon.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
-            #region Entity
+            #region Image
             // Image
             modelBuilder.Entity<Image>()
                 .HasOne(I => I.Property)

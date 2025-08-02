@@ -97,6 +97,23 @@ namespace Eskon.Core.Response
                 Succeeded = false,
                 Message = Message == null ? "Bad Request" : Message,
 
+        public Response<T> Forbidden<T>()
+        {
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.Forbidden,
+                Succeeded = false,
+                Message = "Forbidden"
+            };
+        }
+        public Response<T> BadRequest<T>(string Message = null)
+        {
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.BadRequest,
+                Succeeded = false,
+                Message = Message == null ? "Bad Request" : Message,
+                
             };
         }
 
