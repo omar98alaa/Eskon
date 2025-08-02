@@ -29,30 +29,30 @@ namespace Eskon.API.Controllers
         #region POST
         [Authorize]
         [HttpGet("GetCustomerBookings")]
-        public async Task<IActionResult> GetCustomerBookings([FromQuery] string status)
+        public async Task<IActionResult> GetCustomerBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
         {
             var customerId = GetUserIdFromAuthenticatedUserToken();
-            var query = new GetCustomerBookingsQuery(customerId, status);
+            var query = new GetCustomerBookingsQuery(customerId, status, pageNum, itemsPerPage);
             var bookings = await Mediator.Send(query);
             return NewResult(bookings);
         }
 
         [Authorize(Roles = "Owner")]
         [HttpGet("GetOwnerBookings")]
-        public async Task<IActionResult> GetOwnerBookings([FromQuery] string status)
+        public async Task<IActionResult> GetOwnerBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
-            var query = new GetOwnerBookingsQuery(ownerId, status);
+            var query = new GetOwnerBookingsQuery(ownerId, status, pageNum, itemsPerPage);
             var bookings = await Mediator.Send(query);
             return Ok(bookings);
         }
 
         [Authorize(Roles = "Owner")]
         [HttpGet("GetPropertyBookings")]
-        public async Task<IActionResult> GetPropertyBookings([FromQuery] string status)
+        public async Task<IActionResult> GetPropertyBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
-            var query = new GetPropertyBookingsQuery(ownerId, status);
+            var query = new GetPropertyBookingsQuery(ownerId, status, pageNum, itemsPerPage);
             var bookings = await Mediator.Send(query);
             return Ok(bookings);
         }
