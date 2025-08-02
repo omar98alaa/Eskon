@@ -24,7 +24,7 @@ namespace Eskon.API.Controllers
 
         #region POST
         [Authorize]
-        [HttpPost("Customer")]
+        [HttpPost("Customer/Request")]
         public async Task<IActionResult> MakeABookingRequest([FromBody] BookingRequestDTO bookingWriteDTO)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();
