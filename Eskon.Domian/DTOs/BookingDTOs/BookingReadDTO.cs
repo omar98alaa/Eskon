@@ -17,7 +17,7 @@ namespace Eskon.Domian.DTOs.BookingDTOs
         public int Guests { get; set; }
         public decimal TotalPrice { get; set; }
         public Guid CustomerId { get; set; }
-        public string? CustomerName { get; set; }
+        public string CustomerName { get; set; }
         public Guid PropertyId { get; set; }
 
     }
