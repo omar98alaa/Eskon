@@ -1,6 +1,7 @@
 ﻿using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -84,9 +85,20 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
                 return BadRequest<string>(internalErrorMessages);
             }
+            Booking userBooking = await  _serviceUnitOfWork.BookingService.GetBookingById(request.RequestDTO.BookingId);
+
+            if(userBooking == null)
+            {
+                return NotFound<string>("Booking does not exists");
+            }
+
+            if(!userBooking.IsAccepted)
+            {
+                return BadRequest<string>("Booking is not accepted from owner");
+            }
 
             string checkoutSessionLink = _serviceUnitOfWork.StripeService.CreateStripeCheckoutUrl(
-                booking: request.RequestDTO.Booking,
+                booking: userBooking,
                 successUrl: request.RequestDTO.SuccessUrl, 
                 cancelUrl: request.RequestDTO.CancelUrl);
 
