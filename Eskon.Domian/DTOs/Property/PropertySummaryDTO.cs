@@ -1,4 +1,6 @@
-﻿namespace Eskon.Domian.DTOs.Property
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Eskon.Domian.DTOs.Property
 {
     public class PropertySummaryDTO
     {
@@ -11,6 +13,8 @@
         public decimal PricePerNight { get; set; }
 
         public string ThumbnailUrl { get; set; }
+
+        public string? RejectionMessage { get; set; }
 
         public decimal AverageRating { get; set; }
 

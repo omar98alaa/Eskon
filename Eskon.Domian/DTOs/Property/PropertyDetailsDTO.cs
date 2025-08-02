@@ -1,4 +1,6 @@
-﻿namespace Eskon.Domian.DTOs.Property
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Eskon.Domian.DTOs.Property
 {
     public class PropertyDetailsDTO
     {
@@ -27,6 +29,8 @@
         public double Latitude { get; set; }
 
         public bool IsSuspended { get; set; }
+
+        public string? RejectionMessage { get; set; }
 
         public decimal AverageRating { get; set; }
 

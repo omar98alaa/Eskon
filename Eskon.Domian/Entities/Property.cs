@@ -51,7 +51,7 @@ namespace Eskon.Domian.Models
         public bool IsAccepted { get; set; }
 
         [StringLength(200)]
-        public string RejectionMessage { get; set; }
+        public string? RejectionMessage { get; set; }
 
         public decimal AverageRating { get; set; } = 0.0m;
 
