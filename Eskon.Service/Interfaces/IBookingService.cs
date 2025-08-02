@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domain.Utilities;
+using Eskon.Domian.Models;
 
 namespace Eskon.Service.Interfaces
 {
@@ -11,15 +12,25 @@ namespace Eskon.Service.Interfaces
         #region Read
         public Task<Booking> GetBookingById(Guid Id);
 
-        public Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid ownerId);
-        public Task<List<Booking>> GetPendingBookingsPerCustomerAsync(Guid customerId);
-        public Task<List<Booking>> GetAcceptedBookingsPerCustomerAsync(Guid customerId);
-        public Task<List<Booking>> GetRejectedBookingsPerCustomerAsync(Guid customerId);
-        public Task<List<Booking>> GetPayedBookingsPerCustomerAsync(Guid customerId);
-        public Task<List<Booking>> GetBookingHistoryPerCustomerAsync(Guid customerId);
-        public Task<List<Booking>> GetBookingHistoryPerPropertyAsync(Guid propertyId);
+        public Task<Paginated<Booking>> GetPaginatedPendingBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedPendingBookingsPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedAcceptedBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedAcceptedBookingsPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedRejectedBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedRejectedBookingsPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedPaidBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedPaidBookingsPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedBookingHistoryPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedBookingHistoryPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedBookingHistoryPerPropertyAsync(Guid propertyId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedAcceptedBookingsPerPropertyAsync(Guid propertyId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedPendingBookingsPerPropertyAsync(Guid propertyId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedRejectedBookingsPerPropertyAsync(Guid propertyId, int pageNum, int itemsPerPage);
+        public Task<Paginated<Booking>> GetPaginatedPaidBookingsPerPropertyAsync(Guid propertyId, int pageNum, int itemsPerPage);
         public Task<List<Booking>> GetAcceptedBookingsPerPropertyAsync(Guid propertyId);
         public Task<List<Booking>> GetPendingBookingsPerPropertyAsync(Guid propertyId);
+
+
         #endregion
 
         #region Update

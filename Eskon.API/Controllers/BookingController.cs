@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
-using Eskon.Core.Features.BookingFeatures.Commands.Command;
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.DTOs.StripeDTOs;
+using Eskon.Core.Features.BookingFeatures.Queries.Query;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Eskon.Core.Features.BookingFeatures.Commands.Command;
 
 namespace Eskon.API.Controllers
 {
@@ -26,12 +27,44 @@ namespace Eskon.API.Controllers
 
         #region POST
         [Authorize]
+        [HttpGet("GetCustomerBookings")]
+        public async Task<IActionResult> GetCustomerBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
+        {
+            var customerId = GetUserIdFromAuthenticatedUserToken();
+            var query = new GetCustomerBookingsQuery(customerId, status, pageNum, itemsPerPage);
+            var bookings = await Mediator.Send(query);
+            return NewResult(bookings);
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpGet("GetOwnerBookings")]
+        public async Task<IActionResult> GetOwnerBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
+        {
+            var ownerId = GetUserIdFromAuthenticatedUserToken();
+            var query = new GetOwnerBookingsQuery(ownerId, status, pageNum, itemsPerPage);
+            var bookings = await Mediator.Send(query);
+            return Ok(bookings);
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpGet("GetPropertyBookings")]
+        public async Task<IActionResult> GetPropertyBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
+        {
+            var ownerId = GetUserIdFromAuthenticatedUserToken();
+            var query = new GetPropertyBookingsQuery(ownerId, status, pageNum, itemsPerPage);
+            var bookings = await Mediator.Send(query);
+            return Ok(bookings);
+        }
+
+        [Authorize]
+        [HttpPost("Customer")]
         [HttpPost("Customer/Request")]
         public async Task<IActionResult> MakeABookingRequest([FromBody] BookingRequestDTO bookingWriteDTO)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddNewBookingCommand(userId, bookingWriteDTO));
             return NewResult(response);
+
         }
         #endregion
 
