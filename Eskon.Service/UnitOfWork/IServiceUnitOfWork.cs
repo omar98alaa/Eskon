@@ -21,6 +21,8 @@ namespace Eskon.Service.UnitOfWork
         public IReviewService ReviewService { get; }
         public ITicketService TicketService { get; }
         public IUserService UserService { get; }
+
+        public IStripeService StripeService { get; }
         #endregion
 
         #region Methods

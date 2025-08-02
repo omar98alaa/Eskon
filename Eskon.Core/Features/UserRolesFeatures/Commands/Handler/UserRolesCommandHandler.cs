@@ -26,27 +26,72 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
         #endregion
 
         #region Add Owner Role
-        public async Task<Response<TokenResponseDto>> Handle(AddOwnerRoleToUserCommand request, CancellationToken cancellationToken)
+
+        // Add Stripe Account
+        public async Task<Response<string>> Handle(CreateStripeConnectedAccountAndFillLinkCommand request, CancellationToken cancellationToken)
         {
+            var validationContext = new ValidationContext(request.OwnerRoleDTO);
+            var results = new List<ValidationResult>();
+            bool isValid = Validator.TryValidateObject(request.OwnerRoleDTO, validationContext, results, true);
+            if (!isValid)
+            {
+                var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
+                return BadRequest<string>(internalErrorMessages);
+            }
+
             var user = await _userManager.FindByIdAsync(request.UserToBeOwnerId.ToString());
 
             if (user == null)
-                return NotFound<TokenResponseDto>("User Not Found");
+                return NotFound<string>("User Not Found");
 
-            var result = await _userManager.AddToRoleAsync(user, "Owner");
+            if (!string.IsNullOrEmpty(user.stripeAccountId))
+            {
+                return BadRequest<string>("User already has an active stripe account");
+            }
+            var stripeAccountId = _serviceUnitOfWork.StripeService.CreateStripeAccountForOwner(user);
+
+            // Needs to be more precise
+            if (string.IsNullOrEmpty(stripeAccountId))
+            {
+                return BadRequest<string>("Error at stripe");
+            }
+            await _serviceUnitOfWork.UserService.SetUserStripeAccountIdAsync(user.Id, stripeAccountId);
+            await _serviceUnitOfWork.SaveChangesAsync();
+
+            string connectedAccountFillLink = _serviceUnitOfWork.StripeService
+                .CreateStripeConnectedAccountLinkForOwner(
+                stripeAccountId, 
+                request.OwnerRoleDTO.RefreshUrl, 
+                request.OwnerRoleDTO.ReturnUrl);
+
+            if (string.IsNullOrEmpty(connectedAccountFillLink))
+            {
+                return BadRequest<string>("Error creating a stripe account fill link");
+            }
+
+            return Success(connectedAccountFillLink);
+        }
+
+        // Add OwnerRole To database
+        public async Task<Response<string>> Handle(AddOwnerRoleToUserCommand request, CancellationToken cancellationToken)
+        {
+            if (request.UserToBeOwner == null)
+                return NotFound<string>("User Not Found");
+
+            var result = await _userManager.AddToRoleAsync(request.UserToBeOwner, "Owner");
 
             if (!result.Succeeded)
             {
                 var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
-                return BadRequest<TokenResponseDto>(dbErrorMessages);
+                return BadRequest<string>(dbErrorMessages);
             }
 
-            var userManagerClaims = await _userManager.GetClaimsAsync(user);
-            var userManagerRoles = await _userManager.GetRolesAsync(user);
+            var userManagerClaims = await _userManager.GetClaimsAsync(request.UserToBeOwner);
+            var userManagerRoles = await _userManager.GetRolesAsync(request.UserToBeOwner);
 
-            var newAccessToken = _serviceUnitOfWork.AuthenticationService.GenerateJWTTokenAsync(user, userManagerRoles, userManagerClaims);
+            var newAccessToken = _serviceUnitOfWork.AuthenticationService.GenerateJWTTokenAsync(request.UserToBeOwner, userManagerRoles, userManagerClaims);
 
-            var existingRefreshToken = await _serviceUnitOfWork.RefreshTokenService.GetTokenByUserIdAsync(user.Id);
+            var existingRefreshToken = await _serviceUnitOfWork.RefreshTokenService.GetTokenByUserIdAsync(request.UserToBeOwner.Id);
 
             var tokenResponse = new TokenResponseDto
             {
@@ -54,7 +99,7 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
                 RefreshToken = existingRefreshToken.RefreshToken // reuse the existing one
             };
 
-            return Success(tokenResponse, "User owner role added, new access token issued.");
+            return Success("User owner role added, new access token issued.");
         }
 
         #endregion

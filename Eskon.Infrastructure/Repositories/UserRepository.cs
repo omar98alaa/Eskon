@@ -23,7 +23,24 @@ namespace Eskon.Infrastructure.Repositories
         #region Methods
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return  _userDbSet.FirstOrDefault(s => s.Email == email);
+            return  await _userDbSet.FirstOrDefaultAsync(s => s.Email == email);
+        }
+
+        public async Task<bool> SetUserStripeAccountIdAsync(Guid userId, string stripeAccountId)
+        {
+            var user = await _userDbSet.FirstOrDefaultAsync(u => u.Id ==  userId);
+            if (user == null)
+            {
+                return false;
+            }
+            user.stripeAccountId = stripeAccountId;
+            _userDbSet.Update(user);
+            return true;
+        }
+
+        public async Task<User> GetUserByStripeAccountIdAsync(string stripeAccountId)
+        {
+            return await _userDbSet.FirstOrDefaultAsync(s => s.stripeAccountId == stripeAccountId);
         }
         #endregion
     }
