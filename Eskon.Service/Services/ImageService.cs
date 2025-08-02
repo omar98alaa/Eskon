@@ -32,5 +32,10 @@ namespace Eskon.Service.Services
         {
             return (await _imageRepository.GetFilteredAsync(i => i.Url == imageName)).FirstOrDefault();
         }
+
+        public async Task<List<Image>> GetImagesByNameAsync(List<string> imagesNames)
+        {
+            return await _imageRepository.GetFilteredAsync(i => imagesNames.Contains(i.Url));
+        }
     }
 }
