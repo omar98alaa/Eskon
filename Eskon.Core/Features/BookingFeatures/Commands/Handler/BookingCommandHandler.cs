@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.BookingFeatures.Commands.Command;
 using Eskon.Core.Response;
+using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 using System.ComponentModel.DataAnnotations;
@@ -30,7 +31,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         #endregion
 
         #region Handlers
-        public async Task<Response<Booking>> Handle(AddNewBookingCommand request, CancellationToken cancellationToken)
+        public async Task<Response<BookingReadDTO>> Handle(AddNewBookingCommand request, CancellationToken cancellationToken)
         {
             var bookingRequestDTO = request.bookingRequestDTO;
 
@@ -40,7 +41,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             if (!isValid)
             {
                 var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
-                return BadRequest<Booking>(internalErrorMessages);
+                return BadRequest<BookingReadDTO>(internalErrorMessages);
             }
 
             // Check property exists
@@ -48,13 +49,13 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             if (property == null)
             {
-                return NotFound<Booking>("Property does not exist");
+                return NotFound<BookingReadDTO>("Property does not exist");
             }
 
             // Check dates are valid
-            if(bookingRequestDTO.StartDate >= bookingRequestDTO.EndDate)
+            if (bookingRequestDTO.StartDate >= bookingRequestDTO.EndDate)
             {
-                return BadRequest<Booking>("Start date cannot be greater than or equal to end date");
+                return BadRequest<BookingReadDTO>("Start date cannot be greater than or equal to end date");
             }
 
             // Check booking start date is at least 3 days later
@@ -62,13 +63,13 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             if (bookingRequestDTO.StartDate < today.AddDays(3))
             {
-                return BadRequest<Booking>("Cannot make a reservation less than 3 days ahead");
+                return BadRequest<BookingReadDTO>("Cannot make a reservation less than 3 days ahead");
             }
 
             // Check property active
             if (!property.IsAccepted || property.IsSuspended)
             {
-                return BadRequest<Booking>("Property is not available");
+                return BadRequest<BookingReadDTO>("Property is not available");
             }
 
             // Check overlapping with accepted bookings
@@ -78,7 +79,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             if (overlappingBookingsExist)
             {
-                return BadRequest<Booking>("Reservation period not available");
+                return BadRequest<BookingReadDTO>("Reservation period not available");
             }
 
             // Get number of days
@@ -96,7 +97,9 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             await _serviceUnitOfWork.BookingService.AddBookingAsync(newBooking);
 
-            return Created(newBooking, message: "Booking request submitted successfully. Awaiting confirmation");
+            var bookingDTO = _mapper.Map<BookingReadDTO>(newBooking);
+
+            return Created(bookingDTO, message: "Booking request submitted successfully. Awaiting confirmation");
         }
 
         public async Task<Response<string>> Handle(SetBookingAsAcceptedCommand request, CancellationToken cancellationToken)
