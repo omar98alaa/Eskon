@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.BookingFeatures.Commands.Command;
 using Eskon.Core.Response;
-using Eskon.Domian.DTOs.Booking;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 using System.ComponentModel.DataAnnotations;
@@ -52,12 +51,18 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 return NotFound<Booking>("Property does not exist");
             }
 
+            // Check dates are valid
+            if(bookingRequestDTO.StartDate >= bookingRequestDTO.EndDate)
+            {
+                return BadRequest<Booking>("Start date cannot be greater than or equal to end date");
+            }
+
             // Check booking start date is at least 3 days later
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            if(bookingRequestDTO.StartDate < today.AddDays(3))
+            if (bookingRequestDTO.StartDate < today.AddDays(3))
             {
-                return BadRequest<Booking>("Cannot make reservation less than 3 days ahead");
+                return BadRequest<Booking>("Cannot make a reservation less than 3 days ahead");
             }
 
             // Check property active
@@ -76,12 +81,16 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 return BadRequest<Booking>("Reservation period not available");
             }
 
+            // Get number of days
+            var days = bookingRequestDTO.EndDate.DayNumber - bookingRequestDTO.StartDate.DayNumber;
+
             // Create pending booking
             var newBooking = new Booking()
             {
                 PropertyId = request.propertyId,
                 StartDate = bookingRequestDTO.StartDate,
-                EndDate = bookingRequestDTO.EndDate
+                EndDate = bookingRequestDTO.EndDate,
+                TotalPrice = property.PricePerNight * days
             };
 
             await _serviceUnitOfWork.BookingService.AddBookingAsync(newBooking);
@@ -93,13 +102,13 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         {
             // Check booking exists
             var booking = await _serviceUnitOfWork.BookingService.GetBookingById(request.bookingId);
-            if(booking == null)
+            if (booking == null)
             {
                 return NotFound<string>("Booking does not exist");
             }
 
             // Check same owner
-            if(booking.Property.OwnerId != request.ownerId)
+            if (booking.Property.OwnerId != request.ownerId)
             {
                 return Forbidden<string>();
             }
@@ -131,7 +140,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             var pendingBookings = await _serviceUnitOfWork.BookingService.GetPendingBookingsPerPropertyAsync(booking.PropertyId);
             var overlappingPendingBookings = pendingBookings.FindAll(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
 
-            foreach(var pendingBooking in overlappingPendingBookings)
+            foreach (var pendingBooking in overlappingPendingBookings)
             {
                 await _serviceUnitOfWork.BookingService.SetBookingAsRejectedAsync(pendingBooking);
             }
