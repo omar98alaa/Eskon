@@ -11,15 +11,23 @@ namespace Eskon.Service.Interfaces
         #region Read
         public Task<Booking> GetBookingById(Guid Id);
 
-        public Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid ownerId);
         public Task<List<Booking>> GetPendingBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid ownerId);
         public Task<List<Booking>> GetAcceptedBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetAcceptedBookingsPerOwnerAsync(Guid ownerId);
         public Task<List<Booking>> GetRejectedBookingsPerCustomerAsync(Guid customerId);
-        public Task<List<Booking>> GetPayedBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetRejectedBookingsPerOwnerAsync(Guid ownerId);
+        public Task<List<Booking>> GetPaidBookingsPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetPaidBookingsPerOwnerAsync(Guid ownerId);
         public Task<List<Booking>> GetBookingHistoryPerCustomerAsync(Guid customerId);
+        public Task<List<Booking>> GetBookingHistoryPerOwnerAsync(Guid ownerId);
         public Task<List<Booking>> GetBookingHistoryPerPropertyAsync(Guid propertyId);
         public Task<List<Booking>> GetAcceptedBookingsPerPropertyAsync(Guid propertyId);
         public Task<List<Booking>> GetPendingBookingsPerPropertyAsync(Guid propertyId);
+        public Task<List<Booking>> GetRejectedBookingsPerPropertyAsync(Guid propertyId);
+        public Task<List<Booking>> GetPaidBookingsPerPropertyAsync(Guid propertyId);
+
+
         #endregion
 
         #region Update
