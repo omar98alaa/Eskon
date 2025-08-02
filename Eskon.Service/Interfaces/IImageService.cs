@@ -6,6 +6,7 @@ namespace Eskon.Service.Interfaces
     {
         Task<Image?> GetImageByIdAsync(Guid Id);
         Task<Image?> GetImageByNameAsync(string imageName);
+        Task<List<Image>> GetImagesByNameAsync(List<string> imagesNames);
         Task AddImageAsync(Image image);
         Task DeleteImageAsync(Image image);
     }
