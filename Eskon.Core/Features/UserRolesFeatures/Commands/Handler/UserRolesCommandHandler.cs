@@ -1,6 +1,6 @@
 ﻿using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Core.Response;
-using Eskon.Domian.DTOs.User;
+using Eskon.Domian.DTOs.UserDTOs;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Identity;

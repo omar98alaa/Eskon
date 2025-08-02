@@ -1,6 +1,6 @@
 ﻿using Eskon.Core.Features.AccountFeatures.Commands.Command;
 using Eskon.Core.Response;
-using Eskon.Domian.DTOs.User;
+using Eskon.Domian.DTOs.UserDTOs;
 using MediatR;
 using System;
 using System.Collections.Generic;

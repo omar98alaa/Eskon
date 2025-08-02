@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Eskon.Domian.DTOs.User
+namespace Eskon.Domian.DTOs.UserDTOs
 {
     public class UserSignInDto
     {

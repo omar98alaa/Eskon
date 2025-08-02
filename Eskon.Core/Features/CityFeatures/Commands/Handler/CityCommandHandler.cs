@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.CityFeatures.Commands.Commands;
 using Eskon.Core.Response;
-using Eskon.Domian.DTOs.CityDTO;
+using Eskon.Domian.DTOs.CityDTOs;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 using MediatR;

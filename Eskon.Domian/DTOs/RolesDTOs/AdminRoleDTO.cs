@@ -1,7 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 
-namespace Eskon.Domian.DTOs.Roles
+namespace Eskon.Domian.DTOs.RolesDTOs
 {
     public class AdminRoleDTO
     {

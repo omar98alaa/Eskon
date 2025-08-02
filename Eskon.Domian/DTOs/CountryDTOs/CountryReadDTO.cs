@@ -1,4 +1,4 @@
-﻿namespace Eskon.Domian.DTOs.Country
+﻿namespace Eskon.Domian.DTOs.CountryDTOs
 {
     public class CountryReadDTO
     {

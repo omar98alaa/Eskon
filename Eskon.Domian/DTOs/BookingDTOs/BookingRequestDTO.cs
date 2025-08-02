@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eskon.Domian.DTOs.Booking
+namespace Eskon.Domian.DTOs.BookingDTOs
 {
     public class BookingRequestDTO
     {

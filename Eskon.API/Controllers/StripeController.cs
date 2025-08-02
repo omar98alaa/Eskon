@@ -1,7 +1,7 @@
 ﻿using Eskon.API.Base;
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
-using Eskon.Domian.DTOs.Stripe;
+using Eskon.Domian.DTOs.StripeDTOs;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Stripe;
 using Eskon.Service.UnitOfWork;

@@ -1,7 +1,7 @@
 ﻿using Eskon.Core.Features.CountryFeatures.Queries.Models;
 using Eskon.Core.Response;
-using Eskon.Domian.DTOs.Country;
-using Eskon.Domian.DTOs.Country_City;
+using Eskon.Domian.DTOs.CountryDTOs;
+using Eskon.Domian.DTOs.CountryDTOs;
 using MediatR;
 
 namespace Eskon.Core.Features.CountryFeatures.Queries.Handlers

@@ -3,7 +3,7 @@ using Eskon.API.Base;
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Features.UserFeatures.Queries.Query;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
-using Eskon.Domian.DTOs.Roles;
+using Eskon.Domian.DTOs.RolesDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

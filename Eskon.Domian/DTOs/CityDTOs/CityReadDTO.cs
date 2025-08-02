@@ -1,4 +1,4 @@
-﻿namespace Eskon.Domian.DTOs.City
+﻿namespace Eskon.Domian.DTOs.CityDTOs
 {
     public class CityReadDTO
     {

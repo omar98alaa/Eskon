@@ -2,7 +2,7 @@
 using Eskon.API.Base;
 using Eskon.Core.Features.Country_CityFeatures.Commands.Commands;
 using Eskon.Core.Features.CountryFeatures.Queries.Models;
-using Eskon.Domian.DTOs.Country;
+using Eskon.Domian.DTOs.CountryDTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eskon.API.Controllers

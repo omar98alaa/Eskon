@@ -1,5 +1,5 @@
 ﻿using Eskon.Core.Response;
-using Eskon.Domian.DTOs.CityDTO;
+using Eskon.Domian.DTOs.CityDTOs;
 using MediatR;
 
 namespace Eskon.Core.Features.CityFeatures.Commands.Commands

@@ -1,6 +1,6 @@
 ﻿
 using Eskon.Core.Response;
-using Eskon.Domian.DTOs.Roles;
+using Eskon.Domian.DTOs.RolesDTOs;
 using MediatR;
 
 namespace Eskon.Core.Features.UserRolesFeatures.Commands.Command

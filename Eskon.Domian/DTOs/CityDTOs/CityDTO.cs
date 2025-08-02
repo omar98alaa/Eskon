@@ -1,8 +1,6 @@
-﻿
+﻿using System.ComponentModel.DataAnnotations;
 
-using System.ComponentModel.DataAnnotations;
-
-namespace Eskon.Domian.DTOs.CityDTO
+namespace Eskon.Domian.DTOs.CityDTOs
 {
     public class CityDTO
     {

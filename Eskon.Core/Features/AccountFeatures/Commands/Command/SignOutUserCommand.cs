@@ -1,5 +1,5 @@
 ﻿using Eskon.Core.Response;
-using Eskon.Domian.DTOs.RefreshToken;
+using Eskon.Domian.DTOs.RefreshTokenDTOs;
 using MediatR;
 
 namespace Eskon.Core.Features.AccountFeatures.Commands.Command

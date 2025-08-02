@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
 using Eskon.Core.Features.BookingFeatures.Commands.Command;
-using Eskon.Domian.DTOs.Booking;
+using Eskon.Domian.DTOs.BookingDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

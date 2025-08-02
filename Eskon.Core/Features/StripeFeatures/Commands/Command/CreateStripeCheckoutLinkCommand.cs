@@ -1,5 +1,5 @@
 ﻿using Eskon.Core.Response;
-using Eskon.Domian.DTOs.Stripe;
+using Eskon.Domian.DTOs.StripeDTOs;
 using MediatR;
 
 namespace Eskon.Core.Features.StripeFeatures.Commands.Command

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eskon.Domian.DTOs.Stripe
+namespace Eskon.Domian.DTOs.StripeDTOs
 {
     public class CreateStripeConnectedAccountFillLinkRequestDTO
     {

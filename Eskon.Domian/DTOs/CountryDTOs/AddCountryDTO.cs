@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eskon.Domian.DTOs.Country
+namespace Eskon.Domian.DTOs.CountryDTOs
 {
     public class AddCountryDTO
     {

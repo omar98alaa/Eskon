@@ -1,5 +1,5 @@
 ﻿using Eskon.Core.Response;
-using Eskon.Domian.DTOs.Booking;
+using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
 using MediatR;
 

@@ -2,8 +2,8 @@
 using Eskon.API.Base;
 using Eskon.Core.Features.AccountFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Utilities;
-using Eskon.Domian.DTOs.RefreshToken;
-using Eskon.Domian.DTOs.User;
+using Eskon.Domian.DTOs.RefreshTokenDTOs;
+using Eskon.Domian.DTOs.UserDTOs;
 using Eskon.Domian.Entities.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

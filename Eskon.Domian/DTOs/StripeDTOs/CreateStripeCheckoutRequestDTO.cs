@@ -1,12 +1,11 @@
-﻿using Eskon.Domian.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Eskon.Domian.DTOs.Stripe
+namespace Eskon.Domian.DTOs.StripeDTOs
 {
     public class CreateStripeCheckoutRequestDTO
     {
         [Required]
-        public Booking Booking { get; set; }
+        public Guid BookingId { get; set; }
 
         [Required]
         [Url]
