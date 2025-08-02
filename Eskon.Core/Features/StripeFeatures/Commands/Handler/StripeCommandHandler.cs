@@ -114,6 +114,30 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
         }
         #endregion
 
+        #region Stripe Refund
+        public async Task<Response<string>> Handle(CreateStripePaymentRefundCommand request, CancellationToken cancellationToken)
+        {
+            var booking = await _serviceUnitOfWork.BookingService.GetBookingById(request.BookingId);
+            if (booking == null)
+            {
+                return NotFound<string>("Booking does not exists");
+            }
+
+            if (booking.UserId != request.CustomerId)
+            {
+                return Forbidden<string>();
+            }
+
+            if (!booking.IsPayed)
+            {
+                return BadRequest<string>("Booking is not payed");
+            }
+
+            _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment.StripeChargeId);
+            return Success<string>("Refund request is created...");
+        }
+        #endregion
+
 
     }
 }

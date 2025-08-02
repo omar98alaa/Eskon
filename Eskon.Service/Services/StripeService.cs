@@ -123,5 +123,35 @@ namespace Eskon.Service.Services
         }
         #endregion
 
+        #region Stripe Refund
+
+        public void CreateStripeRefund(string chargeId)
+        {
+            StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+
+
+            try
+            {
+                var options = new RefundCreateOptions
+                {
+                    Charge = chargeId,
+                    RefundApplicationFee = true,
+                    ReverseTransfer = true,
+                };
+
+                var service = new RefundService();
+                var refund = service.Create(options); //pending, requires_action, succeeded, failed or canceled
+            }
+            catch (StripeException ex)
+            {
+                throw new ApplicationException($"Stripe error occurred: {ex.StripeError?.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An error occurred while creating the Stripe Checkout session.", ex);
+            }
+        }
+
+        #endregion
     }
 }

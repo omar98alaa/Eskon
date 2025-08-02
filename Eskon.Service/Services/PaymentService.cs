@@ -41,6 +41,12 @@ namespace Eskon.Service.Services
             await _paymentRepository.UpdateAsync(payment);
         }
 
+        public async Task SetPaymentAsRefunded(Payment payment)
+        {
+            payment.IsRefund = true;
+            await _paymentRepository.UpdateAsync(payment);
+        }
+
         public Payment GetPaymentByChargedId(string chargedId)
         {
             return _paymentRepository.GetPaymentByChargedId(chargedId);

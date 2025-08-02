@@ -6,5 +6,6 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
 {
     public interface IStripeCommandHandler : IRequestHandler<CreateStripeAccountCommand, Response<string>>,
                                              IRequestHandler<CreateStripeConnectedAccountLinkForOwnerCommand, Response<string>>,
-                                             IRequestHandler<CreateStripeCheckoutLinkCommand, Response<string>>;
+                                             IRequestHandler<CreateStripeCheckoutLinkCommand, Response<string>>,
+                                             IRequestHandler<CreateStripePaymentRefundCommand, Response<string>>;
 }

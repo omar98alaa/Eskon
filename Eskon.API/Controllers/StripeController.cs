@@ -3,6 +3,7 @@ using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Domian.DTOs.StripeDTOs;
 using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Models;
 using Eskon.Domian.Stripe;
 using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
@@ -80,8 +81,28 @@ namespace Eskon.API.Controllers
                     User user = await _unitOfWork.UserService.GetUserByStripeAccountIdAsync(connectedAccountId);
                     await Mediator.Send(new AddOwnerRoleToUserCommand(user));
                 }
+                else if (stripeEvent.Type == EventTypes.ChargeRefunded)
+                {
+                    var charge = stripeEvent.Data.Object as Charge;
 
-                return Ok();
+                    if (charge != null)
+                    {
+                        foreach (var refund in charge.Refunds.Data)
+                        {
+                            if (refund.Status == "succeeded")
+                            {
+                                var refundId = refund.Id;
+                                var amount = refund.Amount;
+                                var currency = refund.Currency;
+
+                                var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(refund.ChargeId);
+                                await _unitOfWork.PaymentService.SetPaymentAsRefunded(payment);
+                                await _unitOfWork.SaveChangesAsync();
+                            }
+                        } 
+                    }
+                }
+                    return Ok();
             }
             catch (StripeException e)
             {
@@ -106,6 +127,7 @@ namespace Eskon.API.Controllers
             Account deleted = service.Delete(stripeAccountId);
             return Ok(deleted);
         }
+
         #endregion
 
     }

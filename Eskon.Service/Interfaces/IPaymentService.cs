@@ -20,6 +20,8 @@ namespace Eskon.Service.Interfaces
 
         public Task SetPaymentAsFailed(Payment payment);
 
+        public Task SetPaymentAsRefunded(Payment payment);
+
         #endregion
 
     }
