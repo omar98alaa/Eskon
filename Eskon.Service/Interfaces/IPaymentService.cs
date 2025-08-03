@@ -13,6 +13,8 @@ namespace Eskon.Service.Interfaces
 
         public Payment GetPaymentByChargedId(string chargedId);
 
+        public Task<Payment> GetPaymentByBookingIdAsync(Guid bookingId);
+
         #endregion
 
         #region Update

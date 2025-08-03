@@ -7,5 +7,6 @@ namespace Eskon.Infrastructure.Interfaces
     public interface IPaymentRepository : IGenericRepositoryAsync<Payment>
     {
         public Payment GetPaymentByChargedId(string chargedId);
+        public Task<Payment> GetPaymentByBookingIdAsync(Guid bookingId);
     }
 }

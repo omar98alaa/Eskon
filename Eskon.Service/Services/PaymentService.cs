@@ -51,5 +51,10 @@ namespace Eskon.Service.Services
         {
             return _paymentRepository.GetPaymentByChargedId(chargedId);
         }
+
+        public async Task<Payment> GetPaymentByBookingIdAsync(Guid bookingId)
+        {
+            return await _paymentRepository.GetPaymentByBookingIdAsync(bookingId);
+        }
     }
 }

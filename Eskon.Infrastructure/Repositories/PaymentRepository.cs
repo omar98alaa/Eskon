@@ -25,6 +25,11 @@ namespace Eskon.Infrastructure.Repositories
         {
             return _paymentDbSet.SingleOrDefault(p => p.StripeChargeId == chargedId);
         }
+
+        public async Task<Payment> GetPaymentByBookingIdAsync(Guid bookingId)
+        {
+            return _paymentDbSet.SingleOrDefault(p => p.BookingId == bookingId);
+        }
         #endregion
     }
 }

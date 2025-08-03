@@ -2,13 +2,13 @@
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Domian.DTOs.StripeDTOs;
-using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Domian.Stripe;
 using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
+using Stripe.Checkout;
 using System.Text;
 
 namespace Eskon.API.Controllers
@@ -43,73 +43,130 @@ namespace Eskon.API.Controllers
 
             try
             {
-                var stripeEvent = EventUtility.ConstructEvent(json, stripeSignature, endpointSecret, throwOnApiVersionMismatch: false);
+                var stripeEvent = EventUtility.ConstructEvent(
+                    json, stripeSignature, endpointSecret, throwOnApiVersionMismatch: false);
 
-                if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded)
+                switch (stripeEvent.Type)
                 {
-                    var intent = stripeEvent.Data.Object as PaymentIntent;
 
-                    var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(intent.LatestChargeId);
-
-                    if (payment != null)
-                    {
-                        await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
-
-                        await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
-                        
-                        await _unitOfWork.SaveChangesAsync();
-                    }
-                }
-                else if (stripeEvent.Type == EventTypes.CheckoutSessionAsyncPaymentFailed)
-                {
-                    var intent = stripeEvent.Data.Object as PaymentIntent;
-
-                    var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(intent.LatestChargeId);
-
-                    if (payment != null)
-                    {
-                        await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
-                        await _unitOfWork.SaveChangesAsync();
-                    }
-                }
-                else if (stripeEvent.Type == EventTypes.AccountExternalAccountCreated) // fires when a new account is created
-                {
-                    var connectedAccountId = stripeEvent.Account;
-                    _logger.LogInformation($"---Account {connectedAccountId} Added To Stripe---");
-
-                    // Add Owner Role and generate the new access token
-                    User user = await _unitOfWork.UserService.GetUserByStripeAccountIdAsync(connectedAccountId);
-                    await Mediator.Send(new AddOwnerRoleToUserCommand(user));
-                }
-                else if (stripeEvent.Type == EventTypes.ChargeRefunded)
-                {
-                    var charge = stripeEvent.Data.Object as Charge;
-
-                    if (charge != null)
-                    {
-                        foreach (var refund in charge.Refunds)
+                    case "checkout.session.completed":
                         {
-                            if (refund.Status == "succeeded")
-                            {
-                                var refundId = refund.Id;
-                                var amount = refund.Amount;
-                                var currency = refund.Currency;
+                            var session = stripeEvent.Data.Object as Session;
+                            if (session == null) break;
+                            var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(session.Id);
 
-                                var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(refund.ChargeId);
-                                await _unitOfWork.PaymentService.SetPaymentAsRefunded(payment);
-                                await _unitOfWork.BookingService.SoftRemoveBookingAsync(payment.Booking);
+
+                            break;
+                        }
+                    case "checkout.session.async_payment_succeeded":
+                        {
+                            var session = stripeEvent.Data.Object as Session;
+                            if (session == null) break;
+                            var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(session.Id);
+                            if (payment != null)
+                            {
+                                payment.StripeChargeId = session.PaymentIntent.LatestChargeId;
+                                await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
+                                await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
                                 await _unitOfWork.SaveChangesAsync();
                             }
-                        } 
-                    }
+
+                            break;
+                        }
+                    case "checkout.session.async_payment_failed":
+                        {
+                            var session = stripeEvent.Data.Object as Session;
+                            if (session == null) break;
+                            var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(session.PaymentIntent.LatestChargeId);
+                            if (payment != null)
+                            {
+                                await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
+                                await _unitOfWork.SaveChangesAsync();
+                            }
+
+                            break;
+                        }
+                    case "account.external_account.created":
+                        {
+                            var connectedAccountId = stripeEvent.Account;
+                            _logger.LogInformation($"--- Stripe Connected Account Created: {connectedAccountId} ---");
+
+                            var user = await _unitOfWork.UserService.GetUserByStripeAccountIdAsync(connectedAccountId);
+                            if (user != null)
+                            {
+                                await Mediator.Send(new AddOwnerRoleToUserCommand(user));
+                            }
+
+                            break;
+                        }
+                    case "charge.refunded":
+                        {
+                            var charge = stripeEvent.Data.Object as Charge;
+                            if (charge == null || charge.Refunded != true) break;
+
+                            if (charge.Status == "succeeded")
+                            {
+                                var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(charge.Id);
+                                if (payment != null)
+                                {
+                                    await _unitOfWork.PaymentService.SetPaymentAsRefunded(payment);
+                                    await _unitOfWork.BookingService.SoftRemoveBookingAsync(payment.Booking);
+                                    await _unitOfWork.SaveChangesAsync();
+                                }
+                            }
+
+
+                            break;
+                        }
+                    case "payment_intent.succeeded":
+                        {
+                            var intent = stripeEvent.Data.Object as PaymentIntent;
+                            if (intent == null) break;
+                            var payment = await _unitOfWork.PaymentService.GetPaymentByBookingIdAsync(Guid.Parse(intent.Metadata["BookingId"]));
+                            if (payment != null)
+                            {
+                                payment.StripeChargeId = intent.LatestChargeId;
+                                await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
+                                Booking booking = await _unitOfWork.BookingService.GetBookingById(payment.BookingId);
+                                booking.PaymentId = payment.Id; // Check one-to-one relation fluent API
+                                await _unitOfWork.BookingService.SetBookingAsPayedAsync(booking);
+                                await _unitOfWork.SaveChangesAsync();
+                            }
+                            break;
+                        }
+                    case "payment_intent.payment_failed":
+                        {
+                            var intent = stripeEvent.Data.Object as PaymentIntent;
+                            if (intent == null) break;
+                            var payment = await _unitOfWork.PaymentService.GetPaymentByBookingIdAsync(Guid.Parse(intent.Metadata["BookingId"]));
+                            if (payment != null)
+                            {
+                                payment.StripeChargeId = intent.LatestChargeId;
+                                await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
+                                await _unitOfWork.SaveChangesAsync();
+                            }
+                            break;
+                        }
+
+                    default:
+                        _logger.LogInformation($"Unhandled Stripe Event: {stripeEvent.Type}");
+                        break;
                 }
-                    return Ok();
+
+                return Ok();
             }
-            catch (StripeException e)
+            catch (StripeException ex)
             {
-                return BadRequest(new { error = e.Message });
+                _logger.LogError(ex, "StripeException in webhook.");
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled exception in Stripe webhook.");
+                return StatusCode(500, new { error = ex.Message });
             }
         }
+
 
         [Authorize]
         [HttpPost("request-connected-account-fill-link")]
