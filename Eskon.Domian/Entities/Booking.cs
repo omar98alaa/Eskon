@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Eskon.Domian.Models
 {
-    [Index(nameof(UserId), nameof(PropertyId), nameof(StartDate), nameof(EndDate), IsUnique = true)]
+    [Index(nameof(CustomerId), nameof(PropertyId), nameof(StartDate), nameof(EndDate), IsUnique = true)]
     public class Booking : BaseModel
     {
         [Required]
@@ -37,8 +37,8 @@ namespace Eskon.Domian.Models
 
         //  User
         //[ForeignKey(nameof(User))]
-        public Guid UserId { get; set; }
-        public virtual User User { get; set; }
+        public Guid CustomerId { get; set; }
+        public virtual User Customer { get; set; }
 
         //  Property
         //[ForeignKey(nameof(Property))]

@@ -10,7 +10,7 @@ namespace Eskon.Domian.DTOs.BookingDTOs
     {
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
-        public DateOnly CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         public bool IsPending { get; set; }
         public bool IsAccepted { get; set; }
         public bool IsPayed { get; set; }

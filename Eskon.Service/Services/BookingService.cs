@@ -78,29 +78,29 @@ namespace Eskon.Service.Services
         public async Task<Paginated<Booking>> GetPaginatedBookingHistoryPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage)
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.UserId == customerId && b.StartDate <= now && !b.IsPending && b.IsPayed);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.CustomerId == customerId && b.StartDate <= now && !b.IsPending && b.IsPayed);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedAcceptedBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage)
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.UserId == customerId && b.StartDate > now && b.IsAccepted);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.CustomerId == customerId && b.StartDate > now && b.IsAccepted);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedPaidBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage)
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.UserId == customerId && b.StartDate > now && b.IsPayed);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.CustomerId == customerId && b.StartDate > now && b.IsPayed);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedPendingBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage)
         {
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.UserId == customerId && b.IsPending && !b.IsAccepted);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.CustomerId == customerId && b.IsPending && !b.IsAccepted);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedRejectedBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage)
         {
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.UserId == customerId && !b.IsPending && !b.IsAccepted);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.CustomerId == customerId && !b.IsPending && !b.IsAccepted);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedPendingBookingsPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
@@ -171,6 +171,17 @@ namespace Eskon.Service.Services
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
             return await _bookingRepository.GetFilteredAsync(b => b.PropertyId == propertyId && b.StartDate > now && b.IsPending);
+        }
+
+        public async Task<bool> IsAlreadyBookedBefore(Booking newBooking)
+        {
+            List<Booking> booking = await _bookingRepository.GetFilteredAsync(b =>
+            b.CustomerId == newBooking.CustomerId &&
+            b.StartDate == newBooking.StartDate &&
+            b.EndDate == newBooking.EndDate &&
+            b.PropertyId == newBooking.PropertyId
+            );
+            return booking.Count() != 0;
         }
     }
 }

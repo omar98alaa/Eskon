@@ -90,7 +90,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 return NotFound<string>("Booking does not exists");
             }
 
-            if(userBooking.UserId != request.customerId)
+            if(userBooking.CustomerId != request.customerId)
             {
                 return Forbidden<string>();
             }
@@ -123,7 +123,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 return NotFound<string>("Booking does not exists");
             }
 
-            if (booking.UserId != request.CustomerId)
+            if (booking.CustomerId != request.CustomerId)
             {
                 return Forbidden<string>();
             }

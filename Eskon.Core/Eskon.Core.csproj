@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Eskon.Service\Eskon.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mapping\BookingMapping\QueryMapping\" />
+  </ItemGroup>
+
 </Project>

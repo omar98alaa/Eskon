@@ -45,7 +45,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             }
 
             // Check property exists
-            var property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.propertyId);
+            var property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.bookingRequestDTO.PropertyId);
 
             if (property == null)
             {
@@ -72,6 +72,14 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 return BadRequest<BookingReadDTO>("Property is not available");
             }
 
+            Booking bookingToCheck = _mapper.Map<Booking>(bookingRequestDTO);
+            bookingToCheck.CustomerId = request.customerId;
+            if (await _serviceUnitOfWork.BookingService.IsAlreadyBookedBefore(bookingToCheck))
+            {
+                return BadRequest<BookingReadDTO>("Booking is processing");
+            }
+
+
             // Check overlapping with accepted bookings
             var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(property.Id);
 
@@ -88,14 +96,16 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             // Create pending booking
             var newBooking = new Booking()
             {
-                PropertyId = request.propertyId,
+                PropertyId = bookingRequestDTO.PropertyId,
                 StartDate = bookingRequestDTO.StartDate,
                 EndDate = bookingRequestDTO.EndDate,
                 TotalPrice = property.PricePerNight * days,
-                Guests = request.bookingRequestDTO.Guests
+                Guests = request.bookingRequestDTO.Guests,
+                CustomerId = request.customerId,
             };
 
             await _serviceUnitOfWork.BookingService.AddBookingAsync(newBooking);
+            await _serviceUnitOfWork.SaveChangesAsync();
 
             var bookingDTO = _mapper.Map<BookingReadDTO>(newBooking);
 

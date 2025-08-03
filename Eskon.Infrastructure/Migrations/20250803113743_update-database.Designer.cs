@@ -4,16 +4,19 @@ using Eskon.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Eskon.Infrastructure.Migrations
+namespace Askon.Infrastructure.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250803113743_update-database")]
+    partial class updatedatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,9 +219,6 @@ namespace Eskon.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -252,6 +252,9 @@ namespace Eskon.Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PaymentId")
@@ -260,7 +263,7 @@ namespace Eskon.Infrastructure.Migrations
 
                     b.HasIndex("PropertyId");
 
-                    b.HasIndex("CustomerId", "PropertyId", "StartDate", "EndDate")
+                    b.HasIndex("UserId", "PropertyId", "StartDate", "EndDate")
                         .IsUnique();
 
                     b.ToTable("Bookings");
@@ -895,12 +898,6 @@ namespace Eskon.Infrastructure.Migrations
 
             modelBuilder.Entity("Eskon.Domian.Models.Booking", b =>
                 {
-                    b.HasOne("Eskon.Domian.Entities.Identity.User", "Customer")
-                        .WithMany("Bookings")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Eskon.Domian.Models.Payment", "Payment")
                         .WithOne("Booking")
                         .HasForeignKey("Eskon.Domian.Models.Booking", "PaymentId")
@@ -912,11 +909,17 @@ namespace Eskon.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.HasOne("Eskon.Domian.Entities.Identity.User", "User")
+                        .WithMany("Bookings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Payment");
 
                     b.Navigation("Property");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Chat", b =>

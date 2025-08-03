@@ -4,12 +4,13 @@ using Eskon.Domian.Models;
 
 namespace Eskon.Core.Mapping.BookingMapping
 {
-    public class BookingProfileMapping : Profile
+    public partial class BookingMapping : Profile
     {
-        public BookingProfileMapping()
+        public BookingMapping()
         {
             #region ReadMapping
-            CreateMap<Booking, BookingReadDTO>();
+            CreateBooking();
+            CheckIfAlreadyBooked();
             #endregion
 
             #region WriteMapping
