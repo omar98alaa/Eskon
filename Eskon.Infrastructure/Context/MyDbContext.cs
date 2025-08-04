@@ -70,7 +70,8 @@ namespace Eskon.Infrastructure.Context
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Payment)
                 .WithOne(p => p.Booking)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey<Payment>(p => p.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
             #endregion
 
             #region Chat

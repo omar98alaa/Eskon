@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Askon.Infrastructure.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250803123310_Rename-User-to-Customer-BookingTable")]
-    partial class RenameUsertoCustomerBookingTable
+    [Migration("20250804090443_temp")]
+    partial class temp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -240,9 +240,6 @@ namespace Askon.Infrastructure.Migrations
                     b.Property<bool>("IsPending")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("PropertyId")
                         .HasColumnType("uniqueidentifier");
 
@@ -256,10 +253,6 @@ namespace Askon.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PaymentId")
-                        .IsUnique()
-                        .HasFilter("[PaymentId] IS NOT NULL");
 
                     b.HasIndex("PropertyId");
 
@@ -565,6 +558,9 @@ namespace Askon.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
 
                     b.HasIndex("CustomerId");
 
@@ -904,11 +900,6 @@ namespace Askon.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Eskon.Domian.Models.Payment", "Payment")
-                        .WithOne("Booking")
-                        .HasForeignKey("Eskon.Domian.Models.Booking", "PaymentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Eskon.Domian.Models.Property", "Property")
                         .WithMany("Bookings")
                         .HasForeignKey("PropertyId")
@@ -916,8 +907,6 @@ namespace Askon.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
-
-                    b.Navigation("Payment");
 
                     b.Navigation("Property");
                 });
@@ -1021,11 +1010,19 @@ namespace Askon.Infrastructure.Migrations
 
             modelBuilder.Entity("Eskon.Domian.Models.Payment", b =>
                 {
+                    b.HasOne("Eskon.Domian.Models.Booking", "Booking")
+                        .WithOne("Payment")
+                        .HasForeignKey("Eskon.Domian.Models.Payment", "BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Eskon.Domian.Entities.Identity.User", "Customer")
                         .WithMany("Payments")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Booking");
 
                     b.Navigation("Customer");
                 });
@@ -1175,6 +1172,11 @@ namespace Askon.Infrastructure.Migrations
                     b.Navigation("UserRoles");
                 });
 
+            modelBuilder.Entity("Eskon.Domian.Models.Booking", b =>
+                {
+                    b.Navigation("Payment");
+                });
+
             modelBuilder.Entity("Eskon.Domian.Models.Chat", b =>
                 {
                     b.Navigation("ChatMessages");
@@ -1193,12 +1195,6 @@ namespace Askon.Infrastructure.Migrations
             modelBuilder.Entity("Eskon.Domian.Models.NotificationType", b =>
                 {
                     b.Navigation("Notifications");
-                });
-
-            modelBuilder.Entity("Eskon.Domian.Models.Payment", b =>
-                {
-                    b.Navigation("Booking")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Eskon.Domian.Models.Property", b =>

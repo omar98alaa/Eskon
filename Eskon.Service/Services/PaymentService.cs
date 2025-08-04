@@ -47,12 +47,12 @@ namespace Eskon.Service.Services
             await _paymentRepository.UpdateAsync(payment);
         }
 
-        public Payment GetPaymentByChargedId(string chargedId)
+        public async Task<Payment?> GetPaymentByChargedId(string chargedId)
         {
-            return _paymentRepository.GetPaymentByChargedId(chargedId);
+            return await _paymentRepository.GetPaymentByChargedId(chargedId);
         }
 
-        public async Task<Payment> GetPaymentByBookingIdAsync(Guid bookingId)
+        public async Task<Payment?> GetPaymentByBookingIdAsync(Guid bookingId)
         {
             return await _paymentRepository.GetPaymentByBookingIdAsync(bookingId);
         }
