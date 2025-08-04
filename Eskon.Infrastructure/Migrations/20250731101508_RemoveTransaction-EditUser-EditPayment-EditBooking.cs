@@ -11,9 +11,9 @@ namespace Askon.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Payments_Users_UserId",
-                table: "Payments");
+            //migrationBuilder.DropForeignKey(
+            //    name: "FK_Payments_Users_UserId",
+            //    table: "Payments");
 
             migrationBuilder.DropTable(
                 name: "Transactions");
@@ -84,11 +84,11 @@ namespace Askon.Infrastructure.Migrations
                 type: "uniqueidentifier",
                 nullable: true);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Cities_Name_CountryId",
-                table: "Cities",
-                columns: new[] { "Name", "CountryId" },
-                unique: true);
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_Cities_Name_CountryId",
+            //    table: "Cities",
+            //    columns: new[] { "Name", "CountryId" },
+            //    unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_PaymentId",
@@ -125,9 +125,9 @@ namespace Askon.Infrastructure.Migrations
                 name: "FK_Payments_Users_CustomerId",
                 table: "Payments");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Cities_Name_CountryId",
-                table: "Cities");
+            //migrationBuilder.DropIndex(
+            //    name: "IX_Cities_Name_CountryId",
+            //    table: "Cities");
 
             migrationBuilder.DropIndex(
                 name: "IX_Bookings_PaymentId",
@@ -223,13 +223,13 @@ namespace Askon.Infrastructure.Migrations
                 table: "Transactions",
                 column: "SenderId");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Payments_Users_UserId",
-                table: "Payments",
-                column: "UserId",
-                principalTable: "Users",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+            //migrationBuilder.AddForeignKey(
+            //    name: "FK_Payments_Users_UserId",
+            //    table: "Payments",
+            //    column: "UserId",
+            //    principalTable: "Users",
+            //    principalColumn: "Id",
+            //    onDelete: ReferentialAction.Restrict);
         }
     }
 }

@@ -30,6 +30,8 @@ namespace Eskon.Service.Interfaces
         public Task<List<Booking>> GetAcceptedBookingsPerPropertyAsync(Guid propertyId);
         public Task<List<Booking>> GetPendingBookingsPerPropertyAsync(Guid propertyId);
 
+        public Task<bool> IsAlreadyBookedBefore(Booking newBooking);
+
 
         #endregion
 

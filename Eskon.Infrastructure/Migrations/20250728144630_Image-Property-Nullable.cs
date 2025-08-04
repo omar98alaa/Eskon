@@ -19,19 +19,19 @@ namespace Askon.Infrastructure.Migrations
                 oldClrType: typeof(Guid),
                 oldType: "uniqueidentifier");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Cities_Name_CountryId",
-                table: "Cities",
-                columns: new[] { "Name", "CountryId" },
-                unique: true);
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_Cities_Name_CountryId",
+            //    table: "Cities",
+            //    columns: new[] { "Name", "CountryId" },
+            //    unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_Cities_Name_CountryId",
-                table: "Cities");
+            //migrationBuilder.DropIndex(
+            //    name: "IX_Cities_Name_CountryId",
+            //    table: "Cities");
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "PropertyId",

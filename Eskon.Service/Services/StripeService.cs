@@ -3,6 +3,7 @@ using Eskon.Domian.Models;
 using Eskon.Domian.Stripe;
 using Eskon.Service.Interfaces;
 using Stripe;
+using Stripe.Checkout;
 
 namespace Eskon.Service.Services
 {
@@ -16,7 +17,7 @@ namespace Eskon.Service.Services
         public StripeService(StripeSettings stripeSettings)
         {
             _stripeSettings = stripeSettings;
-        } 
+        }
         #endregion
 
         public decimal CalculateEskonBookingFees(decimal BookingAmount)
@@ -69,25 +70,27 @@ namespace Eskon.Service.Services
         #endregion
 
         #region Stripe Checkout
-        public  string CreateStripeCheckoutUrl(Booking booking, string successUrl, string cancelUrl)
+        public Session CreateStripeCheckoutSession(Booking booking, string successUrl, string cancelUrl)
         {
             try
             {
                 StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-                var options = new Stripe.Checkout.SessionCreateOptions
+                var options = new SessionCreateOptions
                 {
                     Mode = "payment",
                     SuccessUrl = successUrl,
                     CancelUrl = cancelUrl,
-                    LineItems = new List<Stripe.Checkout.SessionLineItemOptions>
+                    LineItems = new List<SessionLineItemOptions>
+
                 {
-                    new Stripe.Checkout.SessionLineItemOptions
+                    new SessionLineItemOptions
                     {
-                        PriceData = new Stripe.Checkout.SessionLineItemPriceDataOptions
+
+                        PriceData = new SessionLineItemPriceDataOptions
                         {
                             Currency = "usd",
-                            ProductData = new Stripe.Checkout.SessionLineItemPriceDataProductDataOptions
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
                             {
                                 Name = $"Reservation for {booking.Property.Title} from {booking.StartDate} to {booking.EndDate}",
                             },
@@ -96,24 +99,27 @@ namespace Eskon.Service.Services
                         Quantity = 1,
                     },
                 },
-                    PaymentIntentData = new Stripe.Checkout.SessionPaymentIntentDataOptions
+
+                    PaymentIntentData = new SessionPaymentIntentDataOptions
                     {
                         ApplicationFeeAmount = (long)CalculateEskonBookingFees(booking.TotalPrice) * 100,
-                        TransferData = new Stripe.Checkout.SessionPaymentIntentDataTransferDataOptions
+                        TransferData = new SessionPaymentIntentDataTransferDataOptions
                         {
                             Destination = booking.Property.Owner.stripeAccountId,
                         },
-
+                        Metadata = new Dictionary<string, string>
+                        {
+                           { "BookingId", booking.Id.ToString() }
+                        }
                     }
                 };
 
-                var service = new Stripe.Checkout.SessionService();
-                Stripe.Checkout.Session session = service.Create(options);
-
-                return session.Url;
+                var service = new SessionService();
+                Session session = service.Create(options);
+                return session;
             }
             catch (StripeException ex)
-            {          
+            {
                 throw new ApplicationException($"Stripe error occurred: {ex.StripeError?.Message}", ex);
             }
             catch (Exception ex)
@@ -125,7 +131,7 @@ namespace Eskon.Service.Services
 
         #region Stripe Refund
 
-        public void CreateStripeRefund(string chargeId)
+        public void CreateStripeRefund(Payment payment)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
@@ -134,9 +140,10 @@ namespace Eskon.Service.Services
             {
                 var options = new RefundCreateOptions
                 {
-                    Charge = chargeId,
+                    Charge = payment.StripeChargeId,
                     RefundApplicationFee = true,
                     ReverseTransfer = true,
+                    Amount = (long)((payment.BookingAmount - payment.Fees) * 100),                   
                 };
 
                 var service = new RefundService();

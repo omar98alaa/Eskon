@@ -32,7 +32,7 @@ namespace Eskon.Domian.Models
         public Guid CustomerId { get; set; }
         public virtual User Customer { get; set; }
 
-        [Required, ForeignKey(nameof(Booking))]
+        //[Required, ForeignKey(nameof(Booking))]
         public Guid BookingId { get; set; }
         public virtual Booking Booking { get; set; }
 

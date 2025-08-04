@@ -45,11 +45,17 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             }
 
             // Check property exists
-            var property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.propertyId);
+            var property = await _serviceUnitOfWork.PropertyService.GetPropertyByIdAsync(request.bookingRequestDTO.PropertyId);
 
             if (property == null)
             {
                 return NotFound<BookingReadDTO>("Property does not exist");
+            }
+
+            // Check property active
+            if (!property.IsAccepted || property.IsSuspended)
+            {
+                return BadRequest<BookingReadDTO>("Property is not available");
             }
 
             // Check dates are valid
@@ -66,11 +72,23 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 return BadRequest<BookingReadDTO>("Cannot make a reservation less than 3 days ahead");
             }
 
-            // Check property active
-            if (!property.IsAccepted || property.IsSuspended)
+            // Map to new booking
+            var newBooking = _mapper.Map<Booking>(bookingRequestDTO);
+            
+            // Set customer Id
+            newBooking.CustomerId = request.customerId;
+
+            // Check if it is a duplicate booking
+            if (await _serviceUnitOfWork.BookingService.IsAlreadyBookedBefore(newBooking))
             {
-                return BadRequest<BookingReadDTO>("Property is not available");
+                return BadRequest<BookingReadDTO>("Booking is processing");
             }
+
+            // Get number of days
+            var days = bookingRequestDTO.EndDate.DayNumber - bookingRequestDTO.StartDate.DayNumber;
+
+            // Set total price
+            newBooking.TotalPrice = property.PricePerNight * days;
 
             // Check overlapping with accepted bookings
             var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(property.Id);
@@ -82,20 +100,9 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 return BadRequest<BookingReadDTO>("Reservation period not available");
             }
 
-            // Get number of days
-            var days = bookingRequestDTO.EndDate.DayNumber - bookingRequestDTO.StartDate.DayNumber;
-
-            // Create pending booking
-            var newBooking = new Booking()
-            {
-                PropertyId = request.propertyId,
-                StartDate = bookingRequestDTO.StartDate,
-                EndDate = bookingRequestDTO.EndDate,
-                TotalPrice = property.PricePerNight * days,
-                Guests = request.bookingRequestDTO.Guests
-            };
-
+            // Add pending booking request
             await _serviceUnitOfWork.BookingService.AddBookingAsync(newBooking);
+            await _serviceUnitOfWork.SaveChangesAsync();
 
             var bookingDTO = _mapper.Map<BookingReadDTO>(newBooking);
 
@@ -127,7 +134,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             await _serviceUnitOfWork.BookingService.SetBookingAsAcceptedAsync(booking);
             await _serviceUnitOfWork.SaveChangesAsync();
 
-            // Check overlapping bookings
+            // Check overlapping bookings (To avoid race conditions)
             var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(booking.PropertyId);
             var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
 

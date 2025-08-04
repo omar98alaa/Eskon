@@ -1,5 +1,6 @@
 ﻿using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
+using Stripe.Checkout;
 
 namespace Eskon.Service.Interfaces
 {
@@ -11,8 +12,8 @@ namespace Eskon.Service.Interfaces
 
         public string CreateStripeConnectedAccountLinkForOwner(string stripeAccountId, string refreshUrl, string returnUrl);
 
-        public string CreateStripeCheckoutUrl(Booking booking, string successUrl, string cancelUrl);
+        public Session CreateStripeCheckoutSession(Booking booking, string successUrl, string cancelUrl);
 
-        public void CreateStripeRefund(string chargeId);
+        public void CreateStripeRefund(Payment payment);
     }
 }

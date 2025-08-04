@@ -56,9 +56,9 @@ namespace Eskon.Infrastructure.Context
             #region Booking
             //  Booking
             modelBuilder.Entity<Booking>()
-                .HasOne(b => b.User)
+                .HasOne(b => b.Customer)
                 .WithMany(u => u.Bookings)
-                .HasForeignKey(b => b.UserId)
+                .HasForeignKey(b => b.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Booking>()
@@ -70,7 +70,8 @@ namespace Eskon.Infrastructure.Context
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Payment)
                 .WithOne(p => p.Booking)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey<Payment>(p => p.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
             #endregion
 
             #region Chat

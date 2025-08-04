@@ -3,7 +3,7 @@ using Eskon.Core.Response;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
-using MediatR;
+using Stripe.Checkout;
 using System.ComponentModel.DataAnnotations;
 
 namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
@@ -34,10 +34,10 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
             {
                 return BadRequest<string>("User already has an active stripe account");
             }
-            
+
             string AccountId = _serviceUnitOfWork.StripeService.CreateStripeAccountForOwner(user);
 
-            if(string.IsNullOrEmpty(AccountId))
+            if (string.IsNullOrEmpty(AccountId))
             {
                 throw new Exception("Error creating a stripe account");
             }
@@ -82,35 +82,47 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 var internalErrorMessages = results.Select(r => r.ErrorMessage).ToList();
                 return BadRequest<string>(internalErrorMessages);
             }
-            
-            Booking userBooking = await  _serviceUnitOfWork.BookingService.GetBookingById(request.bookingId);
 
-            if(userBooking == null)
+            Booking userBooking = await _serviceUnitOfWork.BookingService.GetBookingById(request.bookingId);
+
+            if (userBooking == null)
             {
                 return NotFound<string>("Booking does not exists");
             }
 
-            if(userBooking.UserId != request.customerId)
+            if (userBooking.CustomerId != request.customerId)
             {
                 return Forbidden<string>();
             }
 
-            if(!userBooking.IsAccepted)
+            if (!userBooking.IsAccepted)
             {
                 return BadRequest<string>("Booking is not accepted from owner");
             }
 
-            string checkoutSessionLink = _serviceUnitOfWork.StripeService.CreateStripeCheckoutUrl(
+            Session checkoutSession = _serviceUnitOfWork.StripeService.CreateStripeCheckoutSession(
                 booking: userBooking,
-                successUrl: request.RequestDTO.SuccessUrl, 
+                successUrl: request.RequestDTO.SuccessUrl,
                 cancelUrl: request.RequestDTO.CancelUrl);
 
-            if (string.IsNullOrEmpty(checkoutSessionLink))
+            if (checkoutSession == null || string.IsNullOrEmpty(checkoutSession.Url))
             {
                 throw new Exception("Can not create checkout session");
             }
 
-            return Success(checkoutSessionLink);
+            var payment = new Payment()
+            {
+                BookingAmount = userBooking.TotalPrice,
+                Fees = _serviceUnitOfWork.StripeService.CalculateEskonBookingFees(userBooking.TotalPrice),
+                MaximumRefundDate = userBooking.StartDate.AddDays(-1),
+                //StripeChargeId = userBooking.Id.ToString(),
+                CustomerId = userBooking.CustomerId,
+                BookingId = userBooking.Id,
+            };
+            await _serviceUnitOfWork.PaymentService.AddPaymentAsync(payment);
+            await _serviceUnitOfWork.SaveChangesAsync();
+
+            return Success(checkoutSession.Url);
         }
         #endregion
 
@@ -118,12 +130,18 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
         public async Task<Response<string>> Handle(CreateStripePaymentRefundCommand request, CancellationToken cancellationToken)
         {
             var booking = await _serviceUnitOfWork.BookingService.GetBookingById(request.BookingId);
+            
             if (booking == null)
             {
-                return NotFound<string>("Booking does not exists");
+                return NotFound<string>("Booking does not exist");
             }
 
-            if (booking.UserId != request.CustomerId)
+            if (booking.Payment == null)
+            {
+                return NotFound<string>("Payment does not exist");
+            }
+
+            if (booking.CustomerId != request.CustomerId)
             {
                 return Forbidden<string>();
             }
@@ -133,18 +151,21 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 return BadRequest<string>("Booking is not payed");
             }
 
-            var aDayBefore = DateOnly.FromDateTime(DateTime.Now.AddDays(-1));
-            
-            if(booking.StartDate >= aDayBefore)
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            if (booking.Payment.MaximumRefundDate < today)
             {
-                return BadRequest<string>("Booking already started and cannot be refunded");
+                return BadRequest<string>("Booking cannot be refunded, maximum refund date passed");
             }
 
-            _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment.StripeChargeId);
-            return Success<string>("Refund request is created...");
+            if (booking.Payment.IsRefund)
+            {
+                return BadRequest<string>("Payment already refunded");
+            }
+
+            _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment);
+            return Success("Refund request is created...");
         }
         #endregion
-
-
     }
 }

@@ -57,7 +57,6 @@ namespace Eskon.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("Customer")]
         [HttpPost("Customer/Request")]
         public async Task<IActionResult> MakeABookingRequest([FromBody] BookingRequestDTO bookingWriteDTO)
         {
@@ -109,10 +108,10 @@ namespace Eskon.API.Controllers
 
         [Authorize]
         [HttpDelete("Customer/Refund/{bookingId:guid}")]
-        public async Task<IActionResult> RefundBooking([FromRoute] Guid bookingId, CreateStripePaymentRefundCommand createStripePaymentRefundCommand)
+        public async Task<IActionResult> RefundBooking([FromRoute] Guid bookingId)
         {
             var cusotmerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new CreateStripePaymentRefundCommand(bookingId, cusotmerId));
+            var response = await Mediator.Send(new CreateStripePaymentRefundCommand(cusotmerId, bookingId));
             return NewResult(response);
         }
         #endregion
