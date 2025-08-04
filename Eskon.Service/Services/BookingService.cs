@@ -175,13 +175,7 @@ namespace Eskon.Service.Services
 
         public async Task<bool> IsAlreadyBookedBefore(Booking newBooking)
         {
-            List<Booking> booking = await _bookingRepository.GetFilteredAsync(b =>
-            b.CustomerId == newBooking.CustomerId &&
-            b.StartDate == newBooking.StartDate &&
-            b.EndDate == newBooking.EndDate &&
-            b.PropertyId == newBooking.PropertyId
-            );
-            return booking.Count() != 0;
+            return await _bookingRepository.CheckBookingExists(newBooking);
         }
     }
 }
