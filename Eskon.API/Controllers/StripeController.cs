@@ -49,45 +49,60 @@ namespace Eskon.API.Controllers
                 switch (stripeEvent.Type)
                 {
 
-                    case "checkout.session.completed":
+                    case EventTypes.CheckoutSessionCompleted:
                         {
-                            var session = stripeEvent.Data.Object as Session;
-                            if (session == null) break;
-                            var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(session.Id);
+                            //
+                            //  Customer completes the payment form
+                            //
 
-
-                            break;
-                        }
-                    case "checkout.session.async_payment_succeeded":
-                        {
-                            var session = stripeEvent.Data.Object as Session;
-                            if (session == null) break;
-                            var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(session.Id);
-                            if (payment != null)
-                            {
-                                payment.StripeChargeId = session.PaymentIntent.LatestChargeId;
-                                await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
-                                await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
-                                await _unitOfWork.SaveChangesAsync();
-                            }
+                            //var session = stripeEvent.Data.Object as Session;
+                            //if (session == null) break;
+                            //var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(session.Id);
 
                             break;
                         }
-                    case "checkout.session.async_payment_failed":
+                    case EventTypes.CheckoutSessionAsyncPaymentSucceeded:
                         {
-                            var session = stripeEvent.Data.Object as Session;
-                            if (session == null) break;
-                            var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(session.PaymentIntent.LatestChargeId);
-                            if (payment != null)
-                            {
-                                await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
-                                await _unitOfWork.SaveChangesAsync();
-                            }
+                            //
+                            //  Payment with an async method succeeds
+                            //
+
+                            //var session = stripeEvent.Data.Object as Session;
+                            //if (session == null) break;
+                            //var payment = await _unitOfWork.PaymentService.GetPaymentByChargedId(session.Id);
+                            //if (payment != null)
+                            //{
+                            //    payment.StripeChargeId = session.PaymentIntent.LatestChargeId;
+                            //    await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
+                            //    await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
+                            //    await _unitOfWork.SaveChangesAsync();
+                            //}
 
                             break;
                         }
-                    case "account.external_account.created":
+                    case EventTypes.CheckoutSessionAsyncPaymentFailed:
                         {
+                            //
+                            //  Payment with an async method fails
+                            //
+
+                            //var session = stripeEvent.Data.Object as Session;
+                            //if (session == null) break;
+                            //var payment = await _unitOfWork.PaymentService.GetPaymentByChargedId(session.PaymentIntent.LatestChargeId);
+                            //if (payment != null)
+                            //{
+                            //    await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
+                            //    await _unitOfWork.SaveChangesAsync();
+                            //}
+
+                            break;
+                        }
+                    case EventTypes.AccountExternalAccountCreated:
+                        {
+                            //
+                            //  Connected account created
+                            //
+
                             var connectedAccountId = stripeEvent.Account;
                             _logger.LogInformation($"--- Stripe Connected Account Created: {connectedAccountId} ---");
 
@@ -99,14 +114,18 @@ namespace Eskon.API.Controllers
 
                             break;
                         }
-                    case "charge.refunded":
+                    case EventTypes.ChargeRefunded:
                         {
+                            //
+                            //  Charge successfully refunded
+                            //
+
                             var charge = stripeEvent.Data.Object as Charge;
                             if (charge == null || charge.Refunded != true) break;
 
                             if (charge.Status == "succeeded")
                             {
-                                var payment = _unitOfWork.PaymentService.GetPaymentByChargedId(charge.Id);
+                                var payment = await _unitOfWork.PaymentService.GetPaymentByChargedId(charge.Id);
                                 if (payment != null)
                                 {
                                     await _unitOfWork.PaymentService.SetPaymentAsRefunded(payment);
@@ -118,8 +137,12 @@ namespace Eskon.API.Controllers
 
                             break;
                         }
-                    case "payment_intent.succeeded":
+                    case EventTypes.PaymentIntentSucceeded:
                         {
+                            //
+                            //  Payment with a sync method succeeds
+                            //
+
                             var intent = stripeEvent.Data.Object as PaymentIntent;
                             if (intent == null) break;
                             var payment = await _unitOfWork.PaymentService.GetPaymentByBookingIdAsync(Guid.Parse(intent.Metadata["BookingId"]));
@@ -127,15 +150,19 @@ namespace Eskon.API.Controllers
                             {
                                 payment.StripeChargeId = intent.LatestChargeId;
                                 await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
-                                Booking booking = await _unitOfWork.BookingService.GetBookingById(payment.BookingId);
-                                booking.PaymentId = payment.Id; // Check one-to-one relation fluent API
-                                await _unitOfWork.BookingService.SetBookingAsPayedAsync(booking);
+                                //Booking booking = await _unitOfWork.BookingService.GetBookingById(payment.BookingId);
+                                //booking.PaymentId = payment.Id; // Check one-to-one relation fluent API
+                                await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
                                 await _unitOfWork.SaveChangesAsync();
                             }
                             break;
                         }
-                    case "payment_intent.payment_failed":
+                    case EventTypes.PaymentIntentPaymentFailed:
                         {
+                            //
+                            //  Payment with a sync method fails
+                            //
+
                             var intent = stripeEvent.Data.Object as PaymentIntent;
                             if (intent == null) break;
                             var payment = await _unitOfWork.PaymentService.GetPaymentByBookingIdAsync(Guid.Parse(intent.Metadata["BookingId"]));
