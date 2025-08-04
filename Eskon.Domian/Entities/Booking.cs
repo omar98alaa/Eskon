@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Eskon.Domian.Models
 {
@@ -22,13 +21,13 @@ namespace Eskon.Domian.Models
         public decimal TotalPrice { get; set; }
 
         [DefaultValue(true)]
-        public bool IsPending { get; set; }
+        public bool IsPending { get; set; } = true;
 
         [DefaultValue(false)]
-        public bool IsAccepted { get; set; }
+        public bool IsAccepted { get; set; } = false;
 
         [DefaultValue(false)]
-        public bool IsPayed { get; set; }
+        public bool IsPayed { get; set; } = false;
 
 
         //

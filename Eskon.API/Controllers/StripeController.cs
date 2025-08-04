@@ -2,7 +2,6 @@
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Domian.DTOs.StripeDTOs;
-using Eskon.Domian.Models;
 using Eskon.Domian.Stripe;
 using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.Authorization;
@@ -67,16 +66,16 @@ namespace Eskon.API.Controllers
                             //  Payment with an async method succeeds
                             //
 
-                            //var session = stripeEvent.Data.Object as Session;
-                            //if (session == null) break;
-                            //var payment = await _unitOfWork.PaymentService.GetPaymentByChargedId(session.Id);
-                            //if (payment != null)
-                            //{
-                            //    payment.StripeChargeId = session.PaymentIntent.LatestChargeId;
-                            //    await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
-                            //    await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
-                            //    await _unitOfWork.SaveChangesAsync();
-                            //}
+                            var session = stripeEvent.Data.Object as Session;
+                            if (session == null) break;
+                            var payment = await _unitOfWork.PaymentService.GetPaymentByBookingIdAsync(Guid.Parse(session.PaymentIntent.Metadata["BookingId"]));
+                            if (payment != null)
+                            {
+                                payment.StripeChargeId = session.PaymentIntent.LatestChargeId;
+                                await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
+                                await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
+                                await _unitOfWork.SaveChangesAsync();
+                            }
 
                             break;
                         }
@@ -86,14 +85,15 @@ namespace Eskon.API.Controllers
                             //  Payment with an async method fails
                             //
 
-                            //var session = stripeEvent.Data.Object as Session;
-                            //if (session == null) break;
-                            //var payment = await _unitOfWork.PaymentService.GetPaymentByChargedId(session.PaymentIntent.LatestChargeId);
-                            //if (payment != null)
-                            //{
-                            //    await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
-                            //    await _unitOfWork.SaveChangesAsync();
-                            //}
+                            var session = stripeEvent.Data.Object as Session;
+                            if (session == null) break;
+                            var payment = await _unitOfWork.PaymentService.GetPaymentByBookingIdAsync(Guid.Parse(session.PaymentIntent.Metadata["BookingId"]));
+                            if (payment != null)
+                            {
+                                payment.StripeChargeId = session.PaymentIntent.LatestChargeId;
+                                await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
+                                await _unitOfWork.SaveChangesAsync();
+                            }
 
                             break;
                         }
@@ -121,9 +121,8 @@ namespace Eskon.API.Controllers
                             //
 
                             var charge = stripeEvent.Data.Object as Charge;
-                            if (charge == null || charge.Refunded != true) break;
-
-                            if (charge.Status == "succeeded")
+                            if (charge == null) break;
+                            if (charge.AmountRefunded == charge.Amount - charge.ApplicationFeeAmount)
                             {
                                 var payment = await _unitOfWork.PaymentService.GetPaymentByChargedId(charge.Id);
                                 if (payment != null)
@@ -150,8 +149,6 @@ namespace Eskon.API.Controllers
                             {
                                 payment.StripeChargeId = intent.LatestChargeId;
                                 await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
-                                //Booking booking = await _unitOfWork.BookingService.GetBookingById(payment.BookingId);
-                                //booking.PaymentId = payment.Id; // Check one-to-one relation fluent API
                                 await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
                                 await _unitOfWork.SaveChangesAsync();
                             }

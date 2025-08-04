@@ -163,7 +163,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
                 return BadRequest<string>("Payment already refunded");
             }
 
-            _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment.StripeChargeId);
+            _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment);
             return Success("Refund request is created...");
         }
         #endregion

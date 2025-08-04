@@ -131,7 +131,7 @@ namespace Eskon.Service.Services
 
         #region Stripe Refund
 
-        public void CreateStripeRefund(string chargeId)
+        public void CreateStripeRefund(Payment payment)
         {
             StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
@@ -140,9 +140,10 @@ namespace Eskon.Service.Services
             {
                 var options = new RefundCreateOptions
                 {
-                    Charge = chargeId,
+                    Charge = payment.StripeChargeId,
                     RefundApplicationFee = true,
                     ReverseTransfer = true,
+                    Amount = (long)((payment.BookingAmount - payment.Fees) * 100),                   
                 };
 
                 var service = new RefundService();

@@ -14,6 +14,6 @@ namespace Eskon.Service.Interfaces
 
         public Session CreateStripeCheckoutSession(Booking booking, string successUrl, string cancelUrl);
 
-        public void CreateStripeRefund(string chargeId);
+        public void CreateStripeRefund(Payment payment);
     }
 }
