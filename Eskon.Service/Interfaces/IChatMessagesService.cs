@@ -9,5 +9,7 @@ namespace Eskon.Service.Interfaces
         Task<ChatMessage?> GetMessageByIdAsync(Guid messageId);
         Task UpdateMessageAsync(ChatMessage chatMessage);
         Task DeleteMessageAsync(ChatMessage chatMessage);
+        Task MarkMessagesAsReadAsync(Guid chatId, Guid userId);
+
     }
 }

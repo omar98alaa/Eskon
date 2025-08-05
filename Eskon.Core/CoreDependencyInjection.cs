@@ -1,4 +1,4 @@
-﻿using Eskon.Core.Mapping.BookingMapping;
+using Eskon.Core.Mapping.BookingMapping;
 using Eskon.Core.Mapping.CityMapping;
 using Eskon.Core.Mapping.CountryMapping;
 using Eskon.Core.Mapping.FavouriteMapping;
@@ -15,6 +15,7 @@ namespace Eskon.Core
         {
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
             services.AddAutoMapper(conf => conf.AddProfile<UserProfileMapping>());
+            services.AddAutoMapper(conf => conf.AddProfile<ChatMessageMapping>());
             services.AddAutoMapper(conf => conf.AddProfile<CityMapping>());
             services.AddAutoMapper(conf => conf.AddProfile<CountryMapper>());
             services.AddAutoMapper(conf => conf.AddProfile<PropertyMappings>());

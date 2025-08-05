@@ -36,6 +36,11 @@ namespace Eskon.Service.Services
         {
             await _chatMessageRepository.SoftDeleteAsync(chatMessage);
         }
+
+        public async Task MarkMessagesAsReadAsync(Guid chatId, Guid userId)
+        {
+          await _chatMessageRepository.MarkMessagesAsReadAsync(chatId, userId);
+        }
     }
 
 }

@@ -1,7 +1,9 @@
-﻿using Eskon.Domian.Entities.Identity;
+﻿using Eskon.Domian.DTOs.Chat;
+using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
+using System.Runtime.Intrinsics.X86;
 
 namespace Eskon.Service.Services
 {
@@ -32,6 +34,11 @@ namespace Eskon.Service.Services
         public async Task<bool> ChatExistsAsync(User user1, User user2)
         {
             return await _chatRepository.ChatExistsAsync(user1.Id, user2.Id);
+        }
+
+        public async Task<ChatMessage> SendMessageAsync(SendMessageDto dto)
+        {
+            return await _chatRepository.SendMessageAsync(dto);
         }
 
     }

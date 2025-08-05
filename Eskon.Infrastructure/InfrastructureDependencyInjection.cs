@@ -10,7 +10,8 @@ namespace Eskon.Infrastructure
         public static IServiceCollection InjectingInfrastructureDependencies(this IServiceCollection services)
         {
             services.AddScoped<IRepositoryUnitOfWork, RepositoryUnitOfWork>();
-          
+            services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+            services.AddScoped<IChatRepository, ChatRepository>();
             return services;
         }
     }

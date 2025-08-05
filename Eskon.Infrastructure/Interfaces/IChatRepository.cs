@@ -1,7 +1,6 @@
-using Eskon.Domian.Entities;
+using Eskon.Domian.DTOs.Chat;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Generics;
-using Microsoft.EntityFrameworkCore;
 
 namespace Eskon.Infrastructure.Interfaces
 {
@@ -9,6 +8,8 @@ namespace Eskon.Infrastructure.Interfaces
     {
         Task<List<Chat>> GetChatsForUserAsync(Guid userId);
         Task<bool> ChatExistsAsync(Guid user1Id, Guid user2Id);
+
+        Task<ChatMessage> SendMessageAsync(SendMessageDto dto);
 
 
     }

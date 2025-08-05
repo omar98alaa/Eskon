@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Entities.Identity;
+﻿using Eskon.Domian.DTOs.Chat;
+using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 
 namespace Eskon.Service.Interfaces
@@ -9,5 +10,7 @@ namespace Eskon.Service.Interfaces
         Task<Chat?> GetChatByIdAsync(Guid chatId);
         Task<List<Chat>> GetAllUserChatsAsync(User user);
         Task<bool> ChatExistsAsync(User user1, User user2);
+        Task<ChatMessage> SendMessageAsync(SendMessageDto dto);
+
     }
 }

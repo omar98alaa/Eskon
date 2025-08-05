@@ -98,6 +98,12 @@ namespace Eskon.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ChatMessage>()
+                .HasOne(cm => cm.Receiver)
+                .WithMany()
+                .HasForeignKey(cm => cm.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ChatMessage>()
                 .HasOne(chm => chm.Chat)
                 .WithMany(c => c.ChatMessages)
                 .HasForeignKey(chm => chm.ChatId)
