@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domain.Utilities;
+using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -20,6 +21,11 @@ namespace Eskon.Service.Services
 
         #region Methods
 
+        public async Task<Review?> GetReviewByIdAsync(Guid reviewId)
+        {
+            return await _reviewRepository.GetByIdAsync(reviewId);
+        }
+
 
         public async Task<Review> CreatePropertyReviewAsync(Review review)
         {
@@ -28,13 +34,20 @@ namespace Eskon.Service.Services
         }
 
 
-
         public async Task<List<Review>> GetPropertyReviewsAsync(Guid propId)
         {
             return await _reviewRepository.GetFilteredAsync(f => f.PropertyId == propId);
         }
 
+        public async Task<Paginated<Review>> GetPropertyReviewsPaginatedAsync(Guid propertyId, int pageNumber, int itemsPerPage) 
+        {
+            return await _reviewRepository.GetPaginatedSortedAsync(r => r.CreatedAt, false, filter: r => r.PropertyId == propertyId, pageNumber: pageNumber, itemsPerPage: itemsPerPage);
+        }
 
+        public async Task<Paginated<Review>> GetCustomerReviewsPaginatedAsync(Guid customerId, int pageNumber, int itemsPerPage) 
+        { 
+            return await _reviewRepository.GetPaginatedSortedAsync(r => r.CreatedAt, false, filter: r => r.CustomerId == customerId, pageNumber: pageNumber, itemsPerPage: itemsPerPage);
+        }
 
         public async Task UpdatePropertyReviewAsync(Review review)
         {
