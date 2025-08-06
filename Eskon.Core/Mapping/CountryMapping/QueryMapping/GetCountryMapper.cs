@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Eskon.Domian.DTOs.City;
-using Eskon.Domian.DTOs.CityDTO;
-using Eskon.Domian.DTOs.Country_City;
+using Eskon.Domian.DTOs.CityDTOs;
+using Eskon.Domian.DTOs.CityDTOs;
+using Eskon.Domian.DTOs.CountryDTOs;
 using Eskon.Domian.Models;
 using System;
 using System.Collections.Generic;

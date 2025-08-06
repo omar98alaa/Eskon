@@ -39,8 +39,6 @@ namespace Eskon.Infrastructure.UnitOfWork
 
         private ITicketRepository ticketRepository;
 
-        private ITransactionRepository transactionRepository;
-
         private IUserRepository userRepository;
         #endregion
 
@@ -56,7 +54,9 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ICountryRepository CountryRepository => countryRepository == null ? new CountryRepository(context) : countryRepository;
 
         public IFavouriteRepository FavouriteRepository => favouriteRepository == null ? new FavouriteRepository(context) : favouriteRepository;
-        
+
+        public IImageRepository ImageRepository => imageRepository == null ? new ImageRepository(context) : imageRepository;
+
         public INotificationRepository NotificationRepository => notificationRepository == null ? new NotificationRepositroy(context) : notificationRepository;
         
         public INotificationTypeRepository NotificationTypeRepository => notificationTypeRepository == null ? new NotificationTypeRepository(context) : notificationTypeRepository;
@@ -72,8 +72,6 @@ namespace Eskon.Infrastructure.UnitOfWork
         public IReviewRepository ReviewRepository => reviewRepository == null ? new ReviewRepository(context) : reviewRepository;
 
         public ITicketRepository TicketRepository => ticketRepository == null ? new TicketRepository(context) : ticketRepository;
-
-        public ITransactionRepository TransactionRepository => transactionRepository == null ? new TransactionRepository(context) : transactionRepository;
 
         public IUserRepository UserRepository => userRepository == null ? new UserRepository(context) : userRepository;
         #endregion

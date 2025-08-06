@@ -9,13 +9,21 @@ namespace Eskon.Service.Interfaces
         #endregion
 
         #region Read
-        public Task<List<Payment>> GetPaymentsPerUser(Guid userId);
+        public Task<List<Payment>> GetPaymentsPerCustomer(Guid customerId);
+
+        public Task<Payment?> GetPaymentByChargedId(string chargedId);
+
+        public Task<Payment?> GetPaymentByBookingIdAsync(Guid bookingId);
 
         #endregion
 
         #region Update
-        public Task SetPaymentAsSuccessful(Payment payment);
-        
+        public Task SetPaymentAsSuccess(Payment payment);
+
+        public Task SetPaymentAsFailed(Payment payment);
+
+        public Task SetPaymentAsRefunded(Payment payment);
+
         #endregion
 
     }

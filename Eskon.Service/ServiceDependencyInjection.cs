@@ -1,6 +1,4 @@
-﻿using Eskon.Service.Interfaces;
-using Eskon.Service.Services;
-using Eskon.Service.UnitOfWork;
+﻿using Eskon.Service.UnitOfWork;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Eskon.Service
@@ -10,9 +8,6 @@ namespace Eskon.Service
         public static IServiceCollection InjectingServiceDependencies(this IServiceCollection services)
         {
             services.AddScoped<IServiceUnitOfWork, ServiceUnitOfWork>();
-            services.AddTransient<IImageService, ImageService>();
-            services.AddTransient<IFileService, FileService>();
-
 
             return services;
         }

@@ -1,12 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Eskon.Domian.Entities.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Eskon.Domian.Entities.Identity;
 
 namespace Eskon.Domian.Models
 {
-    [Index(nameof(UserId), nameof(PropertyId), nameof(StartDate), nameof(EndDate), IsUnique = true)]
+    [Index(nameof(CustomerId), nameof(PropertyId), nameof(StartDate), nameof(EndDate), IsUnique = true)]
     public class Booking : BaseModel
     {
         [Required]
@@ -15,17 +14,20 @@ namespace Eskon.Domian.Models
         [Required]
         public DateOnly EndDate { get; set; }
 
+        [Required, Range(1, int.MaxValue)]
+        public int Guests { get; set; }
+
         [Required]
         public decimal TotalPrice { get; set; }
 
         [DefaultValue(true)]
-        public bool IsPending { get; set; }
+        public bool IsPending { get; set; } = true;
 
         [DefaultValue(false)]
-        public bool IsAccepted { get; set; }
+        public bool IsAccepted { get; set; } = false;
 
         [DefaultValue(false)]
-        public bool IsPayed { get; set; }
+        public bool IsPayed { get; set; } = false;
 
 
         //
@@ -34,12 +36,16 @@ namespace Eskon.Domian.Models
 
         //  User
         //[ForeignKey(nameof(User))]
-        public Guid UserId { get; set; }
-        public virtual User User { get; set; }
+        public Guid CustomerId { get; set; }
+        public virtual User Customer { get; set; }
 
         //  Property
         //[ForeignKey(nameof(Property))]
         public Guid PropertyId { get; set; }
         public virtual Property Property { get; set; }
+
+        //[ForeignKey(nameof(Payment))]
+        //public Guid? PaymentId { get; set; }
+        public virtual Payment? Payment { get; set; }
     }
 }

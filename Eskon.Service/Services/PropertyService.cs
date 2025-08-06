@@ -1,4 +1,7 @@
-﻿using Eskon.Domian.Models;
+﻿using System.Linq.Expressions;
+using Eskon.Domain.Utilities;
+using Eskon.Domian.Models;
+using Eskon.Domian.Utilities;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -28,9 +31,39 @@ namespace Eskon.Service.Services
             return await propertyRepository.GetAllAsync();
         }
 
-        public async Task<List<Property>> GetPendingPropertiesAsync(Guid AdminId)
+        public async Task<Paginated<Property>> GetFilteredActivePropertiesPaginatedAsync(int pageNum, int itemsPerPage, PropertySearchFilters psf)
         {
-            return await propertyRepository.GetFilteredAsync(x => x.AssignedAdminId == AdminId && x.IsPending == true);
+
+            Expression<Func<Property, dynamic>> sort = null;
+
+            switch (psf.SortBy?.ToUpperInvariant())
+            {
+                case "RATING":
+                    sort = p => p.AverageRating;
+                    break;
+
+                case "CREATEDATE":
+                    sort = p => p.CreatedAt;
+                    break;
+
+                case "PRICE":
+                    sort = p => p.PricePerNight;
+                    break;
+            }
+
+            return await propertyRepository.GetPaginatedSortedAsync(
+                sort,
+                psf.Asc,
+                pageNum,
+                itemsPerPage,
+                filter: p => p.IsAccepted &&
+                             !p.IsSuspended &&
+                             ((psf.CityName != null) ? p.City.Name == psf.CityName : true) &&
+                             ((psf.CountryName != null) ? p.City.Country.Name == psf.CountryName : true) &&
+                             ((psf.Guests != null) ? p.MaxGuests >= psf.Guests : true) &&
+                             ((psf.minPricePerNight != null) ? p.PricePerNight >= psf.minPricePerNight : true) &&
+                             ((psf.maxPricePerNight != null) ? p.PricePerNight <= psf.maxPricePerNight : true)
+                );
         }
 
         public async Task<List<Property>> GetPropertiesbyCityandCountryAsync(string City, string Country)
@@ -43,9 +76,29 @@ namespace Eskon.Service.Services
             return await propertyRepository.GetByIdAsync(PropertyId);
         }
 
-        public async Task<List<Property>> GetPropertiesPerOwnerAsync(Guid OwnerId)
+        public async Task<Paginated<Property>> GetActivePropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
         {
-            return await propertyRepository.GetFilteredAsync(x => x.OwnerId == OwnerId);
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && p.IsAccepted && !p.IsSuspended);
+        }
+
+        public async Task<Paginated<Property>> GetPendingPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && p.IsPending);
+        }
+
+        public async Task<Paginated<Property>> GetSuspendedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && p.IsSuspended);
+        }
+
+        public async Task<Paginated<Property>> GetRejectedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.OwnerId == ownerId && !p.IsAccepted && !p.IsPending);
+        }
+
+        public async Task<Paginated<Property>> GetAssignedPendingPropertiesAsync(Guid adminId, int pageNum, int itemsPerPage)
+        {
+            return await propertyRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: p => p.AssignedAdminId == adminId && p.IsPending);
         }
 
         public async Task<List<Property>> GetPropertiesbyPriceRangAsync(decimal MinPricePerNight, decimal MaxPricePerNight)
@@ -71,6 +124,14 @@ namespace Eskon.Service.Services
             await propertyRepository.UpdateAsync(property);
         }
 
+        public async Task SetPropertyAsPendingAsync(Property property)
+        {
+            property.IsPending = true;
+            property.IsAccepted = false;
+            property.RejectionMessage = string.Empty;
+            await propertyRepository.UpdateAsync(property);
+        }
+
         public async Task SetPropertySuspensionStateAsync(Property property, bool value)
         {
             property.IsSuspended = value;
@@ -88,31 +149,6 @@ namespace Eskon.Service.Services
             property.IsPending = false;
             property.IsAccepted = false;
             await propertyRepository.UpdateAsync(property);
-        }
-
-        public Task<List<Property>> GetActivePropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetPendingPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetSuspendedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetRejectedPropertiesPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Property>> GetAssignedPendingPropertiesAsync(Guid adminId, int pageNum, int itemsPerPage)
-        {
-            throw new NotImplementedException();
         }
     }
 }

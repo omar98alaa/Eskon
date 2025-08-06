@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Eskon.Domian.Entities.Identity;
+﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
 using Eskon.Infrastructure.Interfaces;
-using Eskon.Domian.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eskon.Infrastructure.Repositories
 {
@@ -21,7 +20,15 @@ namespace Eskon.Infrastructure.Repositories
         #endregion
 
         #region Methods
+        public async Task<Payment?> GetPaymentByChargedId(string chargedId)
+        {
+            return await _paymentDbSet.SingleOrDefaultAsync(p => p.StripeChargeId == chargedId);
+        }
 
+        public async Task<Payment?> GetPaymentByBookingIdAsync(Guid bookingId)
+        {
+            return await _paymentDbSet.SingleOrDefaultAsync(p => p.BookingId == bookingId);
+        }
         #endregion
     }
 }

@@ -26,13 +26,13 @@ namespace Eskon.Domian.Models
         [DefaultValue(1), Range(0, int.MaxValue)]
         public int NumOfBathrooms{ get; set; }
 
-        [DefaultValue(1), Range(0, double.MaxValue)]
-        public decimal PricePerNight { get; set; }
+        [Range(0.0, (double)decimal.MaxValue)]
+        public decimal PricePerNight { get; set; } = 1.0m;
 
         [Required]
         public string ThumbnailUrl { get; set; }
 
-        [Required, Range(0, double.MaxValue)]
+        [Required, Range(0.0, double.MaxValue)]
         public decimal Area { get; set; }
 
         [Required]
@@ -51,10 +51,9 @@ namespace Eskon.Domian.Models
         public bool IsAccepted { get; set; }
 
         [StringLength(200)]
-        public string RejectionMessage { get; set; }
+        public string? RejectionMessage { get; set; }
 
-        [DefaultValue(0.0)]
-        public decimal AverageRating { get; set; }
+        public decimal AverageRating { get; set; } = 0.0m;
 
         //
         //  Navigation Properties

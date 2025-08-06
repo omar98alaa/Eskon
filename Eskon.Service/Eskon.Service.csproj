@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Stripe.net" Version="48.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Eskon.Domian\Eskon.Domian.csproj" />
 	  <ProjectReference Include="..\Eskon.Infrastructure\Eskon.Infrastructure.csproj" />
 

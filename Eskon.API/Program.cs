@@ -1,5 +1,6 @@
 using Eskon.Core;
 using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Stripe;
 using Eskon.Infrastructure;
 using Eskon.Infrastructure.Context;
 using Eskon.Service;
@@ -43,6 +44,12 @@ namespace Eskon.API
             var jwtSettings = new JwtSettings();
             builder.Configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
             builder.Services.AddSingleton(jwtSettings);
+            #endregion
+
+            #region Stripe Settings
+            var stripeSettings = new StripeSettings();
+            builder.Configuration.GetSection(nameof(stripeSettings)).Bind(stripeSettings);
+            builder.Services.AddSingleton(stripeSettings);
             #endregion
 
 
@@ -113,6 +120,8 @@ namespace Eskon.API
             app.UseCors();
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseAuthentication();
 

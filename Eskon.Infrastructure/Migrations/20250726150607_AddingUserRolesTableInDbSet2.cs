@@ -22,9 +22,9 @@ namespace Askon.Infrastructure.Migrations
             migrationBuilder.DropTable(
                 name: "RoleUser");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Cities_Name_CountryId",
-                table: "Cities");
+            //migrationBuilder.DropIndex(
+            //    name: "IX_Cities_Name_CountryId",
+            //    table: "Cities");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
@@ -78,11 +78,11 @@ namespace Askon.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Cities_Name_CountryId",
-                table: "Cities",
-                columns: new[] { "Name", "CountryId" },
-                unique: true);
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_Cities_Name_CountryId",
+            //    table: "Cities",
+            //    columns: new[] { "Name", "CountryId" },
+            //    unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleUser_UsersId",
