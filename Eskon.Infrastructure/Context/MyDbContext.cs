@@ -200,9 +200,9 @@ namespace Eskon.Infrastructure.Context
             #region Review
             // Review
             modelBuilder.Entity<Review>()
-                .HasOne(r => r.User)
+                .HasOne(r => r.Customer)
                 .WithMany(u => u.Reviews)
-                .HasForeignKey(r => r.UserId)
+                .HasForeignKey(r => r.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Review>()

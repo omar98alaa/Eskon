@@ -55,6 +55,8 @@ namespace Eskon.Domian.Models
 
         public decimal AverageRating { get; set; } = 0.0m;
 
+        public int TimesRated { get; set; }
+
         //
         //  Navigation Properties
         //
