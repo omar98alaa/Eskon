@@ -3,7 +3,9 @@ using Eskon.Core.Mapping.CityMapping;
 using Eskon.Core.Mapping.CountryMapping;
 using Eskon.Core.Mapping.Properties;
 using Eskon.Core.Mapping.Users;
+using Eskon.Core.Quartz;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 using System.Reflection;
 
 namespace Eskon.Core
@@ -18,6 +20,23 @@ namespace Eskon.Core
             services.AddAutoMapper(conf => conf.AddProfile<CountryMapper>());
             services.AddAutoMapper(conf => conf.AddProfile<PropertyMappings>());
             services.AddAutoMapper(conf => conf.AddProfile<BookingMappings>());
+
+
+            #region Quartz
+            services.AddQuartz(static q =>
+            {
+
+                // Job 1 - Delete unpaid bookings
+                q.AddJob<DeleteUnpaidBookingsJob>(opts => opts.WithIdentity(nameof(DeleteUnpaidBookingsJob)));
+                q.AddTrigger(opts => opts
+                    .ForJob(nameof(DeleteUnpaidBookingsJob))
+                    .WithIdentity("DeleteUnpaidBookingsTrigger")
+                    .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(2, 0)) // 2:00 AM daily
+                );
+            });
+
+            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+            #endregion
             return services;
         }
     }

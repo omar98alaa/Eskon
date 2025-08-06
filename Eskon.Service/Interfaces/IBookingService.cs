@@ -30,6 +30,8 @@ namespace Eskon.Service.Interfaces
         public Task<List<Booking>> GetAcceptedBookingsPerPropertyAsync(Guid propertyId);
         public Task<List<Booking>> GetPendingBookingsPerPropertyAsync(Guid propertyId);
 
+        public Task<List<Booking>> GetUnpaidPassedAcceptedDateBookingsAsync();
+
         public Task<bool> IsAlreadyBookedBefore(Booking newBooking);
 
 
@@ -46,6 +48,7 @@ namespace Eskon.Service.Interfaces
         #region Delete
         public Task SoftRemoveBookingAsync(Booking booking);
         public Task RemoveBookingAsync(Booking booking);
+        public Task RemoveBookingRangeAsync(List<Booking> bookings);
         #endregion
     }
 
