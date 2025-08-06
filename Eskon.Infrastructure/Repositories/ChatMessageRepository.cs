@@ -1,4 +1,4 @@
-using Eskon.Domian.DTOs.Chat;
+﻿using Eskon.Domian.DTOs.Chat;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
@@ -85,15 +85,18 @@ namespace Eskon.Infrastructure.Repositories
                     m.ChatId == chatId &&
                     m.ReceiverId == userId &&
                     !m.IsRead)
-                .ToListAsync(); 
+                .ToListAsync();
 
             foreach (var message in messages)
             {
                 message.IsRead = true;
-                _chatMessagesDbSet.Update(message); 
+                message.ReadAt = DateTime.UtcNow; // اختياري لو بتسجلي وقت القراءة
+                _chatMessagesDbSet.Update(message);
             }
 
+          
         }
+
 
     }
 }

@@ -25,7 +25,7 @@ namespace Eskon.API.Controllers
         #endregion
 
         #region Controllers
-        [HttpGet("/filtering")]
+        [HttpGet]
         public async Task<IActionResult> GetFilteredActivePropertiesPaginated(
             [FromQuery] decimal? minPricePerNight,
             [FromQuery] decimal? maxPricePerNight,

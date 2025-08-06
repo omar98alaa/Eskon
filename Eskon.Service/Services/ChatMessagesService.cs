@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domian.DTOs.Chat;
+using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
 
@@ -18,15 +19,16 @@ namespace Eskon.Service.Services
             return await _chatMessageRepository.AddAsync(chatMessage);
         }
 
-        public async Task<List<ChatMessage>> GetMessagesPerChatAsync(Chat chat)
+        public async Task<List<ConversationDto>> GetConversationsForUserAsync(Guid userId)
         {
-            return await _chatMessageRepository.GetFilteredAsync(c => c.ChatId == chat.Id);
+            return await _chatMessageRepository.GetConversationsForUserAsync(userId);
         }
 
-        public async Task<ChatMessage?> GetMessageByIdAsync(Guid messageId)
+        public async Task<List<ChatMessage>> GetMessagesByChatIdAsync(Guid chatId)
         {
-            return await _chatMessageRepository.GetByIdAsync(messageId);
+            return await _chatMessageRepository.GetMessagesByChatIdAsync(chatId);
         }
+
 
         public async Task UpdateMessageAsync(ChatMessage chatMessage)
         {
@@ -41,6 +43,8 @@ namespace Eskon.Service.Services
         {
           await _chatMessageRepository.MarkMessagesAsReadAsync(chatId, userId);
         }
+
+   
     }
 
 }

@@ -8,5 +8,7 @@
         public Guid ReceiverId { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+        public DateTime? ReadAt { get; set;}
+        public bool IsRead => ReadAt.HasValue;
     }
 }

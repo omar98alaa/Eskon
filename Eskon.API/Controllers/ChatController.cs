@@ -1,8 +1,6 @@
 ﻿using Eskon.Core.Features.ChatFeatures.Commands.Command;
 using Eskon.Core.Features.ChatFeatures.Queries.Query;
-using Eskon.Domian.DTOs.Chat;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -18,14 +16,6 @@ namespace Eskon.API.Controllers
         public ChatController(IMediator mediator)
         {
             _mediator = mediator;
-        }
-
-        // POST: api/Chat/message
-        [HttpPost("message")]
-        public async Task<IActionResult> SendMessage([FromBody] SendMessageDto dto)
-        {
-            var result = await _mediator.Send(new SendMessageCommand(dto));
-            return Ok(result);
         }
 
         // GET: api/Chat/messages/{chatId}

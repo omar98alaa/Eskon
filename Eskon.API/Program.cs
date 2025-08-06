@@ -34,7 +34,7 @@ namespace Eskon.API
                 options.AddPolicy("AllowLocalhost", policy =>
                 {
                     policy
-                        .WithOrigins("http://localhost:53828","http://localhost:4200") 
+                        .WithOrigins("http://localhost:53828","http://localhost:4200", "http://localhost:50918", "http://localhost:51091", "http://localhost:51174", "http://localhost:54971") 
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -48,7 +48,7 @@ namespace Eskon.API
 
             //signalR 
             builder.Services.AddSignalR();
-            builder.Services.AddScoped<IChatMessagesService, ChatMessageService>();
+           
        
 
 
