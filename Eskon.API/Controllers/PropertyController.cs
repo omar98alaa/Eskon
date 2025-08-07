@@ -245,36 +245,91 @@ namespace Eskon.API.Controllers
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddPropertyCommand(ownerId, propertyWriteDTO));
             return NewResult(response);
-        }  
+        }
         #endregion
         #endregion
 
+        #region PATCH
+        #region Set property Suspension state
+        /// <summary>
+        /// Sets the suspension state of a property for the authenticated owner.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property.</param>
+        /// <param name="state">A boolean indicating whether the property should be suspended (true) or active (false).</param>
+        /// <returns>
+        /// A response indicating success, or an appropriate error message.
+        /// </returns>
+        /// <response code="200">Returned when the suspension state is successfully updated.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the property does not belong to the authenticated owner.</response>
+        /// <response code="404">Returned if the property is not found.</response>
         [Authorize(Roles = "Owner")]
         [HttpPatch("Owner/Suspend/{propertyId:guid}")]
-        public async Task<IActionResult> SetPropertySuspensionState([FromRoute]Guid propertyId,[FromQuery]bool state)
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> SetPropertySuspensionState([FromRoute] Guid propertyId, [FromQuery] bool state)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new SetIsSuspendedPropertyCommand(propertyId,state,ownerId));
+            var response = await Mediator.Send(new SetIsSuspendedPropertyCommand(propertyId, state, ownerId));
             return NewResult(response);
         }
+        #endregion
 
+        #region Set property as Accepted
+        /// <summary>
+        /// Accepts a property by its ID. Only the admin assigned to the property can perform this action.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to accept.</param>
+        /// <returns>
+        /// A response indicating the outcome of the operation.
+        /// </returns>
+        /// <response code="200">Returned when the property is successfully accepted.</response>
+        /// <response code="401">Unauthorized if the admin is not authenticated.</response>
+        /// <response code="403">Forbidden if the admin is not assigned to the property.</response>
+        /// <response code="404">Returned if the property is not found.</response>
         [Authorize(Roles = "Admin")]
         [HttpPatch("Admin/Accept/{propertyId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> SetPropertyAsAccepted([FromRoute] Guid propertyId)
         {
             Guid AdminId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetPropertyAsAcceptedCommand(propertyId, AdminId));
             return NewResult(response);
         }
+        #endregion
 
+        #region Set property as Rejected
+        /// <summary>
+        /// Rejects a property by its ID with a specified rejection message. Only the assigned admin can reject a property.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to reject.</param>
+        /// <param name="RejectionMessage">The reason for rejecting the property.</param>
+        /// <returns>
+        /// A response indicating the result of the rejection operation.
+        /// </returns>
+        /// <response code="200">Returned when the property is successfully rejected.</response>
+        /// <response code="401">Unauthorized if the admin is not authenticated.</response>
+        /// <response code="403">Forbidden if the admin is not assigned to the property.</response>
+        /// <response code="404">Returned if the property does not exist.</response>
         [Authorize(Roles = "Admin")]
         [HttpPatch("Admin/Reject/{propertyId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> SetPropertyAsRejected([FromRoute] Guid propertyId, string RejectionMessage)
         {
             Guid AdminId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetPropertyAsRejectedCommand(propertyId, RejectionMessage, AdminId));
             return NewResult(response);
-        }
+        }  
+        #endregion
+        #endregion
 
         [Authorize(Roles = "Owner")]
         [HttpPut("Owner/{propertyId:guid}")]
