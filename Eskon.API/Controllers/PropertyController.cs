@@ -327,18 +327,40 @@ namespace Eskon.API.Controllers
             Guid AdminId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetPropertyAsRejectedCommand(propertyId, RejectionMessage, AdminId));
             return NewResult(response);
-        }  
+        }
         #endregion
         #endregion
 
+        #region PUT
+        #region Update property
+        /// <summary>
+        /// Updates an existing property owned by the authenticated user.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to update.</param>
+        /// <param name="propertyWriteDTO">The new property data provided by the owner.</param>
+        /// <returns>
+        /// A response containing the updated property details or an appropriate error.
+        /// </returns>
+        /// <response code="200">Property was successfully updated.</response>
+        /// <response code="400">Validation failed for the provided data.</response>
+        /// <response code="401">Unauthorized. Owner not authenticated.</response>
+        /// <response code="403">Forbidden. Owner does not own the property.</response>
+        /// <response code="404">Property, city, or images not found.</response>
         [Authorize(Roles = "Owner")]
         [HttpPut("Owner/{propertyId:guid}")]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateProperty([FromRoute] Guid propertyId, PropertyWriteDTO propertyWriteDTO)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new UpdatePropertyCommand(propertyId, propertyWriteDTO,ownerId));
+            var response = await Mediator.Send(new UpdatePropertyCommand(propertyId, propertyWriteDTO, ownerId));
             return NewResult(response);
-        }
+        }  
+        #endregion
+        #endregion
 
         [Authorize(Roles = "Owner")]
         [HttpDelete("Owner/{propertyId:guid}")]
