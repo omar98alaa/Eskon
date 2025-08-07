@@ -52,7 +52,7 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
 
             // Get stripe account Id if created before or create one
             string stripeAccountId;
-            if (string.IsNullOrEmpty(user.stripeAccountId))
+            if (!string.IsNullOrEmpty(user.stripeAccountId))
             {
                 stripeAccountId = user.stripeAccountId;
             }
