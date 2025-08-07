@@ -40,6 +40,11 @@ namespace Eskon.Service.Services
             return await _cityRepository.GetCityByNameAsync(name);
         }
 
+        public async Task<City?> GetCityByNameAndCountryIdAsync(string cityName, Guid countryId)
+        {
+            return (await _cityRepository.GetFilteredAsync(c => c.Name == cityName && c.CountryId == countryId)).SingleOrDefault();
+        }
+
         public async Task UpdateCityAsync(City city)
         {
             await _cityRepository.UpdateAsync(city);
