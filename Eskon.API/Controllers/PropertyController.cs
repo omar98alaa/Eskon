@@ -216,17 +216,38 @@ namespace Eskon.API.Controllers
             var response = await Mediator.Send(new GetRejectedPropertiesPerOwnerQuery(ownerId, pageNum, itemsPerPage));
             return NewResult(response);
         }
-        #endregion 
+        #endregion
         #endregion
 
+        #region POST
+        #region Add property
+        /// <summary>
+        /// Adds a new property for the currently authenticated owner.
+        /// </summary>
+        /// <param name="propertyWriteDTO">The data required to create a new property.</param>
+        /// <returns>
+        /// A response containing the created property's details if successful.
+        /// </returns>
+        /// <response code="201">Returns the created property's details.</response>
+        /// <response code="400">Returned when validation fails.</response>
+        /// <response code="404">Returned when the city or one or more images are not found.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the user is not in the Owner role.</response>
         [Authorize(Roles = "Owner")]
         [HttpPost]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO?>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO?>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> AddProperty(PropertyWriteDTO propertyWriteDTO)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddPropertyCommand(ownerId, propertyWriteDTO));
             return NewResult(response);
-        }
+        }  
+        #endregion
+        #endregion
 
         [Authorize(Roles = "Owner")]
         [HttpPatch("Owner/Suspend/{propertyId:guid}")]
