@@ -23,7 +23,6 @@ namespace Eskon.API
 
             // Add services to the container.
             builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -32,16 +31,10 @@ namespace Eskon.API
                     Version = "v1",
                     Title = "Eskon API",
                     Description = "An ASP.NET Core Web API for renting",
-                    TermsOfService = new Uri("https://example.com/terms"),
-                    Contact = new OpenApiContact
-                    {
-                        Name = "Example Contact",
-                        Url = new Uri("https://example.com/contact")
-                    },
                 });
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
 
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -174,12 +167,15 @@ namespace Eskon.API
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
-                app.UseSwagger();
-                app.UseSwaggerUI(options =>
+                app.UseSwagger(c =>
                 {
-                    options.SwaggerEndpoint("/openapi/v1.json", "v1");
-                    //options.RoutePrefix = string.Empty; // Swagger at root URL
+                    c.RouteTemplate = "openapi/{documentName}.json";
+                });
+
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/openapi/v1.json", "My API V1");
+                    c.RoutePrefix = "swagger";
                 });
             }
 
