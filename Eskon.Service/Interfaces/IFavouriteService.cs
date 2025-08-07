@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domain.Utilities;
+using Eskon.Domian.Models;
 
 namespace Eskon.Service.Interfaces
 {
@@ -9,7 +10,8 @@ namespace Eskon.Service.Interfaces
         #endregion
 
         #region Read
-        public Task<List<Favourite>> GetFavouritesPerCustomer(Guid customerId);
+        public Task<Favourite?> GetFavouriteByIdAsync(Guid CustomerId, Guid PropertyId);
+        public Task<Paginated<Favourite>> GetPaginatedFavouritesPerCustomer(int pageNum, int itemsPerPage, Guid customerId);
 
         #endregion
 

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Eskon.Domain.Utilities;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;
@@ -25,14 +26,18 @@ namespace Eskon.Service.Services
             return favourite;
         }
 
-        public async Task<List<Favourite>> GetFavouritesPerCustomer(Guid customerId)
+        public async Task<Paginated<Favourite>> GetPaginatedFavouritesPerCustomer(int pageNum, int itemsPerPage,Guid customerId)
         {
-            return await _favouriteRepository.GetFilteredAsync(f => f.UserId == customerId);
+            return await _favouriteRepository.GetPaginatedFavouritesAsync(pageNum,itemsPerPage ,filter: f => f.UserId == customerId);
         }
 
         public async Task RemoveFavouriteAsync(Favourite favourite)
         {
             await _favouriteRepository.DeleteAsync(favourite);
+        }
+        public async Task<Favourite?> GetFavouriteByIdAsync(Guid CustomerId, Guid PropertyId)
+        {
+            return await _favouriteRepository.GetFavouriteByIdAsync(CustomerId, PropertyId);
         }
     }
 }
