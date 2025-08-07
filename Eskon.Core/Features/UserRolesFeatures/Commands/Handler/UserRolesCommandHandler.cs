@@ -44,17 +44,29 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
             if (user == null)
                 return NotFound<string>("User Not Found");
 
-            if (!string.IsNullOrEmpty(user.stripeAccountId))
+            // Check if user has already completed the process and became an owner
+            if(await _userManager.IsInRoleAsync(user, "Owner"))
             {
-                return BadRequest<string>("User already has an active stripe account");
+                return BadRequest<string>("User is already an owner");
             }
-            var stripeAccountId = _serviceUnitOfWork.StripeService.CreateStripeAccountForOwner(user);
 
-            // Needs to be more precise
+            // Get stripe account Id if created before or create one
+            string stripeAccountId;
+            if (string.IsNullOrEmpty(user.stripeAccountId))
+            {
+                stripeAccountId = user.stripeAccountId;
+            }
+            else
+            {
+                stripeAccountId = _serviceUnitOfWork.StripeService.CreateStripeAccountForOwner(user);
+            }
+
+            // Throw 500 error
             if (string.IsNullOrEmpty(stripeAccountId))
             {
-                return BadRequest<string>("Error at stripe");
+                throw new Exception("Error creating stripe account");
             }
+
             await _serviceUnitOfWork.UserService.SetUserStripeAccountIdAsync(user.Id, stripeAccountId);
             await _serviceUnitOfWork.SaveChangesAsync();
 
