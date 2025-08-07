@@ -3,6 +3,7 @@ using AutoMapper;
 using Eskon.Service.UnitOfWork;
 using Eskon.Domian.DTOs.Favourite;
 using Eskon.Core.Features.FavouriteFeatures.Queries.Query;
+using Eskon.Domain.Utilities;
 
 
 namespace Eskon.Core.Features.FavouriteFeatures.Queries.Handler
@@ -22,10 +23,10 @@ namespace Eskon.Core.Features.FavouriteFeatures.Queries.Handler
         }
         #endregion
 
-        public async Task<Response<List<FavouriteReadDTO>>> Handle(GetUserFavouritesQuery request, CancellationToken cancellationToken)
+        public async Task<Response<Paginated<FavouriteReadDTO>>> Handle(GetUserFavouritesQuery request, CancellationToken cancellationToken)
         {
-            var favourites = await _serviceUnitOfWork.FavouriteService.GetFavouritesPerCustomer(request.CustomerId); 
-            var favouriteDTOs = _mapper.Map<List<FavouriteReadDTO>>(favourites);
+            var favourites = await _serviceUnitOfWork.FavouriteService.GetPaginatedFavouritesPerCustomer(request.pageNumber, request.itemsPerPage, request.CustomerId); 
+            var favouriteDTOs = _mapper.Map<Paginated<FavouriteReadDTO>>(favourites);
             return Success(favouriteDTOs);
         }
 

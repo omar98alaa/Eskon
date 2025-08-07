@@ -11,6 +11,6 @@ using System.Threading.Tasks;
 
 namespace Eskon.Core.Features.FavouriteFeatures.Queries.Handler
 {
-    public interface IFavouriteQueryHandler : IRequestHandler<GetUserFavouritesQuery, Response<List<FavouriteReadDTO>>>;
+    public interface IFavouriteQueryHandler : IRequestHandler<GetUserFavouritesQuery, Response<Paginated<FavouriteReadDTO>>>;
 
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Eskon.Core.Features.FavouriteFeatures.Queries.Query
 {
-    public record GetUserFavouritesQuery(Guid CustomerId) : IRequest<Response<List<FavouriteReadDTO>>>;
+    public record GetUserFavouritesQuery(int pageNumber, int itemsPerPage,Guid CustomerId) : IRequest<Response<Paginated<FavouriteReadDTO>>>;
 
 
 }
