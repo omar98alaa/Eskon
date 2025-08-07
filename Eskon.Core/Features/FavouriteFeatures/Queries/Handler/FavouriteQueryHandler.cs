@@ -25,9 +25,20 @@ namespace Eskon.Core.Features.FavouriteFeatures.Queries.Handler
 
         public async Task<Response<Paginated<FavouriteReadDTO>>> Handle(GetUserFavouritesQuery request, CancellationToken cancellationToken)
         {
-            var favourites = await _serviceUnitOfWork.FavouriteService.GetPaginatedFavouritesPerCustomer(request.pageNumber, request.itemsPerPage, request.CustomerId); 
-            var favouriteDTOs = _mapper.Map<Paginated<FavouriteReadDTO>>(favourites);
-            return Success(favouriteDTOs);
+            
+            var favourites = await _serviceUnitOfWork.FavouriteService
+            .GetPaginatedFavouritesPerCustomer(request.pageNumber, request.itemsPerPage, request.CustomerId);
+
+            var favouriteDTOs = _mapper.Map<List<FavouriteReadDTO>>(favourites.Data);
+
+            var paginatedResponse = new Paginated<FavouriteReadDTO>(
+                favouriteDTOs,
+                favourites.PageNumber,
+                favourites.PageSize,
+                favourites.TotalRecords);
+
+            return Success(paginatedResponse);
+
         }
 
 
