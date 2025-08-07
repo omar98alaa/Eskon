@@ -42,13 +42,18 @@ namespace Eskon.Infrastructure.Generics
             return await _myDbContext.Set<T>().ToListAsync();
         }
 
-        public virtual async Task<List<T>> GetFilteredAsync(Expression<Func<T, bool>>? filter = null)
+        public virtual async Task<List<T>> GetFilteredAsync(Expression<Func<T, bool>>? filter = null, string? includes = null)
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
             if (filter != null)
             {
                 query = query.Where(filter);
+            }
+
+            if(includes != null)
+            {
+                query = query.Include(includes);
             }
 
             return await query.ToListAsync();
@@ -132,13 +137,18 @@ namespace Eskon.Infrastructure.Generics
             return _myDbContext.Set<T>().AsNoTracking().AsQueryable();
         }
 
-        public async Task<Paginated<T>> GetPaginatedAsync(int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
+        public async Task<Paginated<T>> GetPaginatedAsync(int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null, string? includes = null)
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
             if (filter != null)
             {
                 query = query.Where(filter);
+            }
+
+            if(includes != null)
+            {
+                query = query.Include(includes);
             }
 
             pageNumber = Math.Max(pageNumber, 1);
@@ -154,13 +164,18 @@ namespace Eskon.Infrastructure.Generics
             return new Paginated<T>(data, pageNumber, itemsPerPage, total);
         }
 
-        public async Task<Paginated<T>> GetPaginatedSortedAsync<TKey>(Expression<Func<T, TKey>> sort, bool asc, int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null)
+        public async Task<Paginated<T>> GetPaginatedSortedAsync<TKey>(Expression<Func<T, TKey>> sort, bool asc, int pageNumber = 1, int itemsPerPage = 10, Expression<Func<T, bool>>? filter = null, string? includes = null)
         {
             IQueryable<T> query = _myDbContext.Set<T>();
 
             if (filter != null)
             {
                 query = query.Where(filter);
+            }
+
+            if(includes != null)
+            {
+                query = query.Include(includes);
             }
 
             if (sort != null)

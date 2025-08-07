@@ -27,7 +27,7 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             if (property == null)
                 return NotFound<FavouriteReadDTO>("Property Not Found");
 
-            var favourite = await _serviceUnitOfWork.FavouriteService.GetFavouriteByIdAsync(request.UserId, request.PropertyId);
+            var favourite = await _serviceUnitOfWork.FavouriteService.GetFavouriteForUserAndPropertyAsync(request.UserId, request.PropertyId);
             if (favourite != null)
                 return BadRequest<FavouriteReadDTO>("This Property is already on your favourites list");
 
@@ -39,7 +39,7 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
 
             await _serviceUnitOfWork.FavouriteService.AddFavouriteAsync(favourite);
             await _serviceUnitOfWork.SaveChangesAsync();
-            favourite = await _serviceUnitOfWork.FavouriteService.GetFavouriteByIdAsync(request.UserId, request.PropertyId);
+            
             var favouriteDTO = _mapper.Map<FavouriteReadDTO>(favourite); 
 
             return Created(favouriteDTO,"Property added to Favourites Succefully");
@@ -47,15 +47,21 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
 
         public async Task<Response<string>> Handle(RemoveFavouriteCommand request, CancellationToken cancellationToken)
         {
-            var favourite = await _serviceUnitOfWork.FavouriteService.GetFavouriteByIdAsync(request.UserId, request.PropertyId);
+            var favourite = await _serviceUnitOfWork.FavouriteService.GetFavouriteByIdAsync(request.favouriteId);
             if (favourite == null)
             {
                 return NotFound<string>($"Property Not Found in favourites");
             }
+
+            if(favourite.UserId != request.UserId)
+            {
+                return Forbidden<string>();
+            }
+
             await _serviceUnitOfWork.FavouriteService.RemoveFavouriteAsync(favourite);
             await _serviceUnitOfWork.SaveChangesAsync();
 
-            return Success($"property with ID: {request.PropertyId} removed from Favourites", message: $"property with ID:  {request.PropertyId} removed");
+            return Success("Favourite successfully removed", message: "Favourite successfully removed");
         }
 
 

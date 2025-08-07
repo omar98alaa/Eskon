@@ -10,7 +10,8 @@ namespace Eskon.Service.Interfaces
         #endregion
 
         #region Read
-        public Task<Favourite?> GetFavouriteByIdAsync(Guid CustomerId, Guid PropertyId);
+        public Task<Favourite?> GetFavouriteByIdAsync(Guid favouriteId);
+        public Task<Favourite?> GetFavouriteForUserAndPropertyAsync(Guid userId, Guid propertyId);
         public Task<Paginated<Favourite>> GetPaginatedFavouritesPerCustomer(int pageNum, int itemsPerPage, Guid customerId);
 
         #endregion

@@ -49,11 +49,11 @@ namespace Eskon.API.Controllers
 
         #region DELETE
         [Authorize]
-        [HttpDelete("{propertyId:guid}")]
-        public async Task<IActionResult> RemoveFromFavourites([FromRoute] Guid propertyId)
+        [HttpDelete("{favouriteId:guid}")]
+        public async Task<IActionResult> RemoveFromFavourites([FromRoute] Guid favouriteId)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();
-            var command = new RemoveFavouriteCommand(userId, propertyId);
+            var command = new RemoveFavouriteCommand(userId, favouriteId);
             var response = await Mediator.Send(command);
             return NewResult(response);
         }

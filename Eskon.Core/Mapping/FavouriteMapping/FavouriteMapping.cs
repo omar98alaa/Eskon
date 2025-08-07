@@ -9,14 +9,14 @@ namespace Eskon.Core.Mapping.FavouriteMapping
         public FavouriteMapping()
         {
             CreateMap<Favourite, FavouriteReadDTO>()
-            .ForMember(dest => dest.Id,              opt => opt.MapFrom(src => src.PropertyId))
-            .ForMember(dest => dest.Title,           opt => opt.MapFrom(src => src.Property.Title))
-            .ForMember(dest => dest.MaxGuests,       opt => opt.MapFrom(src => src.Property.MaxGuests))
-            .ForMember(dest => dest.PricePerNight,   opt => opt.MapFrom(src => src.Property.PricePerNight))
-            .ForMember(dest => dest.RejectionMessage,opt => opt.MapFrom(src => src.Property.RejectionMessage))
-            .ForMember(dest => dest.ThumbnailUrl,    opt => opt.MapFrom(src => src.Property.ThumbnailUrl))
-            .ForMember(dest => dest.City,            opt => opt.MapFrom(src => src.Property.City.Name))
-            .ForMember(dest => dest.Country,         opt => opt.MapFrom(src => src.Property.City.Country.Name));
+            .ForMember(dest => dest.Title,          opt => opt.MapFrom(src => src.Property.Title))
+            .ForMember(dest => dest.MaxGuests,      opt => opt.MapFrom(src => src.Property.MaxGuests))
+            .ForMember(dest => dest.PricePerNight,  opt => opt.MapFrom(src => src.Property.PricePerNight))
+            .ForMember(dest => dest.ThumbnailUrl,   opt => opt.MapFrom(src => src.Property.ThumbnailUrl))
+            .ForMember(dest => dest.AverageRating,  opt => opt.MapFrom(src => src.Property.AverageRating))
+            .ForMember(dest => dest.CityName,       opt => opt.MapFrom(src => src.Property.City.Name))
+            .ForMember(dest => dest.CountryName,    opt => opt.MapFrom(src => src.Property.City.Country.Name))
+            .ReverseMap();
         }
     }
 }

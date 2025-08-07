@@ -22,22 +22,26 @@ namespace Eskon.Service.Services
 
         public async Task<Favourite> AddFavouriteAsync(Favourite favourite)
         {
-            await _favouriteRepository.AddAsync(favourite);
-            return favourite;
+            return await _favouriteRepository.AddAsync(favourite);
         }
 
-        public async Task<Paginated<Favourite>> GetPaginatedFavouritesPerCustomer(int pageNum, int itemsPerPage,Guid customerId)
+        public async Task<Paginated<Favourite>> GetPaginatedFavouritesPerCustomer(int pageNum, int itemsPerPage, Guid customerId)
         {
-            return await _favouriteRepository.GetPaginatedFavouritesAsync(pageNum,itemsPerPage ,filter: f => f.UserId == customerId);
+            return await _favouriteRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: f => f.UserId == customerId, includes: nameof(Favourite.Property));
         }
 
         public async Task RemoveFavouriteAsync(Favourite favourite)
         {
             await _favouriteRepository.DeleteAsync(favourite);
         }
-        public async Task<Favourite?> GetFavouriteByIdAsync(Guid CustomerId, Guid PropertyId)
+        public async Task<Favourite?> GetFavouriteByIdAsync(Guid favouriteId)
         {
-            return await _favouriteRepository.GetFavouriteByIdAsync(CustomerId, PropertyId);
+            return await _favouriteRepository.GetByIdAsync(favouriteId);
+        }
+
+        public async Task<Favourite?> GetFavouriteForUserAndPropertyAsync(Guid userId, Guid propertyId)
+        {
+            return (await _favouriteRepository.GetFilteredAsync(f => f.UserId == userId && f.PropertyId == propertyId)).SingleOrDefault();
         }
     }
 }
