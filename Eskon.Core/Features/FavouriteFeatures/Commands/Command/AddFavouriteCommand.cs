@@ -9,5 +9,5 @@ using System.Threading.Tasks;
 
 namespace Eskon.Core.Features.FavouriteFeatures.Commands.Command
 {
-    public record AddFavouriteCommand(Guid UserId, Guid PropertyId) : IRequest<Response<string>>;
+    public record AddFavouriteCommand(Guid UserId, Guid PropertyId) : IRequest<Response<FavouriteReadDTO>>;
 }
