@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Eskon.API.Base;
+using Eskon.Core.Features.BookingFeatures.Commands.Command;
+using Eskon.Core.Features.BookingFeatures.Queries.Query;
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
+using Eskon.Core.Response;
+using Eskon.Domain.Utilities;
 using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.DTOs.StripeDTOs;
-using Eskon.Core.Features.BookingFeatures.Queries.Query;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Eskon.Core.Features.BookingFeatures.Commands.Command;
 
 namespace Eskon.API.Controllers
 {
@@ -26,18 +28,44 @@ namespace Eskon.API.Controllers
         #endregion
 
         #region POST
+        #region GetCustomerBookings
+        /// <summary>
+        /// Retrieves paginated bookings for the authenticated customer based on booking status.
+        /// </summary>
+        /// <param name="status">The booking status (e.g., pending, accepted, paid, history, rejected).</param>
+        /// <param name="pageNum">The page number (starting from 1).</param>
+        /// <param name="itemsPerPage">The number of bookings per page.</param>
+        /// <returns>A paginated list of customer bookings.</returns>
         [Authorize]
         [HttpGet("GetCustomerBookings")]
-        public async Task<IActionResult> GetCustomerBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
+        [ProducesResponseType(typeof(Response<Paginated<BookingReadDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetCustomerBookings(
+            [FromQuery] string status,
+            [FromQuery] int pageNum,
+            [FromQuery] int itemsPerPage)
         {
             var customerId = GetUserIdFromAuthenticatedUserToken();
             var query = new GetCustomerBookingsQuery(customerId, status, pageNum, itemsPerPage);
             var bookings = await Mediator.Send(query);
             return NewResult(bookings);
         }
+        #endregion
 
+        #region Get owner bookings
+        /// <summary>
+        /// Retrieves paginated bookings for the authenticated property owner based on booking status.
+        /// </summary>
+        /// <param name="status">The booking status (e.g., pending, accepted, paid, history, rejected).</param>
+        /// <param name="pageNum">The page number (starting from 1).</param>
+        /// <param name="itemsPerPage">The number of bookings per page.</param>
+        /// <returns>A paginated list of owner bookings.</returns>
         [Authorize(Roles = "Owner")]
         [HttpGet("GetOwnerBookings")]
+        [ProducesResponseType(typeof(Response<Paginated<BookingReadDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetOwnerBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
@@ -45,9 +73,29 @@ namespace Eskon.API.Controllers
             var bookings = await Mediator.Send(query);
             return Ok(bookings);
         }
+        #endregion
 
+        #region Get Property Bookings
+        /// <summary>
+        /// Retrieves a paginated list of bookings for all properties owned by the authenticated owner,
+        /// filtered by booking status.
+        /// </summary>
+        /// <param name="status">
+        /// The booking status to filter by. Accepted values:
+        /// <c>pending</c>, <c>accepted</c>, <c>paid</c>, <c>history</c>, <c>rejected</c>.
+        /// </param>
+        /// <param name="pageNum">The page number to retrieve (must be ≥ 1).</param>
+        /// <param name="itemsPerPage">The number of bookings to include per page.</param>
+        /// <returns>
+        /// Returns <c>200 OK</c> with a paginated list of bookings for the owner's properties.
+        /// Returns <c>400 Bad Request</c> if the status is invalid.
+        /// Returns <c>401 Unauthorized</c> if the owner is not authenticated.
+        /// </returns>
         [Authorize(Roles = "Owner")]
         [HttpGet("GetPropertyBookings")]
+        [ProducesResponseType(typeof(Response<Paginated<BookingReadDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetPropertyBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
@@ -55,16 +103,33 @@ namespace Eskon.API.Controllers
             var bookings = await Mediator.Send(query);
             return Ok(bookings);
         }
+        #endregion
 
+        #region Add New Booking
+        /// <summary>
+        /// Creates a new booking request for a property by the authenticated customer.
+        /// </summary>
+        /// <param name="bookingWriteDTO">The booking request data including property ID, start and end dates, etc.</param>
+        /// <returns>
+        /// Returns <c>201 Created</c> if the booking request is valid and successfully submitted.
+        /// Returns <c>400 Bad Request</c> if the booking request is invalid, overlaps with existing bookings, or violates business rules.
+        /// Returns <c>404 Not Found</c> if the specified property does not exist.
+        /// Returns <c>401 Unauthorized</c> if the user is not authenticated.
+        /// </returns>
         [Authorize]
         [HttpPost("Customer/Request")]
+        [ProducesResponseType(typeof(Response<BookingReadDTO>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Response<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<object>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> MakeABookingRequest([FromBody] BookingRequestDTO bookingWriteDTO)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddNewBookingCommand(userId, bookingWriteDTO));
             return NewResult(response);
 
-        }
+        } 
+        #endregion
         #endregion
 
         #region PATCH
