@@ -53,6 +53,8 @@ namespace Eskon.Service.Services
 
         public string CreateStripeConnectedAccountLinkForOwner(string stripeAccountId, string refreshUrl, string returnUrl)
         {
+            StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+
             var accountURLOptions = new AccountLinkCreateOptions
             {
                 Account = stripeAccountId,
