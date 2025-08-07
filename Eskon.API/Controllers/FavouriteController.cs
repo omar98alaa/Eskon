@@ -26,10 +26,10 @@ namespace Eskon.API.Controllers
         #region GET
         [Authorize]
         [HttpGet("GetUserFavourites")]
-        public async Task<IActionResult> GetUserFavourites()
+        public async Task<IActionResult> GetUserFavourites([FromQuery] int pageNum = 1,[FromQuery] int itemsPerPage = 10)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();
-            var query = new GetUserFavouritesQuery(userId);
+            var query = new GetUserFavouritesQuery(pageNum, itemsPerPage, userId);
             var response = await Mediator.Send(query);
             return NewResult(response);
         }
@@ -37,7 +37,7 @@ namespace Eskon.API.Controllers
 
         #region POST
         [Authorize]
-        [HttpPost("Add")]
+        [HttpPost("{propertyId:guid}")]
         public async Task<IActionResult> AddToFavourites([FromRoute] Guid propertyId)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();
@@ -49,7 +49,7 @@ namespace Eskon.API.Controllers
 
         #region DELETE
         [Authorize]
-        [HttpDelete("Remove")]
+        [HttpDelete("{propertyId:guid}")]
         public async Task<IActionResult> RemoveFromFavourites([FromRoute] Guid propertyId)
         {
             var userId = GetUserIdFromAuthenticatedUserToken();

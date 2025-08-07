@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Eskon.Domian.DTOs.Favourite
 {
     public class FavouriteReadDTO
     {
-        public Guid UserId { get; set; }
-        public Guid PropertyId { get; set; }
-        public Guid PropertyTitle { get; set; }
+        public Guid Id { get; set; }
+        public string Title { get; set; }
+        public int MaxGuests { get; set; }
+        public decimal PricePerNight { get; set; }
+        public string ThumbnailUrl { get; set; }
+        public string? RejectionMessage { get; set; }
+        public decimal AverageRating { get; set; }
+        public string City { get; set; }
+
+        public string Country { get; set; }
+
     }
 }
