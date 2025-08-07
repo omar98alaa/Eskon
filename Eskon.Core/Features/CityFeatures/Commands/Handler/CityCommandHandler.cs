@@ -35,7 +35,7 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
 
             var existingCity = await _unitofwork.CityService.GetCityByNameAsync(request.CityDTO.Name);
 
-            if (existingCity.CountryId == country.Id)
+            if (existingCity != null && existingCity.CountryId == country.Id)
             {
                 var existCity = _mapper.Map<CityDTO>(existingCity);
                 return BadRequest<CityDTO>("City already exists in this country");
