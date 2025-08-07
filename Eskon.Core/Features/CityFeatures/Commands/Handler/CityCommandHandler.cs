@@ -33,11 +33,10 @@ namespace Eskon.Core.Features.CityFeatures.Commands.Handler
             if (country == null)
                 return NotFound<CityDTO>("Country not found");
 
-            var existingCity = await _unitofwork.CityService.GetCityByNameAsync(request.CityDTO.Name);
+            var existingCity = await _unitofwork.CityService.GetCityByNameAndCountryIdAsync(request.CityDTO.Name, country.Id);
 
-            if (existingCity.CountryId == country.Id)
+            if (existingCity != null)
             {
-                var existCity = _mapper.Map<CityDTO>(existingCity);
                 return BadRequest<CityDTO>("City already exists in this country");
             }
 

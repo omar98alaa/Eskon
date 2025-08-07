@@ -8,11 +8,9 @@ namespace Eskon.Service.Interfaces
         public Task<List<City>> GetAllCitiesAsync();
         public Task<List<City>> GetAllCitiesPerCountryAsync(Country country);
         public Task<City> GetCityByNameAsync(string name);
+        public Task<City?> GetCityByNameAndCountryIdAsync(string cityName, Guid countryId);
         public Task<City> GetCityByIdAsync(Guid id);
         public Task UpdateCityAsync(City city);
         public Task DeleteCityAsync(City city);
-
-
-
     }
 }
