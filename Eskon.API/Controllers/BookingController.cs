@@ -128,37 +128,91 @@ namespace Eskon.API.Controllers
             var response = await Mediator.Send(new AddNewBookingCommand(userId, bookingWriteDTO));
             return NewResult(response);
 
-        } 
+        }
         #endregion
         #endregion
 
         #region PATCH
+        #region Accept pending booking
+        /// <summary>
+        /// Accepts a pending booking request for one of the authenticated owner's properties.
+        /// </summary>
+        /// <param name="bookingId">The ID of the booking to accept.</param>
+        /// <returns>
+        /// Returns <c>200 OK</c> if the booking is accepted successfully and overlapping bookings are handled.
+        /// Returns <c>400 Bad Request</c> if the booking is not pending or if the reservation overlaps with another accepted booking.
+        /// Returns <c>403 Forbidden</c> if the authenticated owner does not own the property.
+        /// Returns <c>404 Not Found</c> if the booking does not exist.
+        /// Returns <c>401 Unauthorized</c> if the user is not authenticated as an owner.
+        /// </returns>
         [Authorize(Roles = "Owner")]
         [HttpPatch("Owner/Accept/{bookingId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> AcceptBooking([FromRoute] Guid bookingId)
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetBookingAsAcceptedCommand(bookingId, ownerId));
             return NewResult(response);
         }
+        #endregion
 
+        #region Reject pending booking
+        /// <summary>
+        /// Rejects a pending booking request for one of the authenticated owner's properties.
+        /// </summary>
+        /// <param name="bookingId">The ID of the booking to reject.</param>
+        /// <returns>
+        /// Returns <c>200 OK</c> if the booking was successfully rejected.
+        /// Returns <c>400 Bad Request</c> if the booking is not in a pending state.
+        /// Returns <c>403 Forbidden</c> if the authenticated user does not own the property associated with the booking.
+        /// Returns <c>404 Not Found</c> if the booking does not exist.
+        /// Returns <c>401 Unauthorized</c> if the user is not authenticated as an owner.
+        /// </returns>
         [Authorize(Roles = "Owner")]
         [HttpPatch("Owner/Reject/{bookingId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> RejectBooking([FromRoute] Guid bookingId)
         {
             var ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetBookingAsRejectedCommand(bookingId, ownerId));
             return NewResult(response);
         }
+        #endregion
 
+        #region Create Stripe checkout and pay booking
+        /// <summary>
+        /// Initiates the Stripe payment process for a booking using a checkout session.
+        /// </summary>
+        /// <param name="bookingId">The unique identifier of the booking to be paid for.</param>
+        /// <param name="createStripeCheckoutRequestDTO">The request body containing Stripe success and cancel URLs.</param>
+        /// <returns>
+        /// Returns <c>200 OK</c> with the Stripe Checkout URL if the session is successfully created.<br/>
+        /// Returns <c>400 Bad Request</c> if the booking is not accepted, invalid, or the DTO fails validation.<br/>
+        /// Returns <c>403 Forbidden</c> if the booking does not belong to the authenticated customer.<br/>
+        /// Returns <c>404 Not Found</c> if the booking is not found.
+        /// </returns>
         [Authorize]
         [HttpPatch("Customer/Pay/{bookingId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> PayBooking([FromRoute] Guid bookingId, CreateStripeCheckoutRequestDTO createStripeCheckoutRequestDTO)
         {
             var cusotmerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new CreateStripeCheckoutLinkCommand(bookingId, cusotmerId, createStripeCheckoutRequestDTO));
             return NewResult(response);
-        }
+        } 
+        #endregion
         #endregion
 
         #region DELETE
