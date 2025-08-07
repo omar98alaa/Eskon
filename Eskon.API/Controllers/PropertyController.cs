@@ -358,10 +358,28 @@ namespace Eskon.API.Controllers
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new UpdatePropertyCommand(propertyId, propertyWriteDTO, ownerId));
             return NewResult(response);
-        }  
+        }
         #endregion
         #endregion
 
+        #region DELETE
+        #region Delete property
+        /// <summary>
+        /// Deletes a property by its ID if the authenticated owner is the one who owns it.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to delete.</param>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing the operation result. 
+        /// Returns 200 OK if deleted successfully, 403 Forbidden if the owner is not authorized, 
+        /// or 404 Not Found if the property does not exist.
+        /// </returns>
+        /// <remarks>
+        /// Requires the user to be authenticated with the 'Owner' role.
+        /// The deletion is a soft delete.
+        /// </remarks>
+        /// <response code="200">Property deleted successfully.</response>
+        /// <response code="403">User is not authorized to delete this property.</response>
+        /// <response code="404">Property not found.</response>
         [Authorize(Roles = "Owner")]
         [HttpDelete("Owner/{propertyId:guid}")]
         public async Task<IActionResult> DeleteProperty([FromRoute] Guid propertyId)
@@ -369,7 +387,9 @@ namespace Eskon.API.Controllers
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new DeletePropertyCommand(propertyId, ownerId));
             return NewResult(response);
-        }
+        }  
+        #endregion
+        #endregion
         #endregion
     }
 }
