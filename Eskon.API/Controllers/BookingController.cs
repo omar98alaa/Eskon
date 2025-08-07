@@ -211,28 +211,62 @@ namespace Eskon.API.Controllers
             var cusotmerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new CreateStripeCheckoutLinkCommand(bookingId, cusotmerId, createStripeCheckoutRequestDTO));
             return NewResult(response);
-        } 
+        }
         #endregion
         #endregion
 
         #region DELETE
+        #region Cancel Booking
+        /// <summary>
+        /// Cancels a booking made by the authenticated customer if it has not been paid.
+        /// </summary>
+        /// <param name="bookingId">The unique identifier of the booking to cancel.</param>
+        /// <returns>
+        /// Returns <c>200 OK</c> with a success message if the booking is successfully canceled.<br/>
+        /// Returns <c>400 Bad Request</c> if the booking has already been paid.<br/>
+        /// Returns <c>403 Forbidden</c> if the booking does not belong to the authenticated customer.<br/>
+        /// Returns <c>404 Not Found</c> if the booking does not exist.
+        /// </returns>
         [Authorize]
         [HttpDelete("Customer/Cancel/{bookingId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CancelBooking([FromRoute] Guid bookingId)
         {
             var customerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new CancelBookingCommand(bookingId, customerId));
             return NewResult(response);
         }
+        #endregion
 
+        #region Refund payed Booking
+        /// <summary>
+        /// Initiates a refund request for a paid booking, if eligible.
+        /// </summary>
+        /// <param name="bookingId">The unique identifier of the booking to refund.</param>
+        /// <returns>
+        /// Returns <c>200 OK</c> if the refund request is successfully created.<br/>
+        /// Returns <c>400 Bad Request</c> if the booking is unpaid, already refunded, or the refund period has expired.<br/>
+        /// Returns <c>403 Forbidden</c> if the booking does not belong to the authenticated customer.<br/>
+        /// Returns <c>404 Not Found</c> if the booking or its associated payment does not exist.
+        /// </returns>
         [Authorize]
         [HttpDelete("Customer/Refund/{bookingId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> RefundBooking([FromRoute] Guid bookingId)
         {
             var cusotmerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new CreateStripePaymentRefundCommand(cusotmerId, bookingId));
             return NewResult(response);
-        }
+        } 
+        #endregion
         #endregion
     }
 }
