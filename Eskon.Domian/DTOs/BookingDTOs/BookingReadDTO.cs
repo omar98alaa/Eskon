@@ -1,16 +1,12 @@
-﻿using Eskon.Domian.Entities;
-using Eskon.Domian.Entities.Identity;
-using System.ComponentModel;
-
-
-
-namespace Eskon.Domian.DTOs.BookingDTOs
+﻿namespace Eskon.Domian.DTOs.BookingDTOs
 {
     public class BookingReadDTO
     {
+        public Guid Id { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public bool IsPending { get; set; }
         public bool IsAccepted { get; set; }
         public bool IsPayed { get; set; }

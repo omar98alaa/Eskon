@@ -24,7 +24,7 @@ namespace Eskon.Core.Features.PropertyTypeFeatures.Queries.Handler
         public async Task<Response<List<PropertyTypeDTO>>> Handle(GetAllPropertyTypesQuery request, CancellationToken cancellationToken)
         {
             var propertyTypes = await _unitOfWork.PropertyTypeService.GetPropertyTypesAsync();
-            var propertyTypeDTOs = propertyTypes.Select(pt => new PropertyTypeDTO { Name = pt.Name }).ToList();
+            var propertyTypeDTOs = propertyTypes.Select(pt => new PropertyTypeDTO { Id = pt.Id, Name = pt.Name }).ToList();
 
             return Success(propertyTypeDTOs);
         }
