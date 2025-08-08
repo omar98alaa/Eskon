@@ -17,4 +17,9 @@
     <ProjectReference Include="..\Eskon.Service\Eskon.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\PropertyTypeFeatures\Commands\Command\" />
+    <Folder Include="Features\PropertyTypeFeatures\Commands\Handler\" />
+  </ItemGroup>
+
 </Project>
