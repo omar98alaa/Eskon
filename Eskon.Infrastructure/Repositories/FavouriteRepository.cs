@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Eskon.Domian.Entities.Identity;
+﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
 using Eskon.Infrastructure.Interfaces;
-using Eskon.Domian.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eskon.Infrastructure.Repositories
 {
@@ -21,7 +20,6 @@ namespace Eskon.Infrastructure.Repositories
         #endregion
 
         #region Methods
-
         #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Eskon.Core.Mapping.BookingMapping;
 using Eskon.Core.Mapping.CityMapping;
 using Eskon.Core.Mapping.CountryMapping;
+using Eskon.Core.Mapping.FavouriteMapping;
 using Eskon.Core.Mapping.Properties;
 using Eskon.Core.Mapping.Users;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,8 @@ namespace Eskon.Core
             services.AddAutoMapper(conf => conf.AddProfile<CountryMapper>());
             services.AddAutoMapper(conf => conf.AddProfile<PropertyMappings>());
             services.AddAutoMapper(conf => conf.AddProfile<BookingMappings>());
+            services.AddAutoMapper(conf => conf.AddProfile<FavouriteMapping>());
+
             return services;
         }
     }
