@@ -23,6 +23,11 @@ namespace Eskon.Service.Services
             return await propertyTypeRepository.GetAllAsync();
         }
 
+        public async Task<PropertyType> GetPropertyTypesByIdAsync(Guid id)
+        {
+            return await propertyTypeRepository.GetByIdAsync(id);
+        }
+
         public async Task RemovePropertyAsync(PropertyType propertyType)
         {
             await propertyTypeRepository.SoftDeleteAsync(propertyType);

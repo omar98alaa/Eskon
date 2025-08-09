@@ -61,12 +61,15 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             // Populate new property object
             Property property = _mapper.Map<Property>(request.PropertyWriteDTO);
             property.OwnerId = request.ownerId;
+            property.Owner = await _userManager.FindByIdAsync(request.ownerId.ToString());
             property.AssignedAdminId = Admin.Id;
             property.Images = images;
+            property.PropertyType = await _serviceUnitOfWork.PropertyTypeService.GetPropertyTypesByIdAsync(request.PropertyWriteDTO.PropertyTypeId);
+            property.City = city;
 
             await _serviceUnitOfWork.PropertyService.AddPropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
-            
+
             PropertyDetailsDTO propertyDetails = _mapper.Map<PropertyDetailsDTO>(property);
             
             return Created(propertyDetails);
