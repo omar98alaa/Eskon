@@ -34,6 +34,11 @@ namespace Eskon.Service.Services
             return await _chatRepository.ChatExistsAsync(user1.Id, user2.Id);
         }
 
+        public async Task<Chat?> GetChatBetweenUsersAsync(User user1, User user2)
+        {
+            return (await _chatRepository.GetFilteredAsync(c => (c.User1Id == user1.Id && c.User2Id == user2.Id) || (c.User1Id == user2.Id && c.User2Id == user1.Id))).SingleOrDefault();
+        }
+
         public async Task MarkMessagesAsRead(Chat chat)
         {
             foreach(var message in chat.ChatMessages)

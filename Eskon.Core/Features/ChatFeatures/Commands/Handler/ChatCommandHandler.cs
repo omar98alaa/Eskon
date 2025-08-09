@@ -67,17 +67,17 @@ namespace Eskon.Core.Features.ChatFeatures.Commands.Handler
                 return NotFound<ConversationDto>("Other user does not exist");
             }
 
-            if(await _serviceUnitOfWork.ChatService.ChatExistsAsync(new User() { Id = request.user1Id }, user2))
+            var chat = await _serviceUnitOfWork.ChatService.GetChatBetweenUsersAsync(new User() { Id = request.user1Id }, user2);
+            
+            if (chat == null)
             {
-                return BadRequest<ConversationDto>("Chat already exits between both users");
+                chat = new Chat() { User1Id = request.user1Id, User2Id = request.user2Id };
+
+                await _serviceUnitOfWork.ChatService.AddChatAsync(chat);
+                await _serviceUnitOfWork.SaveChangesAsync();
             }
 
-            var newChat = new Chat() { User1Id = request.user1Id, User2Id = request.user2Id };
-
-            await _serviceUnitOfWork.ChatService.AddChatAsync(newChat);
-            await _serviceUnitOfWork.SaveChangesAsync();
-
-            var chatDTO = _mapper.Map<ConversationDto>(newChat);
+            var chatDTO = _mapper.Map<ConversationDto>(chat);
 
             return Created(chatDTO, "Chat created successfully");
         }
