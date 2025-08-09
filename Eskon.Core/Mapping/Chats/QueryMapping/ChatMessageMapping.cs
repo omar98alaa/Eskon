@@ -9,11 +9,8 @@ namespace Eskon.Core.Mapping.Chats
         {
             CreateMap<ChatMessage, ChatMessageDto>()
             .ForMember(dest => dest.MessageId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
-
-            CreateMap<ChatMessageDto, ChatMessage>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.MessageId))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
+            .ForMember(dest => dest.ReceiverId, opt => opt.MapFrom(src => src.SenderId == src.Chat.User1Id ? src.Chat.User2Id : src.Chat.User1Id))
+            .ReverseMap();
         }
     }
 }

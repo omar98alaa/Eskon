@@ -4,5 +4,5 @@ using MediatR;
 
 namespace Eskon.Core.Features.ChatFeatures.Commands.Command
 {
-    public record SendMessageCommand(Guid senderId, SendMessageDto MessageDto) : IRequest<ChatMessageDto?>;
+    public record AddNewChatCommand(Guid user1Id, Guid user2Id) : IRequest<Response<ConversationDto>>;
 }

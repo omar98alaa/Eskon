@@ -1,4 +1,3 @@
-using Eskon.Domian.DTOs.Chat;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
@@ -33,57 +32,5 @@ namespace Eskon.Infrastructure.Repositories
                 (c.User1Id == user1Id && c.User2Id == user2Id) ||
                 (c.User1Id == user2Id && c.User2Id == user1Id));
         }
-        public async Task<ChatMessage> SendMessageAsync(SendMessageDto dto)
-        {
-            var senderId = dto.SenderId;
-            var receiverId = dto.ReceiverId;
-
-            Guid chatId;
-
-            if (dto.ChatId != Guid.Empty)
-            {
-                chatId = dto.ChatId;
-            }
-            else
-            {
-                var existingChat = await _chatDbSet.FirstOrDefaultAsync(c =>
-                    (c.User1Id == senderId && c.User2Id == receiverId) ||
-                    (c.User1Id == receiverId && c.User2Id == senderId));
-
-                if (existingChat != null)
-                {
-                    chatId = existingChat.Id;
-                }
-                else
-                {
-                    var newChat = new Chat
-                    {
-                        Id = Guid.NewGuid(),
-                        User1Id = senderId,
-                        User2Id = receiverId,
-                        CreatedAt = DateTime.UtcNow
-                    };
-
-                    await _chatDbSet.AddAsync(newChat);
-                    chatId = newChat.Id;
-                }
-            }
-
-            var message = new ChatMessage
-            {
-                Id = Guid.NewGuid(),
-                ChatId = chatId,
-                SenderId = senderId,
-                ReceiverId = receiverId,
-                Content = dto.Content,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            return message;
-        }
-
-
-
-
     }
 }

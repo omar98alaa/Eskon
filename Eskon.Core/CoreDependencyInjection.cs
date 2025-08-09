@@ -1,4 +1,5 @@
 using Eskon.Core.Mapping.BookingMapping;
+using Eskon.Core.Mapping.Chats;
 using Eskon.Core.Mapping.CityMapping;
 using Eskon.Core.Mapping.CountryMapping;
 using Eskon.Core.Mapping.FavouriteMapping;

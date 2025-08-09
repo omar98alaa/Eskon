@@ -8,8 +8,5 @@ namespace Eskon.Infrastructure.Interfaces
     {
         Task<List<ChatMessage>> GetMessagesByChatIdAsync(Guid chatId);
         Task AddMessageAsync(ChatMessage message);
-        Task<List<ConversationDto>> GetConversationsForUserAsync(Guid userId);
-        Task MarkMessagesAsReadAsync(Guid chatId, Guid userId);
-
     }
 }

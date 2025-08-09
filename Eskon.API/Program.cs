@@ -1,4 +1,3 @@
-using AutoMapper;
 using Eskon.API.Hubs;
 using Eskon.Core;
 using Eskon.Domian.Entities.Identity;
@@ -6,11 +5,8 @@ using Eskon.Domian.Stripe;
 using Eskon.Infrastructure;
 using Eskon.Infrastructure.Context;
 using Eskon.Service;
-using Eskon.Service.Interfaces;
-using Eskon.Service.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -34,7 +30,7 @@ namespace Eskon.API
                 options.AddPolicy("AllowLocalhost", policy =>
                 {
                     policy
-                        .WithOrigins("http://localhost:53828","http://localhost:4200", "http://localhost:50918", "http://localhost:51091", "http://localhost:51174", "http://localhost:54971") 
+                        .WithOrigins("http://localhost:4200")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -48,18 +44,13 @@ namespace Eskon.API
 
             //signalR 
             builder.Services.AddSignalR();
-           
-       
-
-
-
-
 
             #region JWT Settings
             var jwtSettings = new JwtSettings();
             builder.Configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
             builder.Services.AddSingleton(jwtSettings);
             #endregion
+
 
             #region Stripe Settings
             var stripeSettings = new StripeSettings();
@@ -111,22 +102,22 @@ namespace Eskon.API
                           Encoding.ASCII.GetBytes(jwtSettings.Secret)
                       )
                   };
-                   options.Events = new JwtBearerEvents
-                   {
-                       OnMessageReceived = context =>
-                       {
-                           var accessToken = context.Request.Query["access_token"];
-                           var path = context.HttpContext.Request.Path;
+                  options.Events = new JwtBearerEvents
+                  {
+                      OnMessageReceived = context =>
+                      {
+                          var accessToken = context.Request.Query["access_token"];
+                          var path = context.HttpContext.Request.Path;
 
-                   
-                           if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api/chatHub"))
-                           {
-                               context.Token = accessToken;
-                           }
 
-                           return Task.CompletedTask;
-                       }
-                   };
+                          if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api/chatHub"))
+                          {
+                              context.Token = accessToken;
+                          }
+
+                          return Task.CompletedTask;
+                      }
+                  };
               });
             #endregion
 
@@ -150,7 +141,6 @@ namespace Eskon.API
             app.UseRouting();
 
             app.UseCors("AllowLocalhost");
-
 
             app.UseHttpsRedirection();
 

@@ -1,15 +1,16 @@
-﻿using Eskon.Core.Features.ChatFeatures.Commands.Command;
+﻿using Eskon.API.Base;
+using Eskon.Core.Features.ChatFeatures.Commands.Command;
 using Eskon.Core.Features.ChatFeatures.Queries.Query;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Eskon.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
-    public class ChatController : ControllerBase
+    [Authorize]
+    public class ChatController : BaseController
     {
         private readonly IMediator _mediator;
 
@@ -19,32 +20,36 @@ namespace Eskon.API.Controllers
         }
 
         // GET: api/Chat/messages/{chatId}
-        [HttpGet("messages/{chatId}")]
+        [HttpGet("messages/{chatId:guid}")]
         public async Task<IActionResult> GetMessages(Guid chatId)
         {
-            var result = await _mediator.Send(new GetMessagesPerChatQuery(chatId));
-            return Ok(result);
+            var userId = GetUserIdFromAuthenticatedUserToken();
+            var result = await _mediator.Send(new GetMessagesPerChatQuery(userId, chatId));
+            return NewResult(result);
         }
 
         // GET: api/Chat/conversations/{userId}
-        [HttpGet("conversations/{userId}")]
-        public async Task<IActionResult> GetUserConversations(Guid userId)
+        [HttpGet("conversations")]
+        public async Task<IActionResult> GetUserConversations()
         {
+            var userId = GetUserIdFromAuthenticatedUserToken();
             var result = await _mediator.Send(new GetUserConversationsQuery(userId));
-            return Ok(result);
+            return NewResult(result);
         }
         [HttpPost("mark-as-read/{chatId}")]
         public async Task<IActionResult> MarkMessagesAsRead(Guid chatId)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || string.IsNullOrWhiteSpace(userIdClaim.Value))
-                return Unauthorized();
-
-            Guid userId = Guid.Parse(userIdClaim.Value);
-            await _mediator.Send(new MarkMessagesAsReadCommand(chatId, userId));
-            return Ok();
+            var userId = GetUserIdFromAuthenticatedUserToken();
+            var response = await _mediator.Send(new MarkMessagesAsReadCommand(chatId, userId));
+            return NewResult(response);
         }
 
-
+        [HttpPost("{user2Id:guid}")]
+        public async Task<IActionResult> AddNewChat([FromRoute] Guid user2Id)
+        {
+            var user1Id = GetUserIdFromAuthenticatedUserToken();
+            var response = await _mediator.Send(new AddNewChatCommand(user1Id, user2Id));
+            return NewResult(response);
+        }
     }
 }

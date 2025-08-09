@@ -21,9 +21,7 @@ namespace Eskon.Domian.Models
         //[ForeignKey(nameof(Sender))]
         public Guid SenderId { get; set; }
         public virtual User Sender { get; set; }
-        //addthis
-        public Guid ReceiverId { get; set; }
-        public virtual User Receiver { get; set; }
+
         //  Chat
         //[ForeignKey(nameof(Chat))]
         public Guid ChatId { get; set; }

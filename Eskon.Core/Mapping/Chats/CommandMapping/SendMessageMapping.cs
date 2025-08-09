@@ -7,9 +7,7 @@ namespace Eskon.Core.Mapping.Chats
     {
         public void SendMessageProfile()
         {
-            CreateMap<SendMessageDto, ChatMessage>()
-                   .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
-
+            CreateMap<SendMessageDto, ChatMessage>();
         }
     }
 }

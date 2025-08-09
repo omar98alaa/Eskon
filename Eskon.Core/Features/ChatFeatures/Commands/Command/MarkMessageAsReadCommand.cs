@@ -1,12 +1,8 @@
-﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Eskon.Core.Response;
+using MediatR;
 
 namespace Eskon.Core.Features.ChatFeatures.Commands.Command
 {
-    public record MarkMessagesAsReadCommand(Guid ChatId, Guid UserId) : IRequest<Unit>;
+    public record MarkMessagesAsReadCommand(Guid ChatId, Guid UserId) : IRequest<Response<Unit>>;
 
 }

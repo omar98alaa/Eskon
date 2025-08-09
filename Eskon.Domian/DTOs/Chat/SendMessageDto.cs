@@ -1,11 +1,14 @@
-﻿namespace Eskon.Domian.DTOs.Chat
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Eskon.Domian.DTOs.Chat
 {
     public class SendMessageDto
     {
+        [Required]
         public Guid ChatId { get; set; }
-        public Guid SenderId { get; set; }
-        public Guid ReceiverId { get; set; }
-        public string Content { get; set; } = string.Empty;
+
+        [Required, StringLength(500)]
+        public string Content { get; set; }
     }
 
 }

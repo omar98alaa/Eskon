@@ -3,7 +3,7 @@ using Eskon.Domian.DTOs.Chat;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace Eskon.API.Hubs
 {
@@ -43,18 +43,22 @@ namespace Eskon.API.Hubs
 
         public async Task SendMessage(SendMessageDto dto)
         {
+            var senderId = GetUserIdFromAuthenticatedUserToken();
+            var command = new SendMessageCommand(senderId, dto);
+            var messageDto = await _mediator.Send(command);
 
-                var command = new SendMessageCommand(dto);
-                var messageDto = await _mediator.Send(command);
+            var receiverGroup = messageDto.ReceiverId.ToString();
+            var senderGroup = messageDto.SenderId.ToString();
 
-                var receiverGroup = messageDto.ReceiverId.ToString();
-                var senderGroup = messageDto.SenderId.ToString();
-
-                await Clients.User(receiverGroup).SendAsync("ReceiveMessage", messageDto);
-                await Clients.User(senderGroup).SendAsync("ReceiveMessage", messageDto);
-            
-  
+            await Clients.User(receiverGroup).SendAsync("ReceiveMessage", messageDto);
+            await Clients.User(senderGroup).SendAsync("ReceiveMessage", messageDto);
         }
 
+        protected Guid GetUserIdFromAuthenticatedUserToken()
+        {
+            var userIdClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = Guid.Parse(userIdClaim.Value);
+            return userId;
+        }
     }
 }
