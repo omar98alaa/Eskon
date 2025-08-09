@@ -52,6 +52,13 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
                 return NotFound<PropertyDetailsDTO>("One or more images were not found");
             }
 
+            var propertyType = await _serviceUnitOfWork.PropertyTypeService.GetPropertyTypesByIdAsync(request.PropertyWriteDTO.PropertyTypeId);
+            if (propertyType == null)
+            {
+                return NotFound<PropertyDetailsDTO>("Property type Not Found");
+            }
+
+
             // Assign an admin randomly
             List<User> AdminUsers = (await _userManager.GetUsersInRoleAsync("Admin")).ToList();
             Random random = new Random();
@@ -61,12 +68,14 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             // Populate new property object
             Property property = _mapper.Map<Property>(request.PropertyWriteDTO);
             property.OwnerId = request.ownerId;
+            property.Owner = await _userManager.FindByIdAsync(request.ownerId.ToString());
             property.AssignedAdminId = Admin.Id;
             property.Images = images;
+            property.PropertyType = propertyType;
 
             await _serviceUnitOfWork.PropertyService.AddPropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
-            
+
             PropertyDetailsDTO propertyDetails = _mapper.Map<PropertyDetailsDTO>(property);
             
             return Created(propertyDetails);

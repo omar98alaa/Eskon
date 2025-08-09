@@ -42,5 +42,8 @@ namespace Eskon.Domian.DTOs.Property
 
         [Required]
         public List<string> ImageUrls { get; set; }
+
+        [Required]
+        public Guid PropertyTypeId {  get; set; }
     }
 }
