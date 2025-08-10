@@ -8,7 +8,7 @@ namespace Eskon.Core.Mapping.Chats
         {
             ChatMessageProfile();
             SendMessageProfile();
-            conversationmapping();
+            conversationMapping();
         }
     }
 }

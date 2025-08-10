@@ -61,6 +61,11 @@ namespace Eskon.Core.Features.ChatFeatures.Commands.Handler
 
         public async Task<Response<ConversationDto>> Handle(AddNewChatCommand request, CancellationToken cancellationToken)
         {
+            if(request.user1Id == request.user2Id)
+            {
+                return BadRequest<ConversationDto>("Cannot create conversation with self");
+            }
+
             var user2 = await _serviceUnitOfWork.UserService.GetUserByIdAsync(request.user2Id);
             if(user2 == null)
             {
