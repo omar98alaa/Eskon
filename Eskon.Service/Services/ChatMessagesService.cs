@@ -1,5 +1,7 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domian.DTOs.Chat;
+using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
+using Eskon.Infrastructure.Repositories;
 using Eskon.Service.Interfaces;
 
 namespace Eskon.Service.Services
@@ -18,15 +20,11 @@ namespace Eskon.Service.Services
             return await _chatMessageRepository.AddAsync(chatMessage);
         }
 
-        public async Task<List<ChatMessage>> GetMessagesPerChatAsync(Chat chat)
+        public async Task<List<ChatMessage>> GetMessagesByChatIdAsync(Guid chatId)
         {
-            return await _chatMessageRepository.GetFilteredAsync(c => c.ChatId == chat.Id);
+            return await _chatMessageRepository.GetMessagesByChatIdAsync(chatId);
         }
 
-        public async Task<ChatMessage?> GetMessageByIdAsync(Guid messageId)
-        {
-            return await _chatMessageRepository.GetByIdAsync(messageId);
-        }
 
         public async Task UpdateMessageAsync(ChatMessage chatMessage)
         {

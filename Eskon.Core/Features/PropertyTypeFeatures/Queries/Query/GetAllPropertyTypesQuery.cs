@@ -1,7 +1,4 @@
-﻿
-
-using Eskon.Core.Response;
-using Eskon.Domian.DTOs.Country_City;
+﻿using Eskon.Core.Response;
 using Eskon.Domian.DTOs.PropertyType;
 using MediatR;
 

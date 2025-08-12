@@ -10,6 +10,7 @@
 		<PackageReference Include="AutoMapper" Version="15.0.1" />
 		<PackageReference Include="MediatR" Version="13.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,6 +23,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Eskon.Core\Eskon.Core.csproj" />
 		<ProjectReference Include="..\Eskon.Domian\Eskon.Domian.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
 </Project>

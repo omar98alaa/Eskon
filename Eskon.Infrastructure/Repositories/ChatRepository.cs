@@ -1,4 +1,3 @@
-using Eskon.Domian.Entities;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
@@ -17,6 +16,7 @@ namespace Eskon.Infrastructure.Repositories
         public ChatRepository(MyDbContext myDbContext) : base(myDbContext)
         {
             _chatDbSet = myDbContext.Set<Chat>();
+
         }
         #endregion
 

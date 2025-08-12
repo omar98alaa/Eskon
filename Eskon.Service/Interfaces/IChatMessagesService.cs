@@ -1,12 +1,12 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domian.DTOs.Chat;
+using Eskon.Domian.Models;
 
 namespace Eskon.Service.Interfaces
 {
     public interface IChatMessagesService
     {
         Task<ChatMessage> AddMessageAsync(ChatMessage chatMessage);
-        Task<List<ChatMessage>> GetMessagesPerChatAsync(Chat chat);
-        Task<ChatMessage?> GetMessageByIdAsync(Guid messageId);
+        Task<List<ChatMessage>> GetMessagesByChatIdAsync(Guid chatId);
         Task UpdateMessageAsync(ChatMessage chatMessage);
         Task DeleteMessageAsync(ChatMessage chatMessage);
     }

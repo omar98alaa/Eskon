@@ -1,3 +1,4 @@
+using Eskon.API.Hubs;
 using Eskon.Core;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Stripe;
@@ -26,12 +27,13 @@ namespace Eskon.API
             builder.Services.Configure<IdentitySeeder>(builder.Configuration.GetSection("IdentitySettings"));
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy("AllowLocalhost", policy =>
                 {
                     policy
-                        .AllowAnyOrigin()
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowCredentials();
                 });
             });
 
@@ -40,11 +42,15 @@ namespace Eskon.API
             builder.Services.InjectingServiceDependencies();
             builder.Services.InjectingCoreDependencies();
 
+            //signalR 
+            builder.Services.AddSignalR();
+
             #region JWT Settings
             var jwtSettings = new JwtSettings();
             builder.Configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
             builder.Services.AddSingleton(jwtSettings);
             #endregion
+
 
             #region Stripe Settings
             var stripeSettings = new StripeSettings();
@@ -96,6 +102,22 @@ namespace Eskon.API
                           Encoding.ASCII.GetBytes(jwtSettings.Secret)
                       )
                   };
+                  options.Events = new JwtBearerEvents
+                  {
+                      OnMessageReceived = context =>
+                      {
+                          var accessToken = context.Request.Query["access_token"];
+                          var path = context.HttpContext.Request.Path;
+
+
+                          if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api/chatHub"))
+                          {
+                              context.Token = accessToken;
+                          }
+
+                          return Task.CompletedTask;
+                      }
+                  };
               });
             #endregion
 
@@ -116,8 +138,9 @@ namespace Eskon.API
                 await IdentitySeeder.SeedRolesAsync(roleManager);
             }
 
+            app.UseRouting();
 
-            app.UseCors();
+            app.UseCors("AllowLocalhost");
 
             app.UseHttpsRedirection();
 
@@ -128,6 +151,8 @@ namespace Eskon.API
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.MapHub<ChatHub>("/api/chatHub");
 
             app.Run();
         }

@@ -10,7 +10,6 @@ namespace Eskon.Infrastructure
         public static IServiceCollection InjectingInfrastructureDependencies(this IServiceCollection services)
         {
             services.AddScoped<IRepositoryUnitOfWork, RepositoryUnitOfWork>();
-          
             return services;
         }
     }
