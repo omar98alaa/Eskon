@@ -25,7 +25,7 @@ namespace Eskon.API.Controllers
         }
         #endregion
 
-        #region POST
+        #region GET
         [Authorize]
         [HttpGet("GetCustomerBookings")]
         public async Task<IActionResult> GetCustomerBookings([FromQuery] string status, [FromQuery] int pageNum, [FromQuery] int itemsPerPage)
@@ -53,9 +53,11 @@ namespace Eskon.API.Controllers
             var ownerId = GetUserIdFromAuthenticatedUserToken();
             var query = new GetPropertyBookingsQuery(ownerId, status, pageNum, itemsPerPage);
             var bookings = await Mediator.Send(query);
-            return Ok(bookings);
+            return NewResult(bookings);
         }
+        #endregion
 
+        #region POST
         [Authorize]
         [HttpPost("Customer/Request")]
         public async Task<IActionResult> MakeABookingRequest([FromBody] BookingRequestDTO bookingWriteDTO)
@@ -63,7 +65,6 @@ namespace Eskon.API.Controllers
             var userId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddNewBookingCommand(userId, bookingWriteDTO));
             return NewResult(response);
-
         }
         #endregion
 
