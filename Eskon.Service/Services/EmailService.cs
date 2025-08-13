@@ -11,9 +11,14 @@ namespace Eskon.Service.Services
         {
             _fluentEmail = fluentEmail;
         }
-        public async Task SendEmailAsync(string To, string Subject, string Body)
+        public void SendEmailAsync(string To, string Subject, string Body)
         {
-            await _fluentEmail.To(To).Subject(Subject).Body(Body).SendAsync();
+            _fluentEmail.To(To).Subject(Subject).Body(Body).SendAsync();
+        }
+
+        public void SendEmailUsingRazorTemplateAsync(string To, string Subject, string Template, object Model)
+        {
+            _fluentEmail.To(To).Subject(Subject).UsingTemplate(Template, Model).SendAsync();
         }
     }
 }

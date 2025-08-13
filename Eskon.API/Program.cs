@@ -125,6 +125,7 @@ namespace Eskon.API
             #region FluentEmail Configuration
             builder.Services
                 .AddFluentEmail(builder.Configuration.GetRequiredSection("MailGun")["FromEmail"])
+                .AddRazorRenderer()
                 .AddMailGunSender(
                     builder.Configuration.GetRequiredSection("MailGun")["Domain"],
                     builder.Configuration.GetRequiredSection("MailGun")["API_KEY"],
