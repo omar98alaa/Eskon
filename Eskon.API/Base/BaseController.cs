@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 
 namespace Eskon.API.Base
@@ -26,6 +25,8 @@ namespace Eskon.API.Base
                     return new UnauthorizedObjectResult(response);
                 case HttpStatusCode.BadRequest:
                     return new BadRequestObjectResult(response);
+                case HttpStatusCode.Forbidden:
+                    return new ObjectResult(response) { StatusCode = (int)HttpStatusCode.Forbidden};
                 case HttpStatusCode.NotFound:
                     return new NotFoundObjectResult(response);
                 case HttpStatusCode.Accepted:
