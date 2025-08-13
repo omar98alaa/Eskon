@@ -200,7 +200,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             }
 
             // Check same customer
-            if (booking.Property.OwnerId != request.customerId)
+            if (booking.CustomerId != request.customerId)
             {
                 return Forbidden<string>();
             }
