@@ -3,6 +3,7 @@ using Eskon.Core.Features.BookingFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
+using Eskon.Service.Interfaces;
 using Eskon.Service.UnitOfWork;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,13 +14,15 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         #region Fields
         private readonly IMapper _mapper;
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
+        private readonly IEmailService _emailService;
         #endregion
 
         #region Constructors
-        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork)
+        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IEmailService emailService)
         {
             _mapper = mapper;
             _serviceUnitOfWork = serviceUnitOfWork;
+            _emailService = emailService;
         }
         #endregion
 
@@ -157,6 +160,16 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             }
 
             await _serviceUnitOfWork.SaveChangesAsync();
+
+            _emailService.SendEmailAsync(
+                booking.Customer.Email,
+                "ESKON: Booking request accepted",
+                $"Hello Mr.{booking.Customer.LastName}\n\n" +
+                $"Your booking request for: {booking.Property.Title}\n" +
+                $"From: {booking.StartDate} To: {booking.EndDate}\n" +
+                $"has been accepted.\n" +
+                $"Please login before {booking.StartDate.AddDays(-1)} to pay and confirm your booking or it will be automatically cancelled."
+            );
 
             return Success($"Booking with ID: {booking.Id} accepted", message: $"Booking with ID: {booking.Id} accepted");
         }
