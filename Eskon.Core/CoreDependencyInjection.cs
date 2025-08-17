@@ -1,3 +1,4 @@
+using Eskon.Core.Mapping;
 using Eskon.Core.Mapping.BookingMapping;
 using Eskon.Core.Mapping.Chats;
 using Eskon.Core.Mapping.CityMapping;
@@ -24,6 +25,7 @@ namespace Eskon.Core
             services.AddAutoMapper(conf => conf.AddProfile<BookingMappings>());
             services.AddAutoMapper(conf => conf.AddProfile<FavouriteMapping>());
             services.AddAutoMapper(conf => conf.AddProfile<ReviewMappings>());
+            services.AddAutoMapper(conf => conf.AddProfile<NotificationProfile>());
             return services;
         }
     }

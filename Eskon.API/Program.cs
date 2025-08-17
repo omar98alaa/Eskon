@@ -1,5 +1,6 @@
 using Eskon.API.Hubs;
 using Eskon.Core;
+using Eskon.Core.Features.NotificationFeatures.Events.Event;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Stripe;
 using Eskon.Infrastructure;
@@ -44,6 +45,15 @@ namespace Eskon.API
 
             //signalR 
             builder.Services.AddSignalR();
+            // MediatR 
+            builder.Services.AddMediatR(cfg =>
+                cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
+            // NotificationEventHandler 
+            builder.Services.AddTransient<
+                MediatR.INotificationHandler<NotificationCreatedEvent>,
+                Eskon.Core.Features.NotificationFeatures.Events.Handler.NotificationEventHandler>();
+            Console.WriteLine("NotificationEventHandler ");
 
             #region JWT Settings
             var jwtSettings = new JwtSettings();
@@ -110,7 +120,7 @@ namespace Eskon.API
                           var path = context.HttpContext.Request.Path;
 
 
-                          if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api/chatHub"))
+                          if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/api/chatHub") || path.StartsWithSegments("/api/notificationHub")))
                           {
                               context.Token = accessToken;
                           }
@@ -136,6 +146,10 @@ namespace Eskon.API
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 await IdentitySeeder.SeedRolesAsync(roleManager);
+
+                // Seeding the Notification Types
+                var dbContext = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+                await Eskon.Domian.Entities.NotificationTypeSeeder.SeedAsync(dbContext);
             }
 
             app.UseRouting();
@@ -153,6 +167,7 @@ namespace Eskon.API
             app.MapControllers();
 
             app.MapHub<ChatHub>("/api/chatHub");
+            app.MapHub<NotificationHub>("/api/notificationHub");
 
             app.Run();
         }
