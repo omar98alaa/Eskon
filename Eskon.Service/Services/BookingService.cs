@@ -190,5 +190,10 @@ namespace Eskon.Service.Services
                    b => b.IsPayed == false && 
                         b.StartDate.AddDays(-1) < dateNow);
         }
+
+        public async Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid OwnerId)
+        {
+            return await _bookingRepository.GetFilteredAsync(b => b.IsPending == true && b.Property.OwnerId == OwnerId);
+        }
     }
 }

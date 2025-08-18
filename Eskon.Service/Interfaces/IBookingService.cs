@@ -33,6 +33,7 @@ namespace Eskon.Service.Interfaces
         public Task<List<Booking>> GetUnpaidPassedAcceptedDateBookingsAsync();
 
         public Task<bool> IsAlreadyBookedBefore(Booking newBooking);
+        public Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid OwnerId);
 
 
         #endregion

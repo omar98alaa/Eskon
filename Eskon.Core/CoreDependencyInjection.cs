@@ -49,7 +49,18 @@ namespace Eskon.Core
                 //    .WithIntervalInMinutes(2)
                 //    .RepeatForever())
                 );
-                
+
+                // Job 3 - Send daily email by pending bookings to its owner
+                q.AddJob<SendPendingBookingsEmailToOwnerJob>(opts => opts.WithIdentity(nameof(SendPendingBookingsEmailToOwnerJob)));
+                q.AddTrigger(opts => opts
+                    .ForJob(nameof(SendPendingBookingsEmailToOwnerJob))
+                    .WithIdentity("SendPendingBookingsEmailToOwnerTrigger")
+                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(3, 0)) // 3:00 AM daily
+                //.WithSimpleSchedule(x => x
+                //    .WithIntervalInMinutes(2)
+                //    .RepeatForever())
+                );
+
             });
 
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
