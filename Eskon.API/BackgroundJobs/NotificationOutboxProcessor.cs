@@ -49,11 +49,13 @@ namespace Eskon.API.BackgroundJobs
                                         notificationTypeName = payload.NotificationTypeName
                                     }, stoppingToken);
                                 await unitOfWork.NotificationOutboxService.UpdateStatusAsync(msg.Id, "Sent");
+                                await unitOfWork.SaveChangesAsync();
                             }
                             catch (Exception ex)
                             {
                                 _logger.LogError(ex, "Failed to process outbox message {Id}", msg.Id);
                                 await unitOfWork.NotificationOutboxService.UpdateStatusAsync(msg.Id, "Failed", ex.Message);
+                                await unitOfWork.SaveChangesAsync();
                             }
                         }
                     }
