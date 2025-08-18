@@ -37,6 +37,19 @@ namespace Eskon.Core
                     .WithIdentity("DeleteUnpaidBookingsTrigger")
                     .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(2, 0)) // 2:00 AM daily
                 );
+
+
+                // Job 2 - Send daily email by pending properties to its assigned admin
+                q.AddJob<SendPendingPropertiesEmailToAdminJob>(opts => opts.WithIdentity(nameof(SendPendingPropertiesEmailToAdminJob)));
+                q.AddTrigger(opts => opts
+                    .ForJob(nameof(SendPendingPropertiesEmailToAdminJob))
+                    .WithIdentity("SendPendingPropertiesEmailToAdminTrigger")
+                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(1, 0)) // 1:00 AM daily
+                //.WithSimpleSchedule(x => x
+                //    .WithIntervalInMinutes(2)
+                //    .RepeatForever())
+                );
+                
             });
 
             services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
