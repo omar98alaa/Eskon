@@ -1,6 +1,5 @@
 using Eskon.API.Hubs;
 using Eskon.Core;
-using Eskon.Core.Features.NotificationFeatures.Events.Event;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Stripe;
 using Eskon.Infrastructure;
@@ -45,15 +44,6 @@ namespace Eskon.API
 
             //signalR 
             builder.Services.AddSignalR();
-            // MediatR 
-            builder.Services.AddMediatR(cfg =>
-                cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-
-            // NotificationEventHandler 
-            builder.Services.AddTransient<
-                MediatR.INotificationHandler<NotificationCreatedEvent>,
-                Eskon.Core.Features.NotificationFeatures.Events.Handler.NotificationEventHandler>();
-            Console.WriteLine("NotificationEventHandler ");
 
             #region JWT Settings
             var jwtSettings = new JwtSettings();
@@ -131,6 +121,7 @@ namespace Eskon.API
               });
             #endregion
 
+            builder.Services.AddHostedService<Eskon.API.BackgroundJobs.NotificationOutboxProcessor>();
 
             var app = builder.Build();
 

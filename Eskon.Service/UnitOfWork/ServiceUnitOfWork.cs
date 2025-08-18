@@ -40,6 +40,8 @@ namespace Eskon.Service.UnitOfWork
         
         private INotificationTypeService notificationTypeService;
 
+        private INotificationOutboxService notificationOutboxService;
+
         private IPaymentService paymentService;
 
         private IPropertyService propertyService;
@@ -79,6 +81,8 @@ namespace Eskon.Service.UnitOfWork
         public INotificationService NotificationService => notificationService == null ? new NotificationService(repositoryUnitOfWork.NotificationRepository) : notificationService;
         
         public INotificationTypeService NotificationTypeService => notificationTypeService == null? new NotificationTypeService(repositoryUnitOfWork.NotificationTypeRepository) : notificationTypeService;
+
+        public INotificationOutboxService NotificationOutboxService => notificationOutboxService == null ? new NotificationOutboxService(repositoryUnitOfWork.NotificationOutboxMessageReposatory) : notificationOutboxService;
 
         public IPaymentService PaymentService => paymentService == null ? new PaymentService(repositoryUnitOfWork.PaymentRepository) : paymentService;
 

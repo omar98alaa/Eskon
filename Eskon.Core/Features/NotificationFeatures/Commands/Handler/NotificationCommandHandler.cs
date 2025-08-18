@@ -6,7 +6,6 @@ using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 using Eskon.Core.Response;
-using Eskon.Core.Features.NotificationFeatures.Events.Event;
 
 namespace Eskon.Core.Features.NotificationFeatures.Commands.Handler
 {
@@ -44,16 +43,23 @@ namespace Eskon.Core.Features.NotificationFeatures.Commands.Handler
             await _serviceUnitOfWork.NotificationService.AddNewNotificationAsync(notification);
             await _serviceUnitOfWork.SaveChangesAsync();
 
-            Console.WriteLine("[save success in db and event start]");
+            // سجل رسالة Outbox بدلاً من الإرسال المباشر
+            var outboxMessage = new Eskon.Domian.Entities.NotificationOutboxMessage
+            {
+                Payload = System.Text.Json.JsonSerializer.Serialize(new {
+                    NotificationId = notification.Id,
+                    ReceiverId = notification.ReceiverId,
+                    Content = notification.Content,
+                    NotificationTypeName = type.Name,
+                    CreatedAt = notification.CreatedAt
+                }),
+                Type = "Notification",
+                Status = "Pending"
+            };
+            await _serviceUnitOfWork.NotificationOutboxService.AddAsync(outboxMessage);
+            await _serviceUnitOfWork.SaveChangesAsync();
 
-            // Event 
-            await _mediator.Publish(new NotificationCreatedEvent(
-                ReceiverId: notification.ReceiverId,
-                Content: notification.Content,
-                NotificationTypeName: type.Name,
-                NotificationId: notification.Id,
-                CreatedAt: notification.CreatedAt
-            ), cancellationToken);
+            // await _mediator.Publish(...)
 
             return new NotificationDto
             {

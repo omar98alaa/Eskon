@@ -14,6 +14,7 @@ namespace Eskon.Infrastructure.UnitOfWork
         public IImageRepository ImageRepository { get; }
         public INotificationRepository NotificationRepository { get; }
         public INotificationTypeRepository NotificationTypeRepository { get; }
+        public INotificationOutboxMessageReposatory NotificationOutboxMessageReposatory { get; }
         public IPaymentRepository PaymentRepository { get; }
         public IPropertyRepository PropertyRepository { get; }
         public IPropertyTypeRepository PropertyTypeRepository { get; }

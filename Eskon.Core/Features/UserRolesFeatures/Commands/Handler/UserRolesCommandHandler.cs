@@ -1,4 +1,4 @@
-﻿using Eskon.API.Hubs;
+﻿
 using Eskon.Core.Features.NotificationFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Core.Response;
@@ -19,18 +19,16 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly IMediator _mediator;
-        private readonly IHubContext<NotificationHub> _hubContext;
 
         #endregion
 
         #region Constructors
-        public UserRolesCommandHandler(IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, SignInManager<User> signInManager, IMediator mediator,
-    IHubContext<NotificationHub> hubContext)
+        public UserRolesCommandHandler(IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, SignInManager<User> signInManager, IMediator mediator
+    )
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _userManager = userManager;
             _mediator = mediator;
-            _hubContext = hubContext;
         }
         #endregion
 
