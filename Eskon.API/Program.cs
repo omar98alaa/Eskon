@@ -47,14 +47,14 @@ namespace Eskon.API
 
             #region JWT Settings
             var jwtSettings = new JwtSettings();
-            builder.Configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
+            builder.Configuration.GetRequiredSection(nameof(jwtSettings)).Bind(jwtSettings);
             builder.Services.AddSingleton(jwtSettings);
             #endregion
 
 
             #region Stripe Settings
             var stripeSettings = new StripeSettings();
-            builder.Configuration.GetSection(nameof(stripeSettings)).Bind(stripeSettings);
+            builder.Configuration.GetRequiredSection(nameof(stripeSettings)).Bind(stripeSettings);
             builder.Services.AddSingleton(stripeSettings);
             #endregion
 
@@ -119,6 +119,18 @@ namespace Eskon.API
                       }
                   };
               });
+            #endregion
+
+
+            #region FluentEmail Configuration
+            builder.Services
+                .AddFluentEmail(builder.Configuration.GetRequiredSection("MailGun")["FromEmail"])
+                .AddRazorRenderer()
+                .AddMailGunSender(
+                    builder.Configuration.GetRequiredSection("MailGun")["Domain"],
+                    builder.Configuration.GetRequiredSection("MailGun")["API_KEY"],
+                    FluentEmail.Mailgun.MailGunRegion.USA
+                );
             #endregion
 
 
