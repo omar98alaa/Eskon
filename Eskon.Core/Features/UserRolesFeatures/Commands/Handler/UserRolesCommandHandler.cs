@@ -152,8 +152,10 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
             //
             await _mediator.Send(new SendNotificationCommand(
                 ReceiverId: user.Id,
-                Content: "You are now admin.",
-                NotificationTypeName: "AdminPromotion"
+                Content: "You have been promoted to admin.",
+                NotificationTypeName: "Admin Promotion",
+                RedirectionId: user.Id,
+                RedirectionName: user.UserName
             ), cancellationToken);
 
 
@@ -187,12 +189,14 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
             }
 
             ///
-            //notification for admin that he is not adnmin any more
+            //notification for admin that he is not admin any more
             //
             await _mediator.Send(new SendNotificationCommand(
                 ReceiverId: user.Id,
-                Content: "You are no longer admin.",
-                NotificationTypeName: "AdminRemoval"
+                Content: "You have been removed from admin role.",
+                NotificationTypeName: "Admin Removal",
+                RedirectionId: user.Id,
+                RedirectionName: user.UserName
             ), cancellationToken);
 
             return Success("User admin role deleted, new access token issued.");

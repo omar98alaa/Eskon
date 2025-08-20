@@ -7,6 +7,7 @@ using Eskon.Core.Mapping.FavouriteMapping;
 using Eskon.Core.Mapping.Properties;
 using Eskon.Core.Mapping.ReviewMapping;
 using Eskon.Core.Mapping.Users;
+using Eskon.Domian.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -25,7 +26,7 @@ namespace Eskon.Core
             services.AddAutoMapper(conf => conf.AddProfile<BookingMappings>());
             services.AddAutoMapper(conf => conf.AddProfile<FavouriteMapping>());
             services.AddAutoMapper(conf => conf.AddProfile<ReviewMappings>());
-            services.AddAutoMapper(conf => conf.AddProfile<NotificationProfile>());
+            services.AddAutoMapper(conf => conf.AddProfile<NotificationMapping>());
             return services;
         }
     }

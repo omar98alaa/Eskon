@@ -1,10 +1,10 @@
-﻿
-using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.Models;
+﻿using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Entities;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
 using Eskon.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Eskon.Domian.Models;
 
 namespace Eskon.Infrastructure.Repositories
 {

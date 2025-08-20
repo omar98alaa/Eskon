@@ -9,6 +9,6 @@ using System.Threading.Tasks;
 
 namespace Eskon.Core.Features.NotificationFeatures.Commands.Command
 {
-    public record SendNotificationCommand(Guid ReceiverId, string Content, string NotificationTypeName) : IRequest<NotificationDto?>;
+    public record SendNotificationCommand(Guid ReceiverId, string Content, string NotificationTypeName,Guid RedirectionId, string RedirectionName) : IRequest<NotificationDto?>;
 
 }

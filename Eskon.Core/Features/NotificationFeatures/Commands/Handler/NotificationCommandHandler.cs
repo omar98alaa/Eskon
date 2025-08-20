@@ -6,6 +6,7 @@ using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 using Eskon.Core.Response;
+using Eskon.Domian.Entities;
 
 namespace Eskon.Core.Features.NotificationFeatures.Commands.Handler
 {
@@ -24,7 +25,7 @@ namespace Eskon.Core.Features.NotificationFeatures.Commands.Handler
         }
         public async Task<NotificationDto?> Handle(SendNotificationCommand request, CancellationToken cancellationToken)
         {
-            Console.WriteLine("[send command acrivate]");
+
             var type = await _serviceUnitOfWork.NotificationTypeService.GetNotificationTypeByNameAsync(request.NotificationTypeName);
             Console.WriteLine("[send command n type]" + type);
             if (type == null)
@@ -43,8 +44,8 @@ namespace Eskon.Core.Features.NotificationFeatures.Commands.Handler
             await _serviceUnitOfWork.NotificationService.AddNewNotificationAsync(notification);
             await _serviceUnitOfWork.SaveChangesAsync();
 
-            // سجل رسالة Outbox بدلاً من الإرسال المباشر
-            var outboxMessage = new Eskon.Domian.Entities.NotificationOutboxMessage
+
+            var outboxMessage = new NotificationOutboxMessage
             {
                 Payload = System.Text.Json.JsonSerializer.Serialize(new {
                     NotificationId = notification.Id,

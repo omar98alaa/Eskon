@@ -1,5 +1,6 @@
 using Eskon.API.Hubs;
 using Eskon.Core;
+using Eskon.Domian.Entities;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Stripe;
 using Eskon.Infrastructure;
@@ -140,7 +141,7 @@ namespace Eskon.API
 
                 // Seeding the Notification Types
                 var dbContext = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-                await Eskon.Domian.Entities.NotificationTypeSeeder.SeedAsync(dbContext);
+                await NotificationTypeSeeder.SeedAsync(dbContext);
             }
 
             app.UseRouting();

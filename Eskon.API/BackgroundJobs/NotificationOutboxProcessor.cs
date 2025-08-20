@@ -1,4 +1,5 @@
 using Eskon.API.Hubs;
+using Eskon.Domian.DTOs.Notification;
 using Eskon.Domian.Entities;
 using Eskon.Service.UnitOfWork;
 using Microsoft.AspNetCore.SignalR;
@@ -37,19 +38,22 @@ namespace Eskon.API.BackgroundJobs
                         {
                             try
                             {
-                                var payload = JsonSerializer.Deserialize<NotificationPayload>(msg.Payload);
-                                // Send via SignalR
-                                await _hubContext.Clients.User(payload.ReceiverId.ToString())
-                                    .SendAsync("ReceiveNotification", new
-                                    {
-                                        id = payload.NotificationId,
-                                        content = payload.Content,
-                                        isRead = false,
-                                        createdAt = payload.CreatedAt,
-                                        notificationTypeName = payload.NotificationTypeName
-                                    }, stoppingToken);
-                                await unitOfWork.NotificationOutboxService.UpdateStatusAsync(msg.Id, "Sent");
-                                await unitOfWork.SaveChangesAsync();
+                                var payload = JsonSerializer.Deserialize<NotificationDto>(msg.Payload);
+                               if(payload != null)
+                                {
+                                    // Send via SignalR
+                                    await _hubContext.Clients.User(payload.ReceiverId.ToString())
+                                        .SendAsync("ReceiveNotification", new
+                                        {
+                                            id = payload.Id,
+                                            content = payload.Content,
+                                            isRead = payload.IsRead,
+                                            createdAt = payload.CreatedAt,
+                                            notificationTypeName = payload.NotificationTypeName
+                                        }, stoppingToken);
+                                    await unitOfWork.NotificationOutboxService.UpdateStatusAsync(msg.Id, "Sent");
+                                    await unitOfWork.SaveChangesAsync();
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -64,17 +68,8 @@ namespace Eskon.API.BackgroundJobs
                 {
                     _logger.LogError(ex, "Error in NotificationOutboxProcessor loop");
                 }
-                await Task.Delay(5000, stoppingToken); // 5 seconds
+                await Task.Delay(5000, stoppingToken); 
             }
-        }
-
-        private class NotificationPayload
-        {
-            public Guid NotificationId { get; set; }
-            public Guid ReceiverId { get; set; }
-            public string Content { get; set; }
-            public string NotificationTypeName { get; set; }
-            public DateTime CreatedAt { get; set; }
         }
     }
 } 

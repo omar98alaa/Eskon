@@ -1,8 +1,10 @@
-﻿using Eskon.Core.Features.StripeFeatures.Commands.Command;
+﻿using Eskon.Core.Features.NotificationFeatures.Commands.Command;
+using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
+using MediatR;
 using Stripe.Checkout;
 using System.ComponentModel.DataAnnotations;
 
@@ -12,12 +14,14 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
     {
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
+        private readonly IMediator _mediator;
         #endregion
 
         #region Constructors
-        public StripeCommandHandler(IServiceUnitOfWork serviceUnitOfWork)
+        public StripeCommandHandler(IServiceUnitOfWork serviceUnitOfWork, IMediator mediator)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
+            _mediator = mediator;
         }
         #endregion
 
@@ -122,6 +126,17 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
             await _serviceUnitOfWork.PaymentService.AddPaymentAsync(payment);
             await _serviceUnitOfWork.SaveChangesAsync();
 
+            //
+            // Payment Success notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: userBooking.CustomerId,
+                Content: $"Your payment for booking '{userBooking.Property.Title}' was successful.",
+                NotificationTypeName: "Payment Success",
+                RedirectionId: userBooking.Id,
+                RedirectionName: "NotDefiend"
+            ), cancellationToken);
+
             return Success(checkoutSession.Url);
         }
         #endregion
@@ -130,7 +145,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
         public async Task<Response<string>> Handle(CreateStripePaymentRefundCommand request, CancellationToken cancellationToken)
         {
             var booking = await _serviceUnitOfWork.BookingService.GetBookingById(request.BookingId);
-            
+
             if (booking == null)
             {
                 return NotFound<string>("Booking does not exist");
@@ -155,6 +170,18 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
 
             if (booking.Payment.MaximumRefundDate < today)
             {
+
+                //
+                // Refund Notification
+                //
+                await _mediator.Send(new SendNotificationCommand(
+                    ReceiverId: booking.CustomerId,
+                    Content: $"Booking cannot be refunded for property '{booking.Property.Title}, maximum refund date passed'.",
+                    NotificationTypeName: "Refund Canceled",
+                    RedirectionId: booking.Property.Id,
+                    RedirectionName: "NotDefiend"
+                ), cancellationToken);
+
                 return BadRequest<string>("Booking cannot be refunded, maximum refund date passed");
             }
 
@@ -164,6 +191,18 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
             }
 
             _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment);
+
+            //
+            // Refund Notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: booking.CustomerId,
+                Content: $"A refund has been issued for property '{booking.Property.Title}'.",
+                NotificationTypeName: "Refund Issued",
+                RedirectionId: booking.Property.Id,
+                RedirectionName: "NotDefiend"
+            ), cancellationToken);
+
             return Success("Refund request is created...");
         }
         #endregion

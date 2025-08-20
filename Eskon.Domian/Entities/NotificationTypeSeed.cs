@@ -9,29 +9,30 @@ namespace Eskon.Domian.Entities
         {
             string[] notificationTypes =
             {
-                "AdminPromotion",
-                "AdminRemoval",
+                "Admin Promotion",
+                "Admin Removal",
 
                 // Booking
-                "BookingCreated",
-                "BookingAccepted",
-                "BookingRejected",
-                "BookingCancelled",
-                "BookingUpdated",
+                "Booking Created",
+                "Booking Accepted",
+                "Booking Rejected",
+                "Booking Cancelled",
+                "Booking Updated",
 
                 // Property
-                "PropertyCreated",
-                "PropertyAccepted",
-                "PropertyRejected",
+                "Property Created",
+                "Property Accepted",
+                "Property Rejected",
 
                 // Payment
-                "PaymentSuccess",
-                "PaymentFailed",
-                "RefundIssued",
-                "PaymentPending",
+                "Payment Success",
+                "Payment Failed",
+                "Refund Issued",
+                "Refund Canceled",
+                "Payment Pending",
 
                 // Review
-                "ReviewReceived"
+                "Review Received"
             };
 
             foreach (var typeName in notificationTypes)

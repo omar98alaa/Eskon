@@ -4,9 +4,9 @@ using Eskon.Domian.Models;
 
 namespace Eskon.Core.Mapping
 {
-    public class NotificationProfile : Profile
+    public class NotificationMapping  : Profile
     {
-        public NotificationProfile()
+        public NotificationMapping ()
         {
             CreateMap<Notification, NotificationDto>()
                 .ForMember(dest => dest.NotificationTypeName, opt => opt.MapFrom(src => src.NotificationType != null ? src.NotificationType.Name : null))

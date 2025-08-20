@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using Eskon.Core.Features.NotificationFeatures.Commands.Command;
 using Eskon.Core.Features.ReviewFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.ReviewDTOs;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
+using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Eskon.Core.Features.ReviewFeatures.Commands.Handler
 {
@@ -12,13 +15,15 @@ namespace Eskon.Core.Features.ReviewFeatures.Commands.Handler
         #region Fields
         private readonly IMapper _mapper;
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
+        private readonly IMediator _mediator;
         #endregion
 
         #region Constructors
-        public ReviewCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork)
+        public ReviewCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IMediator mediator)
         {
             _mapper = mapper;
             _serviceUnitOfWork = serviceUnitOfWork;
+            _mediator = mediator; ;
         }
         #endregion
 
@@ -58,6 +63,17 @@ namespace Eskon.Core.Features.ReviewFeatures.Commands.Handler
             await _serviceUnitOfWork.ReviewService.CreatePropertyReviewAsync(review);
             await _serviceUnitOfWork.PropertyService.UpdatePropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
+
+            //
+            // Review Received notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: property.OwnerId,
+                Content: $"You have received a new review for your property '{property.Title}'.",
+                NotificationTypeName: "Review Received",
+                RedirectionId: property.Id,
+                RedirectionName: property.Title
+            ), cancellationToken);
 
             var reviewReadDTO = _mapper.Map<ReviewReadDTO>(review);
 

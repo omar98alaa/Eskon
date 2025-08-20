@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using Eskon.Core.Features.NotificationFeatures.Commands.Command;
 using Eskon.Core.Features.PropertyFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.Property;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -16,13 +18,15 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
         private readonly UserManager<User> _userManager;
         #endregion
-        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager)
+        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, IMediator mediator)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _mediator = mediator;
         }
 
         public async Task<Response<PropertyDetailsDTO>> Handle(AddPropertyCommand request, CancellationToken cancellationToken)
@@ -52,13 +56,17 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
                 return NotFound<PropertyDetailsDTO>("One or more images were not found");
             }
 
-            var propertyType = await _serviceUnitOfWork.PropertyTypeService.GetPropertyTypesByIdAsync(request.PropertyWriteDTO.PropertyTypeId);
-            if (propertyType == null)
+            //var propertyType = await _serviceUnitOfWork.PropertyTypeService.GetPropertyTypesByIdAsync(request.PropertyWriteDTO.PropertyTypeId);
+            //if (propertyType == null)
+            //{
+            //    return NotFound<PropertyDetailsDTO>("Property type Not Found");
+            //}
+
+            var defaultPropertyType = new PropertyType
             {
-                return NotFound<PropertyDetailsDTO>("Property type Not Found");
-            }
-
-
+                Id = Guid.NewGuid(),
+                Name = "type3"+ DateTime.Now.Ticks
+            };
             // Assign an admin randomly
             List<User> AdminUsers = (await _userManager.GetUsersInRoleAsync("Admin")).ToList();
             Random random = new Random();
@@ -71,13 +79,25 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             property.Owner = await _userManager.FindByIdAsync(request.ownerId.ToString());
             property.AssignedAdminId = Admin.Id;
             property.Images = images;
-            property.PropertyType = propertyType;
+            property.PropertyType = defaultPropertyType;
 
             await _serviceUnitOfWork.PropertyService.AddPropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
 
             PropertyDetailsDTO propertyDetails = _mapper.Map<PropertyDetailsDTO>(property);
+
             
+            //
+            // Property Created notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: property.AssignedAdminId,
+                Content: $"A new property '{property.Title}' has been assigned to you.",
+                NotificationTypeName: "Property Created",
+                RedirectionId: property.Id,
+                RedirectionName: property.Title
+            ), cancellationToken);
+
             return Created(propertyDetails);
         }
 
@@ -100,6 +120,15 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
 
             await _serviceUnitOfWork.SaveChangesAsync();
 
+            // Property Accepted notification
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: property.OwnerId,
+                Content: $"Your property '{property.Title}' has been accepted.",
+                NotificationTypeName: "Property Accepted",
+                RedirectionId: property.Id,
+                RedirectionName: property.Title
+            ), cancellationToken);
+
             return Success<string>($"Property With Id {property.Id} Accepted", $"{property.Id} Accepted");
         }
 
@@ -120,6 +149,17 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             // Set RejectionMessage and save chanes
             await _serviceUnitOfWork.PropertyService.SetRejectionMessageAsync(property, request.rejectionMessage);
             await _serviceUnitOfWork.SaveChangesAsync();
+
+            //
+            // Property Rejected notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: property.OwnerId,
+                Content: $"Your property '{property.Title}' has been rejected.",
+                NotificationTypeName: "Property Rejected",
+                RedirectionId: property.Id,
+                RedirectionName: property.Title
+            ), cancellationToken);
             return Success<string>(string.Empty, request.rejectionMessage);
         }
 

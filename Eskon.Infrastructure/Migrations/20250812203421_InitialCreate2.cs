@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace Eskon.Infrastructure.Migrations
+namespace Askon.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class PropertyTimesRated : Migration
+    public partial class InitialCreate2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

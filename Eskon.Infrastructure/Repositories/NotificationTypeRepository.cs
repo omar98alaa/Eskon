@@ -1,4 +1,5 @@
-﻿using Eskon.Domian.Models;
+﻿using Eskon.Domian.Entities;
+using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
 using Eskon.Infrastructure.Interfaces;
