@@ -21,6 +21,7 @@ namespace Eskon.Infrastructure.UnitOfWork
         public IReviewRepository ReviewRepository { get; }
         public ITicketRepository TicketRepository { get; }
         public IUserRepository UserRepository { get; }
+        public IDashboardRepository DashboardRepository { get; }
         #endregion
 
         #region Methods

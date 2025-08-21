@@ -40,6 +40,8 @@ namespace Eskon.Infrastructure.UnitOfWork
         private ITicketRepository ticketRepository;
 
         private IUserRepository userRepository;
+
+        private IDashboardRepository dashboardRepository;
         #endregion
 
         #region Properties
@@ -74,6 +76,8 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ITicketRepository TicketRepository => ticketRepository == null ? new TicketRepository(context) : ticketRepository;
 
         public IUserRepository UserRepository => userRepository == null ? new UserRepository(context) : userRepository;
+
+        public IDashboardRepository DashboardRepository => dashboardRepository==null? new DashboardRepository(context): dashboardRepository;
         #endregion
 
         #region Constructors

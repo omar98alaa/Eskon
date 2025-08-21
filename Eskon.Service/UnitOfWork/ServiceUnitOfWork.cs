@@ -55,6 +55,8 @@ namespace Eskon.Service.UnitOfWork
         private ITicketService ticketService;
 
         private IUserService userService;
+
+        private IDashboardService dashboardService;
         #endregion
 
         #region Properties
@@ -95,6 +97,8 @@ namespace Eskon.Service.UnitOfWork
         public ITicketService TicketService => ticketService == null ? new TicketService(repositoryUnitOfWork.TicketRepository) : ticketService;
 
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
+
+        public IDashboardService DashboardService => dashboardService == null? new DashboardService(repositoryUnitOfWork.DashboardRepository):dashboardService;
         #endregion
 
 

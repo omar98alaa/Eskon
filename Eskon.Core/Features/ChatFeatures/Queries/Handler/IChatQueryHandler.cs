@@ -6,5 +6,6 @@ using MediatR;
 namespace Eskon.Core.Features.ChatFeatures.Queries.Handler
 {
     interface IChatQueryHandler : IRequestHandler<GetMessagesPerChatQuery, Response<List<ChatMessageDto>>>,
-                                  IRequestHandler<GetUserConversationsQuery, Response<List<ConversationDto>>>;
+                                  IRequestHandler<GetUserConversationsQuery, Response<List<ConversationDto>>>,
+                                  IRequestHandler<GetLastReceivedMessageQuery, Response<ChatMessageDto>>;
 }

@@ -11,7 +11,7 @@ namespace Eskon.Domian.Models
         public string Content { get; set; }
        //addthis
         public bool IsRead { get; set; } = false;
-        public DateTime ReadAt { get; set; }
+        public DateTime ReadAt { get; set;}
 
         //
         //  Navigation Properties

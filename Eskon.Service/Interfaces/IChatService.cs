@@ -10,6 +10,5 @@ namespace Eskon.Service.Interfaces
         Task<List<Chat>> GetAllUserChatsAsync(User user);
         Task<bool> ChatExistsAsync(User user1, User user2);
         Task<Chat?> GetChatBetweenUsersAsync(User user1, User user2);
-        public Task MarkMessagesAsRead(Chat chat);
     }
 }

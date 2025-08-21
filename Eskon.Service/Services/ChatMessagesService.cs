@@ -1,7 +1,5 @@
-﻿using Eskon.Domian.DTOs.Chat;
-using Eskon.Domian.Models;
+﻿using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
-using Eskon.Infrastructure.Repositories;
 using Eskon.Service.Interfaces;
 
 namespace Eskon.Service.Services
@@ -34,6 +32,26 @@ namespace Eskon.Service.Services
         {
             await _chatMessageRepository.SoftDeleteAsync(chatMessage);
         }
+        public async Task MarkMessagesAsRead(Chat chat, Guid userId)
+        {
+            var messagesToMark = chat.ChatMessages
+                .Where(m => m.SenderId != userId && !m.IsRead)
+                .ToList();
+
+            foreach (var message in messagesToMark)
+            {
+                message.IsRead = true;
+                message.ReadAt = DateTime.UtcNow;
+                await _chatMessageRepository.UpdateAsync(message);
+            }
+
+        }
+
+        public async Task<ChatMessage?> GetlastMessagesAsync(Guid chat, Guid userId)
+        {
+        return await _chatMessageRepository.GetLastMessageAsync(chat, userId);
+        }
+
     }
 
 }

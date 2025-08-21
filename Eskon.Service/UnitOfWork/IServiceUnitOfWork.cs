@@ -25,6 +25,7 @@ namespace Eskon.Service.UnitOfWork
         public IUserService UserService { get; }
 
         public IStripeService StripeService { get; }
+        public IDashboardService DashboardService { get; }
         #endregion
 
         #region Methods
