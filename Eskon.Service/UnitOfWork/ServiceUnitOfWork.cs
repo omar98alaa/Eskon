@@ -56,7 +56,6 @@ namespace Eskon.Service.UnitOfWork
 
         private IUserService userService;
 
-        private IDashboardService dashboardService;
         #endregion
 
         #region Properties
@@ -98,7 +97,6 @@ namespace Eskon.Service.UnitOfWork
 
         public IUserService UserService => userService == null? new UserService(repositoryUnitOfWork.UserRepository) : userService;
 
-        public IDashboardService DashboardService => dashboardService == null? new DashboardService(repositoryUnitOfWork):dashboardService;
         #endregion
 
 
