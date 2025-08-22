@@ -20,6 +20,7 @@ namespace Eskon.Service.Interfaces
         public Task<List<Property>> GetPropertiesbyRatingAsync(decimal Rating);
 
         public Task<List<Property>> GetPropertiesbyPriceRangAsync(decimal minPricePerNight, decimal maxPricePerNight);
+        public Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin);
         #endregion
         #region Add
         public Task<Property> AddPropertyAsync(Property property);

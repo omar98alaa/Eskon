@@ -151,6 +151,11 @@ namespace Eskon.Service.Services
             await propertyRepository.UpdateAsync(property);
         }
 
+        public async Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin)
+        {
+            return await propertyRepository.GetAllPendingPropertiesCountPerAdminAsync(assignedAdmin);
+        }
+        
         public async Task<int> CountPropertiesAsync()
         {
             return await propertyRepository.CountPropertiesAsync();

@@ -6,9 +6,10 @@ namespace Eskon.Infrastructure.Interfaces
     public interface IBookingRepository : IGenericRepositoryAsync<Booking>
     {
         public Task<bool> CheckBookingExists(Booking booking);
-        Task<int> CountBookingsAsync();
-        Task<int> CountAcceptedBookingsAsync();
-        Task<int> CountPendingBookingsAsync();
-        Task<Dictionary<string, int>> GetBookingsByStatusAsync();
+        public Task<int> GetPendingBookingsCountPerOwnerAsync(Guid OwnerId);
+        public Task<int> CountBookingsAsync();
+        public Task<int> CountAcceptedBookingsAsync();
+        public Task<int> CountPendingBookingsAsync();
+        public Task<Dictionary<string, int>> GetBookingsByStatusAsync();
     }
 }

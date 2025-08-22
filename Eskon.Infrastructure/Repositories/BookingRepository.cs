@@ -29,6 +29,12 @@ namespace Eskon.Infrastructure.Repositories
                 b.PropertyId == booking.PropertyId
             );
         }
+        
+        public async Task<int> GetPendingBookingsCountPerOwnerAsync(Guid OwnerId)
+        {
+            return await _bookingDbSet.Where(b => b.IsPending == true && b.Property.OwnerId == OwnerId).CountAsync();
+        }
+        
         public Task<int> CountBookingsAsync()
         {
             return _bookingDbSet.CountAsync();
@@ -51,7 +57,6 @@ namespace Eskon.Infrastructure.Repositories
                 .Select(g => new { Status = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Status, x => x.Count);
         }
-    }
         #endregion
-    
+    }   
 }

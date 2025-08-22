@@ -5,12 +5,12 @@ namespace Eskon.Infrastructure.Interfaces
 {
     public interface IPropertyRepository : IGenericRepositoryAsync<Property>
     {
-        Task<int> CountPropertiesAsync();
-        Task<int> CountPendingPropertiesAsync();
-        Task<int> CountAcceptedPropertiesAsync();
-        Task<int> CountRejectedPropertiesAsync();
-        Task<Dictionary<string, int>> GetPropertiesByTypeAsync();
-        Task<Dictionary<string, int>> GetPropertiesByStatusAsync();
-
+        public Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin);
+        public Task<int> CountPropertiesAsync();
+        public Task<int> CountPendingPropertiesAsync();
+        public Task<int> CountAcceptedPropertiesAsync();
+        public Task<int> CountRejectedPropertiesAsync();
+        public Task<Dictionary<string, int>> GetPropertiesByTypeAsync();
+        public Task<Dictionary<string, int>> GetPropertiesByStatusAsync();
     }
 }

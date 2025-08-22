@@ -71,6 +71,11 @@ namespace Eskon.Service.Services
             await _bookingRepository.DeleteAsync(booking);
         }
 
+        public async Task RemoveBookingRangeAsync(List<Booking> bookings)
+        {
+            await _bookingRepository.DeleteRangeAsync(bookings);
+        }
+
         public async Task<Booking> GetBookingById(Guid Id)
         {
             return await _bookingRepository.GetByIdAsync(Id);
@@ -178,6 +183,19 @@ namespace Eskon.Service.Services
             return await _bookingRepository.CheckBookingExists(newBooking);
         }
 
+        public async Task<List<Booking>> GetUnpaidPassedAcceptedDateBookingsAsync()
+        {
+            var dateNow = DateOnly.FromDateTime(DateTime.UtcNow);
+            return await _bookingRepository.GetFilteredAsync(
+                   b => b.IsPayed == false && 
+                        b.StartDate.AddDays(-1) <= dateNow);
+        }
+
+        public async Task<int> GetPendingBookingsCountPerOwnerAsync(Guid OwnerId)
+        {
+            return await _bookingRepository.GetPendingBookingsCountPerOwnerAsync(OwnerId);
+        }
+        
         public async Task<int> CountBookingsAsync()
         {
             return await _bookingRepository.CountBookingsAsync();
