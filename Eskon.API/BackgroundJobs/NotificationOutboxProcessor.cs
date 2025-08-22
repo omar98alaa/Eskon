@@ -68,7 +68,7 @@ namespace Eskon.API.BackgroundJobs
                 {
                     _logger.LogError(ex, "Error in NotificationOutboxProcessor loop");
                 }
-                await Task.Delay(5000, stoppingToken); 
+                await Task.Delay(1000, stoppingToken); 
             }
         }
     }
