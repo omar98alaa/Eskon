@@ -20,25 +20,25 @@ namespace Eskon.Core.Features.Dashboard.Queries.Handler
             {
                 KPIs = new KpiDto
                 {
-                    TotalCustomers = await _unitOfWork.DashboardRepository.CountUsersByRoleAsync("Customer"),
-                    TotalOwners = await _unitOfWork.DashboardRepository.CountUsersByRoleAsync("Owner"),
-                    TotalAdmins = await _unitOfWork.DashboardRepository.CountUsersByRoleAsync("Admin"),
+                    TotalCustomers = await _unitOfWork.UserRepository.CountUsersByRoleAsync("Customer"),
+                    TotalOwners = await _unitOfWork.UserRepository.CountUsersByRoleAsync("Owner"),
+                    TotalAdmins = await _unitOfWork.UserRepository.CountUsersByRoleAsync("Admin"),
 
-                    TotalProperties = await _unitOfWork.DashboardRepository.CountPropertiesAsync(),
-                    PendingProperties = await _unitOfWork.DashboardRepository.CountPendingPropertiesAsync(),
-                    AcceptedProperties = await _unitOfWork.DashboardRepository.CountAcceptedPropertiesAsync(),
-                    RejectedProperties = await _unitOfWork.DashboardRepository.CountRejectedPropertiesAsync(),
+                    TotalProperties = await _unitOfWork.PropertyRepository.CountPropertiesAsync(),
+                    PendingProperties = await _unitOfWork.PropertyRepository.CountPendingPropertiesAsync(),
+                    AcceptedProperties = await _unitOfWork.PropertyRepository.CountAcceptedPropertiesAsync(),
+                    RejectedProperties = await _unitOfWork.PropertyRepository.CountRejectedPropertiesAsync(),
 
-                    TotalBookings = await _unitOfWork.DashboardRepository.CountBookingsAsync(),
-                    AcceptedBookings = await _unitOfWork.DashboardRepository.CountAcceptedBookingsAsync(),
-                    PendingBookings = await _unitOfWork.DashboardRepository.CountPendingBookingsAsync()
+                    TotalBookings = await _unitOfWork.BookingRepository.CountBookingsAsync(),
+                    AcceptedBookings = await _unitOfWork.BookingRepository.CountAcceptedBookingsAsync(),
+                    PendingBookings = await _unitOfWork.BookingRepository.CountPendingBookingsAsync()
                 },
                 Charts = new ChartDto
                 {
-                    PropertiesByType = await _unitOfWork.DashboardRepository.GetPropertiesByTypeAsync(),
-                    RevenueByMonth = await _unitOfWork.DashboardRepository.GetRevenueByMonthAsync(),
-                    BookingsByStatus = await _unitOfWork.DashboardRepository.GetBookingsByStatusAsync(),
-                    PropertiesByStatus = await _unitOfWork.DashboardRepository.GetPropertiesByStatusAsync()
+                    PropertiesByType = await _unitOfWork.PropertyRepository.GetPropertiesByTypeAsync(),
+                    RevenueByMonth = await _unitOfWork.PaymentRepository.GetRevenueByMonthAsync(),
+                    BookingsByStatus = await _unitOfWork.BookingRepository.GetBookingsByStatusAsync(),
+                    PropertiesByStatus = await _unitOfWork.PropertyRepository.GetPropertiesByStatusAsync()
 
 
                 }

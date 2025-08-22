@@ -42,6 +42,11 @@ namespace Eskon.Infrastructure.Repositories
         {
             return await _userDbSet.FirstOrDefaultAsync(s => s.stripeAccountId == stripeAccountId);
         }
+        public Task<int> CountUsersByRoleAsync(string role)
+        {
+            return _userDbSet
+                .CountAsync(u => u.UserRoles.Any(ur => ur.Role.Name == role));
+        }
         #endregion
     }
 }

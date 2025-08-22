@@ -13,5 +13,8 @@ namespace Eskon.Service.Interfaces
         Task<int> CountPendingPropertiesAsync();
         Task<Dictionary<string, int>> GetPropertiesByTypeAsync();
         Task<Dictionary<string, decimal>> GetRevenueByMonthAsync();
+        Task<int> CountAcceptedBookingsAsync();
+        Task<int> CountPendingBookingsAsync();
+        Task<Dictionary<string, int>> GetBookingsByStatusAsync();
     }
 }

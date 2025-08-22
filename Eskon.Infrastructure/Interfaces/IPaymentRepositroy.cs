@@ -8,5 +8,6 @@ namespace Eskon.Infrastructure.Interfaces
     {
         public Task<Payment?> GetPaymentByChargedId(string chargedId);
         public Task<Payment?> GetPaymentByBookingIdAsync(Guid bookingId);
+        Task<Dictionary<string, decimal>> GetRevenueByMonthAsync();
     }
 }
