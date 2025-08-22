@@ -47,6 +47,10 @@ namespace Eskon.Service.Interfaces
         public Task SoftRemoveBookingAsync(Booking booking);
         public Task RemoveBookingAsync(Booking booking);
         #endregion
+        Task<int> CountBookingsAsync();
+        Task<int> CountAcceptedBookingsAsync();
+        Task<int> CountPendingBookingsAsync();
+        Task<Dictionary<string, int>> GetBookingsByStatusAsync();
     }
 
 }

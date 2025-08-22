@@ -25,6 +25,7 @@ namespace Eskon.Service.Interfaces
         public Task SetPaymentAsRefunded(Payment payment);
 
         #endregion
+        Task<Dictionary<string, decimal>> GetRevenueByMonthAsync();
 
     }
 }

@@ -2,14 +2,15 @@
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.Dashboard;
 using Eskon.Infrastructure.UnitOfWork;
+using Eskon.Service.UnitOfWork;
 
 namespace Eskon.Core.Features.Dashboard.Queries.Handler
 {
     public class GetDashboardStatsQueryHandler : ResponseHandler, IGetDashboardStatsQueryHandler
     {
-        private readonly IRepositoryUnitOfWork _unitOfWork;
+        private readonly IServiceUnitOfWork _unitOfWork;
 
-        public GetDashboardStatsQueryHandler(IRepositoryUnitOfWork unitOfWork)
+        public GetDashboardStatsQueryHandler(IServiceUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -20,25 +21,25 @@ namespace Eskon.Core.Features.Dashboard.Queries.Handler
             {
                 KPIs = new KpiDto
                 {
-                    TotalCustomers = await _unitOfWork.UserRepository.CountUsersByRoleAsync("Customer"),
-                    TotalOwners = await _unitOfWork.UserRepository.CountUsersByRoleAsync("Owner"),
-                    TotalAdmins = await _unitOfWork.UserRepository.CountUsersByRoleAsync("Admin"),
+                    TotalCustomers = await _unitOfWork.UserService.CountUsersByRoleAsync("Customer"),
+                    TotalOwners = await _unitOfWork.UserService.CountUsersByRoleAsync("Owner"),
+                    TotalAdmins = await _unitOfWork.UserService.CountUsersByRoleAsync("Admin"),
 
-                    TotalProperties = await _unitOfWork.PropertyRepository.CountPropertiesAsync(),
-                    PendingProperties = await _unitOfWork.PropertyRepository.CountPendingPropertiesAsync(),
-                    AcceptedProperties = await _unitOfWork.PropertyRepository.CountAcceptedPropertiesAsync(),
-                    RejectedProperties = await _unitOfWork.PropertyRepository.CountRejectedPropertiesAsync(),
+                    TotalProperties = await _unitOfWork.PropertyService.CountPropertiesAsync(),
+                    PendingProperties = await _unitOfWork.PropertyService.CountPendingPropertiesAsync(),
+                    AcceptedProperties = await _unitOfWork.PropertyService.CountAcceptedPropertiesAsync(),
+                    RejectedProperties = await _unitOfWork.PropertyService.CountRejectedPropertiesAsync(),
 
-                    TotalBookings = await _unitOfWork.BookingRepository.CountBookingsAsync(),
-                    AcceptedBookings = await _unitOfWork.BookingRepository.CountAcceptedBookingsAsync(),
-                    PendingBookings = await _unitOfWork.BookingRepository.CountPendingBookingsAsync()
+                    TotalBookings = await _unitOfWork.BookingService.CountBookingsAsync(),
+                    AcceptedBookings = await _unitOfWork.BookingService.CountAcceptedBookingsAsync(),
+                    PendingBookings = await _unitOfWork.BookingService.CountPendingBookingsAsync()
                 },
                 Charts = new ChartDto
                 {
-                    PropertiesByType = await _unitOfWork.PropertyRepository.GetPropertiesByTypeAsync(),
-                    RevenueByMonth = await _unitOfWork.PaymentRepository.GetRevenueByMonthAsync(),
-                    BookingsByStatus = await _unitOfWork.BookingRepository.GetBookingsByStatusAsync(),
-                    PropertiesByStatus = await _unitOfWork.PropertyRepository.GetPropertiesByStatusAsync()
+                    PropertiesByType = await _unitOfWork.PropertyService.GetPropertiesByTypeAsync(),
+                    RevenueByMonth = await _unitOfWork.PaymentService.GetRevenueByMonthAsync(),
+                    BookingsByStatus = await _unitOfWork.BookingService.GetBookingsByStatusAsync(),
+                    PropertiesByStatus = await _unitOfWork.PropertyService.GetPropertiesByStatusAsync()
 
 
                 }
