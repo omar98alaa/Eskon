@@ -58,7 +58,6 @@ namespace Eskon.API
             builder.Services.AddSingleton(stripeSettings);
             #endregion
 
-
             #region Identity Configurations
             // Configure Identity Account 
             builder.Services.AddIdentityApiEndpoints<User>(options =>
@@ -77,7 +76,6 @@ namespace Eskon.API
              .AddEntityFrameworkStores<MyDbContext>()
              .AddDefaultTokenProviders();
             #endregion
-
 
             #region Authentication Configurations
             //Authorization

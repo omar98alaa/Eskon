@@ -150,5 +150,10 @@ namespace Eskon.Service.Services
             property.IsAccepted = false;
             await propertyRepository.UpdateAsync(property);
         }
+
+        public async Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin)
+        {
+            return await propertyRepository.GetAllPendingPropertiesCountPerAdminAsync(assignedAdmin);
+        }
     }
 }
