@@ -40,6 +40,7 @@ namespace Eskon.Infrastructure.UnitOfWork
         private ITicketRepository ticketRepository;
 
         private IUserRepository userRepository;
+
         #endregion
 
         #region Properties

@@ -1,4 +1,6 @@
-﻿using Eskon.Domian.DTOs.Chat;
+﻿using Askon.Infrastructure.Migrations;
+using Eskon.Domian.DTOs.Chat;
+using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
@@ -33,6 +35,12 @@ namespace Eskon.Infrastructure.Repositories
         public async Task AddMessageAsync(ChatMessage message)
         {
             await _chatMessagesDbSet.AddAsync(message);
+        }
+        public async Task<ChatMessage> GetLastMessageAsync (Guid chatId, Guid userId)
+        {
+          return   await _chatMessagesDbSet
+                .OrderByDescending(m => m.CreatedAt)
+                .FirstOrDefaultAsync();
         }
     }
 }

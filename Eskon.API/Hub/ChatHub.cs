@@ -1,4 +1,5 @@
 ﻿using Eskon.Core.Features.ChatFeatures.Commands.Command;
+using Eskon.Core.Features.ChatFeatures.Queries.Query;
 using Eskon.Domian.DTOs.Chat;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +53,43 @@ namespace Eskon.API.Hubs
 
             await Clients.User(receiverGroup).SendAsync("ReceiveMessage", messageDto);
             await Clients.User(senderGroup).SendAsync("ReceiveMessage", messageDto);
+
+        
+            var unreadCountReceiver = await _mediator.Send(new GetUserConversationsQuery(messageDto.ReceiverId));
+            var receiverConv = unreadCountReceiver.Data.FirstOrDefault(c => c.Id == messageDto.ChatId);
+            await Clients.User(receiverGroup).SendAsync("UpdateUnreadCount", receiverConv?.UnreadCount ?? 0);
+
+            await Clients.User(senderGroup).SendAsync("MessageDelivered", new
+            {
+                ChatId = messageDto.ChatId,
+                MessageId = messageDto.MessageId,
+                ReceiverId = messageDto.ReceiverId,
+                DeliveredAt = DateTime.UtcNow
+            });
+        }
+
+        public async Task MarkChatAsRead(Guid chatId)
+        {
+            var userId = GetUserIdFromAuthenticatedUserToken();
+            var command = new MarkMessagesAsReadCommand(chatId, userId);
+            await _mediator.Send(command);
+
+            var unreadCountResponse = await _mediator.Send(new GetUserConversationsQuery(userId));
+            var userConv = unreadCountResponse.Data.FirstOrDefault(c => c.Id == chatId);
+
+            await Clients.User(userId.ToString())
+                .SendAsync("UpdateUnreadCount", userConv?.UnreadCount ?? 0);
+
+            var lastReceivedMessageResponse = await _mediator.Send(
+                new GetLastReceivedMessageQuery(userId, chatId) 
+            );
+
+            var lastReceivedMessage = lastReceivedMessageResponse.Data;
+            if (lastReceivedMessage != null)
+            {
+                await Clients.User(lastReceivedMessage.SenderId.ToString())
+                    .SendAsync("MessagesSeen", chatId, userId);
+            }
         }
 
         protected Guid GetUserIdFromAuthenticatedUserToken()

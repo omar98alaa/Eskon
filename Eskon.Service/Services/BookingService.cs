@@ -195,5 +195,25 @@ namespace Eskon.Service.Services
         {
             return await _bookingRepository.GetPendingBookingsCountPerOwnerAsync(OwnerId);
         }
+        
+        public async Task<int> CountBookingsAsync()
+        {
+            return await _bookingRepository.CountBookingsAsync();
+        }
+
+        public async Task<int> CountAcceptedBookingsAsync()
+        {
+            return await _bookingRepository.CountAcceptedBookingsAsync();
+        }
+
+        public async Task<int> CountPendingBookingsAsync()
+        {
+            return await _bookingRepository.CountPendingBookingsAsync();
+        }
+
+        public async Task<Dictionary<string, int>> GetBookingsByStatusAsync()
+        {
+            return await _bookingRepository.GetBookingsByStatusAsync();
+        }
     }
 }
