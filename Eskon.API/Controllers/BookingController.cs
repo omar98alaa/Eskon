@@ -27,6 +27,7 @@ namespace Eskon.API.Controllers
         }
         #endregion
 
+
         #region POST
         #region GetCustomerBookings
         /// <summary>
@@ -36,6 +37,8 @@ namespace Eskon.API.Controllers
         /// <param name="pageNum">The page number (starting from 1).</param>
         /// <param name="itemsPerPage">The number of bookings per page.</param>
         /// <returns>A paginated list of customer bookings.</returns>
+
+        #region GET
         [Authorize]
         [HttpGet("GetCustomerBookings")]
         [ProducesResponseType(typeof(Response<Paginated<BookingReadDTO>>), StatusCodes.Status200OK)]
@@ -101,9 +104,10 @@ namespace Eskon.API.Controllers
             var ownerId = GetUserIdFromAuthenticatedUserToken();
             var query = new GetPropertyBookingsQuery(ownerId, status, pageNum, itemsPerPage);
             var bookings = await Mediator.Send(query);
-            return Ok(bookings);
+            return NewResult(bookings);
         }
         #endregion
+
 
         #region Add New Booking
         /// <summary>
@@ -116,6 +120,9 @@ namespace Eskon.API.Controllers
         /// Returns <c>404 Not Found</c> if the specified property does not exist.
         /// Returns <c>401 Unauthorized</c> if the user is not authenticated.
         /// </returns>
+
+        #region POST
+
         [Authorize]
         [HttpPost("Customer/Request")]
         [ProducesResponseType(typeof(Response<BookingReadDTO>), StatusCodes.Status201Created)]
@@ -127,7 +134,6 @@ namespace Eskon.API.Controllers
             var userId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddNewBookingCommand(userId, bookingWriteDTO));
             return NewResult(response);
-
         }
         #endregion
         #endregion
