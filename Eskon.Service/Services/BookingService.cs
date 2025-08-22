@@ -188,7 +188,7 @@ namespace Eskon.Service.Services
             var dateNow = DateOnly.FromDateTime(DateTime.UtcNow);
             return await _bookingRepository.GetFilteredAsync(
                    b => b.IsPayed == false && 
-                        b.StartDate.AddDays(-1) < dateNow);
+                        b.StartDate.AddDays(-1) <= dateNow);
         }
 
         public async Task<int> GetPendingBookingsCountPerOwnerAsync(Guid OwnerId)
