@@ -28,7 +28,7 @@ namespace Eskon.API.Controllers
         #endregion
 
 
-        #region POST
+        #region GET
         #region GetCustomerBookings
         /// <summary>
         /// Retrieves paginated bookings for the authenticated customer based on booking status.
@@ -38,7 +38,6 @@ namespace Eskon.API.Controllers
         /// <param name="itemsPerPage">The number of bookings per page.</param>
         /// <returns>A paginated list of customer bookings.</returns>
 
-        #region GET
         [Authorize]
         [HttpGet("GetCustomerBookings")]
         [ProducesResponseType(typeof(Response<Paginated<BookingReadDTO>>), StatusCodes.Status200OK)]
@@ -107,8 +106,9 @@ namespace Eskon.API.Controllers
             return NewResult(bookings);
         }
         #endregion
+        #endregion
 
-
+        #region POST
         #region Add New Booking
         /// <summary>
         /// Creates a new booking request for a property by the authenticated customer.
@@ -120,8 +120,6 @@ namespace Eskon.API.Controllers
         /// Returns <c>404 Not Found</c> if the specified property does not exist.
         /// Returns <c>401 Unauthorized</c> if the user is not authenticated.
         /// </returns>
-
-        #region POST
 
         [Authorize]
         [HttpPost("Customer/Request")]
