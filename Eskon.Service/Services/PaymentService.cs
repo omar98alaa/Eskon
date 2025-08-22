@@ -56,5 +56,10 @@ namespace Eskon.Service.Services
         {
             return await _paymentRepository.GetPaymentByBookingIdAsync(bookingId);
         }
+
+        public Task<Dictionary<string, decimal>> GetRevenueByMonthAsync()
+        {
+            return _paymentRepository.GetRevenueByMonthAsync();
+        }
     }
 }

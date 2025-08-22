@@ -4,6 +4,7 @@ using Eskon.Core.Features.NotificationFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
+using Eskon.Service.Interfaces;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -16,14 +17,16 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         private readonly IMapper _mapper;
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly IMediator _mediator;
+        private readonly IEmailService _emailService;
         #endregion
 
         #region Constructors
-        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IMediator mediator)
+        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IEmailService emailService, IMediator mediator)
         {
             _mapper = mapper;
             _mediator = mediator;
             _serviceUnitOfWork = serviceUnitOfWork;
+            _emailService = emailService;
         }
         #endregion
 
@@ -172,6 +175,16 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             }
 
             await _serviceUnitOfWork.SaveChangesAsync();
+
+            _emailService.SendEmailAsync(
+                booking.Customer.Email,
+                "ESKON: Booking request accepted",
+                $"Hello Mr.{booking.Customer.LastName}\n\n" +
+                $"Your booking request for: {booking.Property.Title}\n" +
+                $"From: {booking.StartDate} To: {booking.EndDate}\n" +
+                $"has been accepted.\n" +
+                $"Please login before {booking.StartDate.AddDays(-1)} to pay and confirm your booking or it will be automatically cancelled."
+            );
 
             //
             // Booking Accepted notification

@@ -29,6 +29,34 @@ namespace Eskon.Infrastructure.Repositories
                 b.PropertyId == booking.PropertyId
             );
         }
+        
+        public async Task<int> GetPendingBookingsCountPerOwnerAsync(Guid OwnerId)
+        {
+            return await _bookingDbSet.Where(b => b.IsPending == true && b.Property.OwnerId == OwnerId).CountAsync();
+        }
+        
+        public Task<int> CountBookingsAsync()
+        {
+            return _bookingDbSet.CountAsync();
+        }
+
+        public Task<int> CountAcceptedBookingsAsync()
+        {
+            return _bookingDbSet.CountAsync(b => b.IsAccepted == true);
+        }
+
+        public Task<int> CountPendingBookingsAsync()
+        {
+            return _bookingDbSet.CountAsync(b => b.IsAccepted == null);
+        }
+
+        public async Task<Dictionary<string, int>> GetBookingsByStatusAsync()
+        {
+            return await _bookingDbSet
+                .GroupBy(b => b.IsAccepted ? "Accepted" : (b.IsPending ? "Pending" : "Rejected"))
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Status, x => x.Count);
+        }
         #endregion
-    }
+    }   
 }

@@ -17,6 +17,7 @@ namespace Eskon.Service.Interfaces
         #endregion
         public Task<bool> SetUserStripeAccountIdAsync(Guid userId, string stripeAccountId);
 
+        Task<int> CountUsersByRoleAsync(string role);
 
 
     }

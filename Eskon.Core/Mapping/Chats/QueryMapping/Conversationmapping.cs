@@ -18,8 +18,12 @@ namespace Eskon.Core.Mapping.Chats
              (src.ChatMessages != null && src.ChatMessages.Any())
             ? src.ChatMessages.OrderByDescending(m => m.CreatedAt).First().CreatedAt
             : (DateTime?)null))
-            .ForMember(dest => dest.UnreadCount, opt => opt.MapFrom(src =>
-             (src.ChatMessages != null) ? src.ChatMessages.Count(m => !m.IsRead) : 0))
+           .ForMember(dest => dest.UnreadCount, opt => opt.MapFrom((src, dest, destMember, context) =>
+    (src.ChatMessages != null)
+        ? src.ChatMessages.Count(m => !m.IsRead && m.SenderId != (Guid)context.Items["CurrentUserId"])
+        : 0
+))
+
             .ReverseMap();
         }
     }

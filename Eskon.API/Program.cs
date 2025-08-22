@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 
 namespace Eskon.API
@@ -22,8 +24,46 @@ namespace Eskon.API
 
             // Add services to the container.
             builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Eskon API",
+                    Description = "An ASP.NET Core Web API for renting",
+                });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter your JWT token in the format: Bearer {your token}"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+
+            });
+
             builder.Services.AddDbContext<MyDbContext>(op => op.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("dev")));
             builder.Services.Configure<IdentitySeeder>(builder.Configuration.GetSection("IdentitySettings"));
             builder.Services.AddCors(options =>
@@ -48,17 +88,16 @@ namespace Eskon.API
 
             #region JWT Settings
             var jwtSettings = new JwtSettings();
-            builder.Configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
+            builder.Configuration.GetRequiredSection(nameof(jwtSettings)).Bind(jwtSettings);
             builder.Services.AddSingleton(jwtSettings);
             #endregion
 
 
             #region Stripe Settings
             var stripeSettings = new StripeSettings();
-            builder.Configuration.GetSection(nameof(stripeSettings)).Bind(stripeSettings);
+            builder.Configuration.GetRequiredSection(nameof(stripeSettings)).Bind(stripeSettings);
             builder.Services.AddSingleton(stripeSettings);
             #endregion
-
 
             #region Identity Configurations
             // Configure Identity Account 
@@ -78,7 +117,6 @@ namespace Eskon.API
              .AddEntityFrameworkStores<MyDbContext>()
              .AddDefaultTokenProviders();
             #endregion
-
 
             #region Authentication Configurations
             //Authorization
@@ -124,13 +162,33 @@ namespace Eskon.API
 
             builder.Services.AddHostedService<Eskon.API.BackgroundJobs.NotificationOutboxProcessor>();
 
+            #region FluentEmail Configuration
+            builder.Services
+                .AddFluentEmail(builder.Configuration.GetRequiredSection("MailGun")["FromEmail"])
+                .AddRazorRenderer()
+                .AddMailGunSender(
+                    builder.Configuration.GetRequiredSection("MailGun")["Domain"],
+                    builder.Configuration.GetRequiredSection("MailGun")["API_KEY"],
+                    FluentEmail.Mailgun.MailGunRegion.USA
+                );
+            #endregion
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
-                app.UseSwaggerUI(op => op.SwaggerEndpoint("/openapi/v1.json", "v1"));
+                app.UseSwagger(c =>
+                {
+                    c.RouteTemplate = "openapi/{documentName}.json";
+                });
+
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/openapi/v1.json", "My API V1");
+                    c.RoutePrefix = "swagger";
+                });
             }
 
             // Seeding the Identity Roles at the Program Start

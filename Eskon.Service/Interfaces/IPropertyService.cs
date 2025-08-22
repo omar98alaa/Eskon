@@ -20,6 +20,7 @@ namespace Eskon.Service.Interfaces
         public Task<List<Property>> GetPropertiesbyRatingAsync(decimal Rating);
 
         public Task<List<Property>> GetPropertiesbyPriceRangAsync(decimal minPricePerNight, decimal maxPricePerNight);
+        public Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin);
         #endregion
         #region Add
         public Task<Property> AddPropertyAsync(Property property);
@@ -35,5 +36,12 @@ namespace Eskon.Service.Interfaces
         #region Delete
         public Task RemovePropertyAsync(Property property);
         #endregion
+        Task<int> CountPropertiesAsync();
+        Task<int> CountPendingPropertiesAsync();
+        Task<int> CountAcceptedPropertiesAsync();
+        Task<int> CountRejectedPropertiesAsync();
+        Task<Dictionary<string, int>> GetPropertiesByTypeAsync();
+        Task<Dictionary<string, int>> GetPropertiesByStatusAsync();
+
     }
 }

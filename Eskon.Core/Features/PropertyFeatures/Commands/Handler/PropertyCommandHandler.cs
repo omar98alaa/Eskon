@@ -6,6 +6,7 @@ using Eskon.Core.Response;
 using Eskon.Domian.DTOs.Property;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
+using Eskon.Service.Interfaces;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -17,16 +18,16 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
     {
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
+        private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly UserManager<User> _userManager;
         #endregion
-        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, IMediator mediator)
+        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _mapper = mapper;
             _userManager = userManager;
-            _mediator = mediator;
         }
 
         public async Task<Response<PropertyDetailsDTO>> Handle(AddPropertyCommand request, CancellationToken cancellationToken)
@@ -120,15 +121,6 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
 
             await _serviceUnitOfWork.SaveChangesAsync();
 
-            // Property Accepted notification
-            await _mediator.Send(new SendNotificationCommand(
-                ReceiverId: property.OwnerId,
-                Content: $"Your property '{property.Title}' has been accepted.",
-                NotificationTypeName: "Property Accepted",
-                RedirectionId: property.Id,
-                RedirectionName: property.Title
-            ), cancellationToken);
-
             return Success<string>($"Property With Id {property.Id} Accepted", $"{property.Id} Accepted");
         }
 
@@ -149,17 +141,6 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             // Set RejectionMessage and save chanes
             await _serviceUnitOfWork.PropertyService.SetRejectionMessageAsync(property, request.rejectionMessage);
             await _serviceUnitOfWork.SaveChangesAsync();
-
-            //
-            // Property Rejected notification
-            //
-            await _mediator.Send(new SendNotificationCommand(
-                ReceiverId: property.OwnerId,
-                Content: $"Your property '{property.Title}' has been rejected.",
-                NotificationTypeName: "Property Rejected",
-                RedirectionId: property.Id,
-                RedirectionName: property.Title
-            ), cancellationToken);
             return Success<string>(string.Empty, request.rejectionMessage);
         }
 

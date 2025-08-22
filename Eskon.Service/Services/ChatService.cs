@@ -1,6 +1,7 @@
 ﻿using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
+using Eskon.Infrastructure.Repositories;
 using Eskon.Service.Interfaces;
 
 namespace Eskon.Service.Services
@@ -39,15 +40,8 @@ namespace Eskon.Service.Services
             return (await _chatRepository.GetFilteredAsync(c => (c.User1Id == user1.Id && c.User2Id == user2.Id) || (c.User1Id == user2.Id && c.User2Id == user1.Id))).SingleOrDefault();
         }
 
-        public async Task MarkMessagesAsRead(Chat chat)
-        {
-            foreach(var message in chat.ChatMessages)
-            {
-                message.IsRead = true;
-                message.ReadAt = DateTime.UtcNow;
-            }
 
-            await _chatRepository.UpdateAsync(chat);
-        }
+    
+
     }
 }
