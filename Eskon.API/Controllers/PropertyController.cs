@@ -2,6 +2,8 @@
 using Eskon.API.Base;
 using Eskon.Core.Features.PropertyFeatures.Commands.Command;
 using Eskon.Core.Features.PropertyFeatures.Queries.Query;
+using Eskon.Core.Response;
+using Eskon.Domain.Utilities;
 using Eskon.Domian.DTOs.Property;
 using Eskon.Domian.Utilities;
 using Microsoft.AspNetCore.Authorization;
@@ -24,8 +26,27 @@ namespace Eskon.API.Controllers
         }
         #endregion
 
-        #region Controllers
+        #region Endpoints
+
+        #region GET
+        #region Get filtered active properties
+        /// <summary>
+        /// Retrieves a paginated list of filtered active properties.
+        /// </summary>
+        /// <param name="minPricePerNight">Minimum price per night filter (optional).</param>
+        /// <param name="maxPricePerNight">Maximum price per night filter (optional).</param>
+        /// <param name="cityName">City name filter (optional).</param>
+        /// <param name="countryName">Country name filter (optional).</param>
+        /// <param name="Guests">Minimum number of guests required (optional).</param>
+        /// <param name="SortBy">The field to sort by (e.g., "Price", "Title", "Rating").</param>
+        /// <param name="asc">Indicates whether to sort in ascending order (default is false).</param>
+        /// <param name="pageNum">Page number for pagination (default is 1).</param>
+        /// <param name="itemsPerPage">Number of items per page (default is 10).</param>
+        /// <returns>
+        /// Returns a paginated list of property summaries that match the filters and sort order.
+        /// </returns>
         [HttpGet]
+        [ProducesResponseType(typeof(Response<Paginated<PropertySummaryDTO>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetFilteredActivePropertiesPaginated(
             [FromQuery] decimal? minPricePerNight,
             [FromQuery] decimal? maxPricePerNight,
@@ -52,104 +73,313 @@ namespace Eskon.API.Controllers
             var response = await Mediator.Send(new GetFilteredActivePropertiesPaginated(pageNum, itemsPerPage, propertySearchFilters));
             return NewResult(response);
         }
+        #endregion
 
+        #region Get property by Id
+        /// <summary>
+        /// Retrieves the details of a property by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the property.</param>
+        /// <returns>
+        /// Returns the detailed information of the property if found; otherwise, a not found response.
+        /// </returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetPropertyById([FromRoute] Guid id)
         {
             var response = await Mediator.Send(new GetPropertyByIdQuery(id));
             return NewResult(response);
         }
+        #endregion
 
+        #region Get Assigned pending properties
+        /// <summary>
+        /// Retrieves a paginated list of pending properties assigned to the currently authenticated admin.
+        /// </summary>
+        /// <param name="pageNum">The page number for pagination (default is 1).</param>
+        /// <param name="itemsPerPage">The number of items per page (default is 10).</param>
+        /// <returns>
+        /// Returns a paginated list of <see cref="PropertySummaryDTO"/> representing pending properties assigned to the admin.
+        /// </returns>
+        /// <response code="200">Returns the paginated list of assigned pending properties.</response>
+        /// <response code="401">Unauthorized access if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the user does not have the Admin role.</response>
         [Authorize(Roles = "Admin")]
         [HttpGet("Admin/Pending")]
+        [ProducesResponseType(typeof(Response<Paginated<PropertySummaryDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetAssignedPendingProperties([FromQuery] int pageNum = 1, [FromQuery] int itemsPerPage = 10)
         {
             var adminId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new GetAssignedPendingPropertiesQuery(adminId, pageNum, itemsPerPage));
             return NewResult(response);
         }
+        #endregion
 
+        #region Get Active properties for currently auth owner
+        /// <summary>
+        /// Retrieves a paginated list of active properties for the currently authenticated owner.
+        /// </summary>
+        /// <param name="pageNum">The page number for pagination (default is 1).</param>
+        /// <param name="itemsPerPage">The number of items to include per page (default is 10).</param>
+        /// <returns>
+        /// Returns a paginated list of <see cref="PropertySummaryDTO"/> for the authenticated owner.
+        /// </returns>
+        /// <response code="200">Returns the paginated list of active properties.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the user does not have the Owner role.</response>
         [Authorize(Roles = "Owner")]
         [HttpGet("Owner")]
+        [ProducesResponseType(typeof(Response<Paginated<PropertySummaryDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetActivePropertiesPerOwner([FromQuery] int pageNum = 1, [FromQuery] int itemsPerPage = 10)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new GetActivePropertiesPerOwnerQuery(ownerId, pageNum, itemsPerPage));
             return NewResult(response);
         }
+        #endregion
 
+        #region Get Pending properties 
+        /// <summary>
+        /// Retrieves a paginated list of pending properties submitted to the currently authenticated owner.
+        /// </summary>
+        /// <param name="pageNum">The current page number (default is 1).</param>
+        /// <param name="itemsPerPage">The number of items to return per page (default is 10).</param>
+        /// <returns>
+        /// A paginated list of <see cref="PropertySummaryDTO"/> representing the pending properties.
+        /// </returns>
+        /// <response code="200">Returns the paginated list of pending properties.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the user does not have the Owner role.</response>
         [Authorize(Roles = "Owner")]
         [HttpGet("Owner/pending")]
+        [ProducesResponseType(typeof(Response<Paginated<PropertySummaryDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetPendingPropertiesPerOwner([FromQuery] int pageNum = 1, [FromQuery] int itemsPerPage = 10)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new GetPendingPropertiesPerOwnerQuery(ownerId, pageNum, itemsPerPage));
             return NewResult(response);
         }
+        #endregion
 
+        #region Get Suspended properties
+        /// <summary>
+        /// Retrieves a paginated list of suspended properties for the currently authenticated owner.
+        /// </summary>
+        /// <param name="pageNum">The page number to retrieve (default is 1).</param>
+        /// <param name="itemsPerPage">The number of items per page (default is 10).</param>
+        /// <returns>
+        /// A paginated <see cref="PropertySummaryDTO"/> list of suspended properties.
+        /// </returns>
+        /// <response code="200">Returns the paginated list of suspended properties.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the user is not in the Owner role.</response>
         [Authorize(Roles = "Owner")]
         [HttpGet("Owner/Suspended")]
+        [ProducesResponseType(typeof(Response<Paginated<PropertySummaryDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetSuspendedPropertiesPerOwner([FromQuery] int pageNum = 1, [FromQuery] int itemsPerPage = 10)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new GetSuspendedPropertiesPerOwnerQuery(ownerId, pageNum, itemsPerPage));
             return NewResult(response);
         }
+        #endregion
 
+        #region Get Rejected properties
+        /// <summary>
+        /// Retrieves a paginated list of rejected properties for the currently authenticated owner.
+        /// </summary>
+        /// <param name="pageNum">The page number to retrieve (default is 1).</param>
+        /// <param name="itemsPerPage">The number of items per page (default is 10).</param>
+        /// <returns>
+        /// A paginated list of <see cref="PropertySummaryDTO"/> representing rejected properties.
+        /// </returns>
+        /// <response code="200">Returns the paginated list of rejected properties.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the user is not in the Owner role.</response>
         [Authorize(Roles = "Owner")]
         [HttpGet("Owner/Rejected")]
+        [ProducesResponseType(typeof(Response<Paginated<PropertySummaryDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetRejectedPropertiesPerOwner([FromQuery] int pageNum = 1, [FromQuery] int itemsPerPage = 10)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new GetRejectedPropertiesPerOwnerQuery(ownerId, pageNum, itemsPerPage));
             return NewResult(response);
         }
+        #endregion
+        #endregion
 
+        #region POST
+        #region Add property
+        /// <summary>
+        /// Adds a new property for the currently authenticated owner.
+        /// </summary>
+        /// <param name="propertyWriteDTO">The data required to create a new property.</param>
+        /// <returns>
+        /// A response containing the created property's details if successful.
+        /// </returns>
+        /// <response code="201">Returns the created property's details.</response>
+        /// <response code="400">Returned when validation fails.</response>
+        /// <response code="404">Returned when the city or one or more images are not found.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the user is not in the Owner role.</response>
         [Authorize(Roles = "Owner")]
         [HttpPost]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO?>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO?>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> AddProperty(PropertyWriteDTO propertyWriteDTO)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new AddPropertyCommand(ownerId, propertyWriteDTO));
             return NewResult(response);
         }
+        #endregion
+        #endregion
 
+        #region PATCH
+        #region Set property Suspension state
+        /// <summary>
+        /// Sets the suspension state of a property for the authenticated owner.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property.</param>
+        /// <param name="state">A boolean indicating whether the property should be suspended (true) or active (false).</param>
+        /// <returns>
+        /// A response indicating success, or an appropriate error message.
+        /// </returns>
+        /// <response code="200">Returned when the suspension state is successfully updated.</response>
+        /// <response code="401">Unauthorized if the user is not authenticated.</response>
+        /// <response code="403">Forbidden if the property does not belong to the authenticated owner.</response>
+        /// <response code="404">Returned if the property is not found.</response>
         [Authorize(Roles = "Owner")]
         [HttpPatch("Owner/Suspend/{propertyId:guid}")]
-        public async Task<IActionResult> SetPropertySuspensionState([FromRoute]Guid propertyId,[FromQuery]bool state)
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> SetPropertySuspensionState([FromRoute] Guid propertyId, [FromQuery] bool state)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new SetIsSuspendedPropertyCommand(propertyId,state,ownerId));
+            var response = await Mediator.Send(new SetIsSuspendedPropertyCommand(propertyId, state, ownerId));
             return NewResult(response);
         }
+        #endregion
 
+        #region Set property as Accepted
+        /// <summary>
+        /// Accepts a property by its ID. Only the admin assigned to the property can perform this action.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to accept.</param>
+        /// <returns>
+        /// A response indicating the outcome of the operation.
+        /// </returns>
+        /// <response code="200">Returned when the property is successfully accepted.</response>
+        /// <response code="401">Unauthorized if the admin is not authenticated.</response>
+        /// <response code="403">Forbidden if the admin is not assigned to the property.</response>
+        /// <response code="404">Returned if the property is not found.</response>
         [Authorize(Roles = "Admin")]
         [HttpPatch("Admin/Accept/{propertyId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> SetPropertyAsAccepted([FromRoute] Guid propertyId)
         {
             Guid AdminId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetPropertyAsAcceptedCommand(propertyId, AdminId));
             return NewResult(response);
         }
+        #endregion
 
+        #region Set property as Rejected
+        /// <summary>
+        /// Rejects a property by its ID with a specified rejection message. Only the assigned admin can reject a property.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to reject.</param>
+        /// <param name="RejectionMessage">The reason for rejecting the property.</param>
+        /// <returns>
+        /// A response indicating the result of the rejection operation.
+        /// </returns>
+        /// <response code="200">Returned when the property is successfully rejected.</response>
+        /// <response code="401">Unauthorized if the admin is not authenticated.</response>
+        /// <response code="403">Forbidden if the admin is not assigned to the property.</response>
+        /// <response code="404">Returned if the property does not exist.</response>
         [Authorize(Roles = "Admin")]
         [HttpPatch("Admin/Reject/{propertyId:guid}")]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> SetPropertyAsRejected([FromRoute] Guid propertyId, string RejectionMessage)
         {
             Guid AdminId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new SetPropertyAsRejectedCommand(propertyId, RejectionMessage, AdminId));
             return NewResult(response);
         }
+        #endregion
+        #endregion
 
+        #region PUT
+        #region Update property
+        /// <summary>
+        /// Updates an existing property owned by the authenticated user.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to update.</param>
+        /// <param name="propertyWriteDTO">The new property data provided by the owner.</param>
+        /// <returns>
+        /// A response containing the updated property details or an appropriate error.
+        /// </returns>
+        /// <response code="200">Property was successfully updated.</response>
+        /// <response code="400">Validation failed for the provided data.</response>
+        /// <response code="401">Unauthorized. Owner not authenticated.</response>
+        /// <response code="403">Forbidden. Owner does not own the property.</response>
+        /// <response code="404">Property, city, or images not found.</response>
         [Authorize(Roles = "Owner")]
         [HttpPut("Owner/{propertyId:guid}")]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(Response<PropertyDetailsDTO>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateProperty([FromRoute] Guid propertyId, PropertyWriteDTO propertyWriteDTO)
         {
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
-            var response = await Mediator.Send(new UpdatePropertyCommand(propertyId, propertyWriteDTO,ownerId));
+            var response = await Mediator.Send(new UpdatePropertyCommand(propertyId, propertyWriteDTO, ownerId));
             return NewResult(response);
         }
+        #endregion
+        #endregion
 
+        #region DELETE
+        #region Delete property
+        /// <summary>
+        /// Deletes a property by its ID if the authenticated owner is the one who owns it.
+        /// </summary>
+        /// <param name="propertyId">The unique identifier of the property to delete.</param>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing the operation result. 
+        /// Returns 200 OK if deleted successfully, 403 Forbidden if the owner is not authorized, 
+        /// or 404 Not Found if the property does not exist.
+        /// </returns>
+        /// <remarks>
+        /// Requires the user to be authenticated with the 'Owner' role.
+        /// The deletion is a soft delete.
+        /// </remarks>
+        /// <response code="200">Property deleted successfully.</response>
+        /// <response code="403">User is not authorized to delete this property.</response>
+        /// <response code="404">Property not found.</response>
         [Authorize(Roles = "Owner")]
         [HttpDelete("Owner/{propertyId:guid}")]
         public async Task<IActionResult> DeleteProperty([FromRoute] Guid propertyId)
@@ -157,7 +387,9 @@ namespace Eskon.API.Controllers
             Guid ownerId = GetUserIdFromAuthenticatedUserToken();
             var response = await Mediator.Send(new DeletePropertyCommand(propertyId, ownerId));
             return NewResult(response);
-        }
+        }  
+        #endregion
+        #endregion
         #endregion
     }
 }
