@@ -30,16 +30,15 @@ namespace Eskon.Core.Quartz
 
             foreach (var owner in owners)
             {
-                var bookings = await _serviceUnitOfWork.BookingService.GetPendingBookingsPerOwnerAsync(owner.Id);
+                var bookingsCount = await _serviceUnitOfWork.BookingService.GetPendingBookingsCountPerOwnerAsync(owner.Id);
 
-                if (bookings == null || bookings.Count == 0)
+                if (bookingsCount == 0)
                 {
                     continue;
                 }
 
                 string subject = "Pending Bookings Notification";
-                string body = $"Dear {owner.Email},\n\nYou have {bookings.Count} pending bookings:\n" +
-                              string.Join("\n", bookings.Select(b => $"- {b.Property.Title} (Start date: {b.StartDate})"));
+                string body = $"Dear {owner.Email},\n\nYou have {bookingsCount} pending bookings:\n";
 
                 _emailService.SendEmailAsync(
                    To: owner.Email,

@@ -30,17 +30,16 @@ namespace Eskon.Core.Quartz
 
             foreach (var admin in admins)
             {
-                var properties = await _serviceUnitOfWork.PropertyService
-                    .GetAllPendingPropertiesPerAdminAsync(admin.Id);
+                var propertiesCount = await _serviceUnitOfWork.PropertyService
+                    .GetAllPendingPropertiesCountPerAdminAsync(admin.Id);
 
-                if (properties == null || properties.Count == 0)
+                if (propertiesCount == 0)
                 {
                     continue;
                 }
 
                 string subject = "Pending Properties Notification";
-                string body = $"Dear {admin.Email},\n\nYou have {properties.Count} pending properties:\n" +
-                              string.Join("\n", properties.Select(p => $"- {p.Title} (ID: {p.Id})"));
+                string body = $"Dear {admin.Email},\n\nYou have {propertiesCount} pending properties:\n";
 
                  _emailService.SendEmailAsync(
                     To: admin.Email,

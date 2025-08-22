@@ -25,5 +25,12 @@ namespace Eskon.Infrastructure.Repositories
             _PropertyDbSet = myDbContext.Set<Property>();
         }
         #endregion
+
+        #region Methods
+        public async Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin)
+        {
+            return await _PropertyDbSet.Where(p => p.IsPending == true && p.AssignedAdminId == assignedAdmin).CountAsync();
+        }
+        #endregion
     }
 }

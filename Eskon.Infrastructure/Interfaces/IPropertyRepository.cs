@@ -6,5 +6,6 @@ namespace Eskon.Infrastructure.Interfaces
 {
     public interface IPropertyRepository:IGenericRepositoryAsync<Property>
     {
+        public Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin);
     }
 }

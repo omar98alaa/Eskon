@@ -191,9 +191,9 @@ namespace Eskon.Service.Services
                         b.StartDate.AddDays(-1) < dateNow);
         }
 
-        public async Task<List<Booking>> GetPendingBookingsPerOwnerAsync(Guid OwnerId)
+        public async Task<int> GetPendingBookingsCountPerOwnerAsync(Guid OwnerId)
         {
-            return await _bookingRepository.GetFilteredAsync(b => b.IsPending == true && b.Property.OwnerId == OwnerId);
+            return await _bookingRepository.GetPendingBookingsCountPerOwnerAsync(OwnerId);
         }
     }
 }
