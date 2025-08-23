@@ -1,4 +1,4 @@
-﻿
+﻿using Eskon.Domian.Entities;
 using Eskon.Domian.Models;
 using Eskon.Infrastructure.Interfaces;
 using Eskon.Service.Interfaces;

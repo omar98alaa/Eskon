@@ -1,8 +1,10 @@
-﻿using Eskon.Core.Features.StripeFeatures.Commands.Command;
+﻿//using Eskon.Core.Features.NotificationFeatures.Commands.Command;
+using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 using Eskon.Service.UnitOfWork;
+using MediatR;
 using Stripe.Checkout;
 using System.ComponentModel.DataAnnotations;
 
@@ -12,12 +14,14 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
     {
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
+        private readonly IMediator _mediator;
         #endregion
 
         #region Constructors
-        public StripeCommandHandler(IServiceUnitOfWork serviceUnitOfWork)
+        public StripeCommandHandler(IServiceUnitOfWork serviceUnitOfWork, IMediator mediator)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
+            _mediator = mediator;
         }
         #endregion
 
@@ -122,6 +126,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
             await _serviceUnitOfWork.PaymentService.AddPaymentAsync(payment);
             await _serviceUnitOfWork.SaveChangesAsync();
 
+
             return Success(checkoutSession.Url);
         }
         #endregion
@@ -130,7 +135,7 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
         public async Task<Response<string>> Handle(CreateStripePaymentRefundCommand request, CancellationToken cancellationToken)
         {
             var booking = await _serviceUnitOfWork.BookingService.GetBookingById(request.BookingId);
-            
+
             if (booking == null)
             {
                 return NotFound<string>("Booking does not exist");
@@ -155,6 +160,8 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
 
             if (booking.Payment.MaximumRefundDate < today)
             {
+
+
                 return BadRequest<string>("Booking cannot be refunded, maximum refund date passed");
             }
 
@@ -164,6 +171,8 @@ namespace Eskon.Core.Features.StripeFeatures.Commands.Handler
             }
 
             _serviceUnitOfWork.StripeService.CreateStripeRefund(booking.Payment);
+
+
             return Success("Refund request is created...");
         }
         #endregion

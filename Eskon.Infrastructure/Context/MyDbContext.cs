@@ -46,6 +46,7 @@ namespace Eskon.Infrastructure.Context
         public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRoles> UserRoles { get; set; }
+        public DbSet<NotificationOutboxMessage> NotificationOutboxMessages { get; set; }
         #endregion
 
         #region Configurations

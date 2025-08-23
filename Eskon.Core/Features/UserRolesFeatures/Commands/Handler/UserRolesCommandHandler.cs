@@ -1,11 +1,14 @@
-﻿using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
+﻿
+using Eskon.Core.Features.NotificationFeatures.Commands.Command;
+using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.UserDTOs;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Service.UnitOfWork;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using System.ComponentModel.DataAnnotations;
-
 
 namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
 {
@@ -15,13 +18,17 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly UserManager<User> _userManager;
+        private readonly IMediator _mediator;
+
         #endregion
 
         #region Constructors
-        public UserRolesCommandHandler(IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, SignInManager<User> signInManager)
+        public UserRolesCommandHandler(IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, SignInManager<User> signInManager, IMediator mediator
+    )
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _userManager = userManager;
+            _mediator = mediator;
         }
         #endregion
 
@@ -45,7 +52,7 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
                 return NotFound<string>("User Not Found");
 
             // Check if user has already completed the process and became an owner
-            if(await _userManager.IsInRoleAsync(user, "Owner"))
+            if (await _userManager.IsInRoleAsync(user, "Owner"))
             {
                 return BadRequest<string>("User is already an owner");
             }
@@ -72,8 +79,8 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
 
             string connectedAccountFillLink = _serviceUnitOfWork.StripeService
                 .CreateStripeConnectedAccountLinkForOwner(
-                stripeAccountId, 
-                request.OwnerRoleDTO.RefreshUrl, 
+                stripeAccountId,
+                request.OwnerRoleDTO.RefreshUrl,
                 request.OwnerRoleDTO.ReturnUrl);
 
             if (string.IsNullOrEmpty(connectedAccountFillLink))
@@ -139,6 +146,19 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
                 return BadRequest<string>(dbErrorMessages);
             }
 
+
+            ///
+            //notification for admin that he is not adnmin any more
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: user.Id,
+                Content: "You have been promoted to admin.",
+                NotificationTypeName: "Admin Promotion",
+                RedirectionId: user.Id,
+                RedirectionName: user.UserName
+            ), cancellationToken);
+
+
             return Success("User admin role added, new access token issued.");
         }
         #endregion
@@ -167,6 +187,18 @@ namespace Eskon.Core.Features.UserRolesFeatures.Commands.Handler
                 var dbErrorMessages = result.Errors.Select(r => r.Description).ToList();
                 return BadRequest<string>(dbErrorMessages);
             }
+
+            ///
+            //notification for admin that he is not admin any more
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: user.Id,
+                Content: "You have been removed from admin role.",
+                NotificationTypeName: "Admin Removal",
+                RedirectionId: user.Id,
+                RedirectionName: user.UserName
+            ), cancellationToken);
+
             return Success("User admin role deleted, new access token issued.");
         }
         #endregion

@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Eskon.Core.Features.BookingFeatures.Commands.Command;
+using Eskon.Core.Features.NotificationFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
 using Eskon.Service.Interfaces;
 using Eskon.Service.UnitOfWork;
+using MediatR;
 using System.ComponentModel.DataAnnotations;
 
 namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
@@ -14,13 +16,15 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         #region Fields
         private readonly IMapper _mapper;
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
+        private readonly IMediator _mediator;
         private readonly IEmailService _emailService;
         #endregion
 
         #region Constructors
-        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IEmailService emailService)
+        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IMediator mediator, IEmailService emailService)
         {
             _mapper = mapper;
+            _mediator = mediator;
             _serviceUnitOfWork = serviceUnitOfWork;
             _emailService = emailService;
         }
@@ -82,7 +86,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             // Map to new booking
             var newBooking = _mapper.Map<Booking>(bookingRequestDTO);
-            
+
             // Set customer Id
             newBooking.CustomerId = request.customerId;
 
@@ -113,6 +117,17 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             await _serviceUnitOfWork.SaveChangesAsync();
 
             var bookingDTO = _mapper.Map<BookingReadDTO>(newBooking);
+
+            //
+            // Booking Created notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: property.OwnerId,
+                Content: $"A new booking has been made for your property '{property.Title}'.",
+                NotificationTypeName: "Booking Created",
+                RedirectionId: property.Id,
+                RedirectionName: property.Title
+            ), cancellationToken);
 
             return Created(bookingDTO, message: "Booking request submitted successfully. Awaiting confirmation");
         }
@@ -178,6 +193,17 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 $"Please login before {booking.StartDate.AddDays(-1)} to pay and confirm your booking or it will be automatically cancelled."
             );
 
+            //
+            // Booking Accepted notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: booking.CustomerId,
+                Content: $"Your booking for property '{booking.Property.Title}' has been accepted.",
+                NotificationTypeName: "Booking Accepted",
+                RedirectionId: booking.Property.Id,
+                RedirectionName: booking.Property.Title
+            ), cancellationToken);
+
             return Success($"Booking with ID: {booking.Id} accepted", message: $"Booking with ID: {booking.Id} accepted");
         }
 
@@ -207,6 +233,18 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             await _serviceUnitOfWork.SaveChangesAsync();
 
+
+            //
+            // Booking Rejected notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: booking.CustomerId,
+                Content: $"Your booking for property '{booking.Property.Title}' has been rejected.",
+                NotificationTypeName: "Booking Rejected",
+                RedirectionId: booking.Property.Id,
+                RedirectionName: booking.Property.Title
+            ), cancellationToken);
+
             return Success($"Booking with ID: {booking.Id} rejected", message: $"Booking with ID: {booking.Id} rejected");
         }
 
@@ -235,6 +273,18 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             await _serviceUnitOfWork.BookingService.RemoveBookingAsync(booking);
 
             await _serviceUnitOfWork.SaveChangesAsync();
+
+
+            //
+            // Booking Cancelled notification
+            //
+            await _mediator.Send(new SendNotificationCommand(
+                ReceiverId: booking.Property.OwnerId,
+                Content: $"Your booking for property '{booking.Property.Title}' has been cancelled.",
+                NotificationTypeName: "Booking Cancelled",
+                RedirectionId: booking.Property.Id,
+                RedirectionName: booking.Property.Title
+            ), cancellationToken);
 
             return Success($"Booking with ID: {booking.Id} removed", message: $"Booking with ID: {booking.Id} removed");
         }

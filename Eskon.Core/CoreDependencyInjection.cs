@@ -1,3 +1,4 @@
+using Eskon.Core.Mapping;
 using Eskon.Core.Mapping.BookingMapping;
 using Eskon.Core.Mapping.Chats;
 using Eskon.Core.Mapping.CityMapping;
@@ -6,6 +7,7 @@ using Eskon.Core.Mapping.FavouriteMapping;
 using Eskon.Core.Mapping.Properties;
 using Eskon.Core.Mapping.ReviewMapping;
 using Eskon.Core.Mapping.Users;
+using Eskon.Domian.Models;
 using Eskon.Core.Quartz;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -24,7 +26,9 @@ namespace Eskon.Core
             services.AddAutoMapper(conf => conf.AddProfile<CountryMapper>());
             services.AddAutoMapper(conf => conf.AddProfile<PropertyMappings>());
             services.AddAutoMapper(conf => conf.AddProfile<BookingMappings>());
-
+            services.AddAutoMapper(conf => conf.AddProfile<FavouriteMapping>());
+            services.AddAutoMapper(conf => conf.AddProfile<ReviewMappings>());
+            services.AddAutoMapper(conf => conf.AddProfile<NotificationMapping>());
 
             #region Quartz
             services.AddQuartz(static q =>

@@ -16,6 +16,7 @@ namespace Eskon.Service.UnitOfWork
         public IImageService ImageService { get; }
         public INotificationService NotificationService { get; }
         public INotificationTypeService NotificationTypeService { get; }
+        public INotificationOutboxService NotificationOutboxService { get; }
         public IPaymentService PaymentService { get; }
         public IPropertyService PropertyService { get; }
         public IPropertyTypeService PropertyTypeService { get; }

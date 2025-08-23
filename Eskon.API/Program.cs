@@ -1,5 +1,6 @@
 using Eskon.API.Hubs;
 using Eskon.Core;
+using Eskon.Domian.Entities;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Stripe;
 using Eskon.Infrastructure;
@@ -148,7 +149,7 @@ namespace Eskon.API
                           var path = context.HttpContext.Request.Path;
 
 
-                          if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/api/chatHub"))
+                          if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/api/chatHub") || path.StartsWithSegments("/api/notificationHub")))
                           {
                               context.Token = accessToken;
                           }
@@ -159,6 +160,7 @@ namespace Eskon.API
               });
             #endregion
 
+            builder.Services.AddHostedService<Eskon.API.BackgroundJobs.NotificationOutboxProcessor>();
 
             #region FluentEmail Configuration
             builder.Services
@@ -194,6 +196,10 @@ namespace Eskon.API
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
                 await IdentitySeeder.SeedRolesAsync(roleManager);
+
+                // Seeding the Notification Types
+                var dbContext = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+                await NotificationTypeSeeder.SeedAsync(dbContext);
             }
 
             app.UseRouting();
@@ -211,6 +217,7 @@ namespace Eskon.API
             app.MapControllers();
 
             app.MapHub<ChatHub>("/api/chatHub");
+            app.MapHub<NotificationHub>("/api/notificationHub");
 
             app.Run();
         }

@@ -1,7 +1,6 @@
 ﻿using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.Models;
 using Eskon.Infrastructure.Generics;
-
+using Eskon.Domian.Models;
 namespace Eskon.Infrastructure.Interfaces
 {
     public interface INotificationRepository : IGenericRepositoryAsync<Notification>

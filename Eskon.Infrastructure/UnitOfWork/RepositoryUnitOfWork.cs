@@ -25,6 +25,8 @@ namespace Eskon.Infrastructure.UnitOfWork
         
         private INotificationRepository notificationRepository;
         
+        private INotificationOutboxMessageReposatory notificationOutboxMessageReposatory;
+        
         private INotificationTypeRepository notificationTypeRepository;
 
         private IPaymentRepository paymentRepository;
@@ -40,7 +42,6 @@ namespace Eskon.Infrastructure.UnitOfWork
         private ITicketRepository ticketRepository;
 
         private IUserRepository userRepository;
-
         #endregion
 
         #region Properties
@@ -75,6 +76,8 @@ namespace Eskon.Infrastructure.UnitOfWork
         public ITicketRepository TicketRepository => ticketRepository == null ? new TicketRepository(context) : ticketRepository;
 
         public IUserRepository UserRepository => userRepository == null ? new UserRepository(context) : userRepository;
+
+        public INotificationOutboxMessageReposatory NotificationOutboxMessageReposatory => notificationOutboxMessageReposatory == null ? new NotificationOutboxMessageReposatory(context) : notificationOutboxMessageReposatory;
         #endregion
 
         #region Constructors

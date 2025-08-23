@@ -1,4 +1,6 @@
 ﻿
+using Eskon.Domian.Entities;
+using Eskon.Domian.Entities;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
 
