@@ -167,13 +167,13 @@ namespace Eskon.API.Controllers
         /// <response code="404">Country not found.</response>
         /// <response code="500">Internal server error.</response>
         [HttpPost]
-        [Authorize("Admin, Root")]
+        //[Authorize("Admin, Root")]
         [ProducesResponseType(typeof(Response<CityDTO>), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost]
-        [Authorize("Admin, Root")]
+        //[Authorize("Admin, Root")]
         public async Task<IActionResult> AddCity([FromBody] CityDTO city)
         {
             var result = await Mediator.Send(new AddCityCommand(city));
@@ -233,7 +233,7 @@ namespace Eskon.API.Controllers
         /// <response code="400">City already exists in the specified country.</response>
         /// <response code="404">City or country not found.</response>
         /// <response code="500">Internal server error.</response>
-        [Authorize("Admin, Root")]
+        //[Authorize("Admin, Root, Customer, Owner")]
         [HttpPut("{name}")]
         [ProducesResponseType(typeof(Response<CityUpdateDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

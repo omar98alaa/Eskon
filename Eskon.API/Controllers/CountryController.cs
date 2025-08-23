@@ -178,7 +178,7 @@ namespace Eskon.API.Controllers
         /// <response code="400">Invalid input data.</response>
         /// <response code="403">User does not have the required permissions.</response>
         /// <response code="500">Internal server error.</response>
-        [Authorize("Admin, Root")]
+        //[Authorize("Admin, Root")]
         [HttpPost]
         [ProducesResponseType(typeof(Response<AddCountryDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Response<AddCountryDTO>), StatusCodes.Status400BadRequest)]
@@ -238,7 +238,7 @@ namespace Eskon.API.Controllers
         /// <response code="404">Country not found.</response>
         /// <response code="403">User not authorized.</response>
         /// <response code="500">Internal server error.</response>
-        [Authorize("Admin, Root")]
+        //[Authorize("Admin, Root, Customer, Owner")]
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(Response<CountryUpdateDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(Response<CountryUpdateDTO>), StatusCodes.Status404NotFound)]

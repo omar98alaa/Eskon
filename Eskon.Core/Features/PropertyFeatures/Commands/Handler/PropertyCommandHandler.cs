@@ -23,11 +23,12 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
         private readonly IMediator _mediator;
         private readonly UserManager<User> _userManager;
         #endregion
-        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager)
+        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager,IMediator mediator)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _mediator = mediator;
         }
 
         public async Task<Response<PropertyDetailsDTO>> Handle(AddPropertyCommand request, CancellationToken cancellationToken)
@@ -92,11 +93,11 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             // Property Created notification
             //
             await _mediator.Send(new SendNotificationCommand(
-                ReceiverId: property.AssignedAdminId,
+                ReceiverId: Admin.Id,
                 Content: $"A new property '{property.Title}' has been assigned to you.",
                 NotificationTypeName: "Property Created",
-                RedirectionId: property.Id,
-                RedirectionName: property.Title
+                RedirectionId: propertyDetails.Id,
+                RedirectionName: propertyDetails.Title
             ), cancellationToken);
 
             return Created(propertyDetails);
