@@ -59,5 +59,10 @@ namespace Eskon.Service.Services
         {
             return await _userRepository.SetUserStripeAccountIdAsync(userId, stripeAccountId);
         }
+
+        public Task<int> CountUsersByRoleAsync(string role)
+        {
+            return _userRepository.CountUsersByRoleAsync(role);
+        }
     }
 }

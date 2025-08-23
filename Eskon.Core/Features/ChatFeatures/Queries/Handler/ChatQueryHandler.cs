@@ -40,10 +40,29 @@ namespace Eskon.Core.Features.ChatFeatures.Queries.Handler
         public async Task<Response<List<ConversationDto>>> Handle(GetUserConversationsQuery request, CancellationToken cancellationToken)
         {
             var chats = await _serviceUnitOfWork.ChatService.GetAllUserChatsAsync(new User() { Id = request.UserId });
-            var chatsDTO = _mapper.Map<List<ConversationDto>>(chats);
+
+            var chatsDTO = _mapper.Map<List<ConversationDto>>(chats, opt =>
+            {
+                opt.Items["CurrentUserId"] = request.UserId;
+            });
 
             return Success(chatsDTO);
         }
+
+        public async Task<Response<ChatMessageDto>> Handle(GetLastReceivedMessageQuery request, CancellationToken cancellationToken)
+        {
+            var lastMessage = await _serviceUnitOfWork.ChatMessagesService
+                .GetlastMessagesAsync(request.chat, request.UserId);
+
+            if (lastMessage == null)
+                return null;
+
+            var lastMessageDto = _mapper.Map<ChatMessageDto>(lastMessage);
+
+            return Success(lastMessageDto);
+        }
+
+
     }
 
 }

@@ -25,5 +25,52 @@ namespace Eskon.Infrastructure.Repositories
             _PropertyDbSet = myDbContext.Set<Property>();
         }
         #endregion
+
+        #region Methods
+        public async Task<int> GetAllPendingPropertiesCountPerAdminAsync(Guid assignedAdmin)
+        {
+            return await _PropertyDbSet.Where(p => p.IsPending == true && p.AssignedAdminId == assignedAdmin).CountAsync();
+        }
+            
+        public Task<int> CountPendingPropertiesAsync()
+        {
+            return _PropertyDbSet.CountAsync(p => p.IsPending == true);
+        }
+
+        public Task<int> CountPropertiesAsync()
+        {
+            return _PropertyDbSet.CountAsync();
+        }
+
+        public Task<int> CountAcceptedPropertiesAsync()
+        {
+            return _PropertyDbSet.CountAsync(p => p.IsAccepted == true);
+        }
+
+        public Task<int> CountRejectedPropertiesAsync()
+        {
+            return _PropertyDbSet.CountAsync(p => p.RejectionMessage != null);
+        }
+        
+        public async Task<Dictionary<string, int>> GetPropertiesByTypeAsync()
+        {
+            return await _PropertyDbSet
+                .GroupBy(p => p.PropertyType.Name)
+                .Select(g => new { Type = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Type, x => x.Count);
+        }
+
+        public async Task<Dictionary<string, int>> GetPropertiesByStatusAsync()
+        {
+            return await _PropertyDbSet
+                .GroupBy(p =>
+                    p.IsSuspended ? "Suspended" :
+                    (p.IsPending ? "Pending" :
+                    (p.IsAccepted ? "Accepted" : "Rejected"))
+                )
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Status, x => x.Count);
+        }
+        #endregion
     }
 }

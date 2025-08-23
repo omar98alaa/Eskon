@@ -4,6 +4,7 @@ using Eskon.Core.Features.NotificationFeatures.Commands.Command;
 using Eskon.Core.Response;
 using Eskon.Domian.DTOs.BookingDTOs;
 using Eskon.Domian.Models;
+using Eskon.Service.Interfaces;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -16,18 +17,25 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         private readonly IMapper _mapper;
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
         private readonly IMediator _mediator;
+        private readonly IEmailService _emailService;
         #endregion
 
         #region Constructors
-        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IMediator mediator)
+        public BookingCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, IMediator mediator, IEmailService emailService)
         {
             _mapper = mapper;
             _mediator = mediator;
             _serviceUnitOfWork = serviceUnitOfWork;
+            _emailService = emailService;
         }
         #endregion
 
         #region Helpers
+        bool IsOverlappingBooking(Booking booking, DateOnly startDate, DateOnly endDate, Guid bookingId)
+        {
+            return booking.Id != bookingId && booking.EndDate >= startDate && booking.StartDate <= endDate;
+        }
+
         bool IsOverlappingBooking(Booking booking, DateOnly startDate, DateOnly endDate)
         {
             return booking.EndDate >= startDate && booking.StartDate <= endDate;
@@ -151,7 +159,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             // Check overlapping bookings (To avoid race conditions)
             var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(booking.PropertyId);
-            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
+            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate, booking.Id));
 
             // Auto reject booking if overlapping
             if (overlappingBookingsExist)
@@ -159,19 +167,31 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 await _serviceUnitOfWork.BookingService.SetBookingAsRejectedAsync(booking);
                 await _serviceUnitOfWork.SaveChangesAsync();
 
-                return BadRequest<string>("Failed operation");
+                return BadRequest<string>("Overlapping with another booking");
             }
+
+
 
             // Get and reject all overlapping pending bookings
             var pendingBookings = await _serviceUnitOfWork.BookingService.GetPendingBookingsPerPropertyAsync(booking.PropertyId);
-            var overlappingPendingBookings = pendingBookings.FindAll(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
+            var overlappingPendingBookings = pendingBookings.FindAll(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate, booking.Id));
 
             foreach (var pendingBooking in overlappingPendingBookings)
             {
                 await _serviceUnitOfWork.BookingService.SetBookingAsRejectedAsync(pendingBooking);
             }
 
-            await _serviceUnitOfWork.SaveChangesAsync();
+
+
+            _emailService.SendEmailAsync(
+                booking.Customer.Email,
+                "ESKON: Booking request accepted",
+                $"Hello Mr.{booking.Customer.LastName}\n\n" +
+                $"Your booking request for: {booking.Property.Title}\n" +
+                $"From: {booking.StartDate} To: {booking.EndDate}\n" +
+                $"has been accepted.\n" +
+                $"Please login before {booking.StartDate.AddDays(-1)} to pay and confirm your booking or it will be automatically cancelled."
+            );
 
             //
             // Booking Accepted notification

@@ -8,5 +8,6 @@ namespace Eskon.Infrastructure.Interfaces
         public Task<User> GetUserByEmailAsync(string email);
         public Task<User> GetUserByStripeAccountIdAsync(string stripeAccountId);
         public Task<bool> SetUserStripeAccountIdAsync(Guid userId, string stripeAccountId);
+        Task<int> CountUsersByRoleAsync(string role);
     }
 }

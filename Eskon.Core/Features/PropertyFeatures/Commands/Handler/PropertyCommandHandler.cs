@@ -6,6 +6,7 @@ using Eskon.Core.Response;
 using Eskon.Domian.DTOs.Property;
 using Eskon.Domian.Entities.Identity;
 using Eskon.Domian.Models;
+using Eskon.Service.Interfaces;
 using Eskon.Service.UnitOfWork;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -17,16 +18,19 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
     {
         #region Fields
         private readonly IServiceUnitOfWork _serviceUnitOfWork;
+        private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
         private readonly UserManager<User> _userManager;
         #endregion
-        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, IMediator mediator)
+        
+        public PropertyCommandHandler(IMapper mapper, IServiceUnitOfWork serviceUnitOfWork, UserManager<User> userManager, IMediator mediator, IEmailService emailService)
         {
             _serviceUnitOfWork = serviceUnitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _mediator = mediator;
+            _emailService = emailService;
         }
 
         public async Task<Response<PropertyDetailsDTO>> Handle(AddPropertyCommand request, CancellationToken cancellationToken)
@@ -128,6 +132,14 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
                 RedirectionId: property.Id,
                 RedirectionName: property.Title
             ), cancellationToken);
+            
+            // Send Email to Owner
+            _emailService.SendEmailAsync(
+                property.Owner.Email,
+                "ESKON: Property Status Update",
+                $"Hello Mr.{property.Owner.LastName}\n\n" +
+                $"We would like to inform you that your property: {property.Title} has been accepted and is now eligible to revceive booking requests."
+            );
 
             return Success<string>($"Property With Id {property.Id} Accepted", $"{property.Id} Accepted");
         }
@@ -160,6 +172,17 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
                 RedirectionId: property.Id,
                 RedirectionName: property.Title
             ), cancellationToken);
+
+            // Send Email to Owner
+            _emailService.SendEmailAsync(
+                property.Owner.Email,
+                "ESKON: Property Status Update",
+                $"Hello Mr.{property.Owner.LastName}\n\n" +
+                $"We regret to inform you that your property: {property.Title} has been rejected.\n" +
+                $"Rejection reason:\n {property.RejectionMessage}\n\n" +
+                $"You can either make any required changes and re-submit your property or remove it."
+            );
+
             return Success<string>(string.Empty, request.rejectionMessage);
         }
 

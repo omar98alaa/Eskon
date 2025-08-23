@@ -33,6 +33,7 @@ namespace Eskon.Core.Features.ChatFeatures.Commands.Handler
                 ChatId = chat.Id,
                 SenderId = request.senderId,
                 Content = request.MessageDto.Content,
+                CreatedAt = DateTime.UtcNow
             };
 
             chat.ChatMessages.Add(newChatMessage);
@@ -40,21 +41,17 @@ namespace Eskon.Core.Features.ChatFeatures.Commands.Handler
             await _serviceUnitOfWork.SaveChangesAsync();
             return _mapper.Map<ChatMessageDto>(newChatMessage);
         }
-
         public async Task<Response<Unit>> Handle(MarkMessagesAsReadCommand request, CancellationToken cancellationToken)
         {
             var chat = await _serviceUnitOfWork.ChatService.GetChatByIdAsync(request.ChatId);
-            if (chat == null)
-            {
-                return NotFound<Unit>("Chat does not exist");
-            }
+            if (chat == null) return NotFound<Unit>("Chat does not exist");
 
             if (chat.User1Id != request.UserId && chat.User2Id != request.UserId)
-            {
                 return Forbidden<Unit>();
-            }
 
-            await _serviceUnitOfWork.ChatService.MarkMessagesAsRead(chat);
+            await _serviceUnitOfWork.ChatMessagesService.MarkMessagesAsRead(chat, request.UserId);
+
+            await _serviceUnitOfWork.SaveChangesAsync();
 
             return Success(Unit.Value);
         }

@@ -25,6 +25,8 @@ namespace Eskon.Infrastructure.UnitOfWork
         
         private INotificationRepository notificationRepository;
         
+        private INotificationOutboxMessageReposatory notificationOutboxMessageReposatory;
+        
         private INotificationTypeRepository notificationTypeRepository;
 
         private IPaymentRepository paymentRepository;
@@ -40,8 +42,6 @@ namespace Eskon.Infrastructure.UnitOfWork
         private ITicketRepository ticketRepository;
 
         private IUserRepository userRepository;
-
-        private INotificationOutboxMessageReposatory notificationOutboxMessageReposatory;
         #endregion
 
         #region Properties

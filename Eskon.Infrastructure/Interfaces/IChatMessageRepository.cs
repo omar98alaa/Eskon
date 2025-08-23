@@ -8,5 +8,6 @@ namespace Eskon.Infrastructure.Interfaces
     {
         Task<List<ChatMessage>> GetMessagesByChatIdAsync(Guid chatId);
         Task AddMessageAsync(ChatMessage message);
+        Task<ChatMessage> GetLastMessageAsync(Guid chatId, Guid userId);
     }
 }

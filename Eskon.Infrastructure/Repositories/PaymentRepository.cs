@@ -29,6 +29,17 @@ namespace Eskon.Infrastructure.Repositories
         {
             return await _paymentDbSet.SingleOrDefaultAsync(p => p.BookingId == bookingId);
         }
+        public async Task<Dictionary<string, decimal>> GetRevenueByMonthAsync()
+        {
+            return await _paymentDbSet
+                .GroupBy(p => new { p.CreatedAt.Year, p.CreatedAt.Month })
+                .Select(g => new
+                {
+                    Month = g.Key.Year + "-" + g.Key.Month,
+                    Revenue = g.Sum(p => p.Fees)
+                })
+                .ToDictionaryAsync(x => x.Month, x => x.Revenue);
+        }
         #endregion
     }
 }
