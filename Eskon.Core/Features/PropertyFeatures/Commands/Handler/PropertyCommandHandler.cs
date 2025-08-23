@@ -67,7 +67,7 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             var defaultPropertyType = new PropertyType
             {
                 Id = Guid.NewGuid(),
-                Name = "type3"+ DateTime.Now.Ticks
+                Name = "type3" + DateTime.Now.Ticks
             };
             // Assign an admin randomly
             List<User> AdminUsers = (await _userManager.GetUsersInRoleAsync("Admin")).ToList();
@@ -82,6 +82,7 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
             property.AssignedAdminId = Admin.Id;
             property.Images = images;
             property.PropertyType = defaultPropertyType;
+            property.IsPending = true;
 
             await _serviceUnitOfWork.PropertyService.AddPropertyAsync(property);
             await _serviceUnitOfWork.SaveChangesAsync();
