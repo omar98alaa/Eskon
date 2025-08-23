@@ -1,4 +1,5 @@
 ﻿using Eskon.API.Base;
+using Eskon.Core.Features.NotificationFeatures.Commands.Command;
 using Eskon.Core.Features.StripeFeatures.Commands.Command;
 using Eskon.Core.Features.UserRolesFeatures.Commands.Command;
 using Eskon.Domian.DTOs.StripeDTOs;
@@ -33,7 +34,11 @@ namespace Eskon.API.Controllers
 
         #region Endpoints
 
+
         [HttpPost("webhook")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> StripeWebhook()
         {
             var json = await new StreamReader(HttpContext.Request.Body, Encoding.UTF8).ReadToEndAsync();
@@ -75,6 +80,15 @@ namespace Eskon.API.Controllers
                                 await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
                                 await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
                                 await _unitOfWork.SaveChangesAsync();
+
+                                // Notification - Payment Success (Async)
+                                await Mediator.Send(new SendNotificationCommand(
+                                    ReceiverId: payment.Booking.CustomerId,
+                                    Content: $"Your payment for booking '{payment.Booking.Property.Title}' was successful.",
+                                    NotificationTypeName: "Payment Success",
+                                    RedirectionId: payment.Booking.Id,
+                                    RedirectionName: "BookingDetails"
+                                ));
                             }
 
                             break;
@@ -93,6 +107,15 @@ namespace Eskon.API.Controllers
                                 payment.StripeChargeId = session.PaymentIntent.LatestChargeId;
                                 await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
                                 await _unitOfWork.SaveChangesAsync();
+
+                                //Notification - Payment Failed (Async)
+                                await Mediator.Send(new SendNotificationCommand(
+                                    ReceiverId: payment.Booking.CustomerId,
+                                    Content: $"Your payment for booking '{payment.Booking.Property.Title}' has failed.",
+                                    NotificationTypeName: "Payment Failed",
+                                    RedirectionId: payment.Booking.Id,
+                                    RedirectionName: "BookingDetails"
+                                ));
                             }
 
                             break;
@@ -130,6 +153,16 @@ namespace Eskon.API.Controllers
                                     await _unitOfWork.PaymentService.SetPaymentAsRefunded(payment);
                                     await _unitOfWork.BookingService.SoftRemoveBookingAsync(payment.Booking);
                                     await _unitOfWork.SaveChangesAsync();
+
+
+                                    // Notification - Refund Issued
+                                    await Mediator.Send(new SendNotificationCommand(
+                                        ReceiverId: payment.Booking.CustomerId,
+                                        Content: $"A refund has been issued for booking '{payment.Booking.Property.Title}'.",
+                                        NotificationTypeName: "Refund Issued",
+                                        RedirectionId: payment.Booking.Id,
+                                        RedirectionName: "BookingDetails"
+                                    ));
                                 }
                             }
 
@@ -151,6 +184,16 @@ namespace Eskon.API.Controllers
                                 await _unitOfWork.PaymentService.SetPaymentAsSuccess(payment);
                                 await _unitOfWork.BookingService.SetBookingAsPayedAsync(payment.Booking);
                                 await _unitOfWork.SaveChangesAsync();
+
+
+                                //Notification - Payment Success (Sync)
+                                await Mediator.Send(new SendNotificationCommand(
+                                    ReceiverId: payment.Booking.CustomerId,
+                                    Content: $"Your payment for booking '{payment.Booking.Property.Title}' was successful.",
+                                    NotificationTypeName: "Payment Success",
+                                    RedirectionId: payment.Booking.Id,
+                                    RedirectionName: "BookingDetails"
+                                ));
                             }
                             break;
                         }
@@ -168,6 +211,15 @@ namespace Eskon.API.Controllers
                                 payment.StripeChargeId = intent.LatestChargeId;
                                 await _unitOfWork.PaymentService.SetPaymentAsFailed(payment);
                                 await _unitOfWork.SaveChangesAsync();
+
+                                // Notification - Payment Failed (Sync)
+                                await Mediator.Send(new SendNotificationCommand(
+                                    ReceiverId: payment.Booking.CustomerId,
+                                    Content: $"Your payment for booking '{payment.Booking.Property.Title}' has failed.",
+                                    NotificationTypeName: "Payment Failed",
+                                    RedirectionId: payment.Booking.Id,
+                                    RedirectionName: "BookingDetails"
+                                ));
                             }
                             break;
                         }
