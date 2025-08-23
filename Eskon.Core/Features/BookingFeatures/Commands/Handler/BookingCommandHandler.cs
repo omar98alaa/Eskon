@@ -101,7 +101,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             // Check overlapping with accepted bookings
             var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(property.Id);
 
-            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, bookingRequestDTO.StartDate, bookingRequestDTO.EndDate, ));
+            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, bookingRequestDTO.StartDate, bookingRequestDTO.EndDate));
 
             if (overlappingBookingsExist)
             {
