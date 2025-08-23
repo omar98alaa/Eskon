@@ -28,7 +28,7 @@ namespace Eskon.Service.Services
         public async Task SetBookingAsAcceptedAsync(Booking booking)
         {
             booking.IsAccepted = true;
-            booking.IsPending = true;
+            booking.IsPending = false;
             booking.IsPayed = false;
             await _bookingRepository.UpdateAsync(booking);
         }

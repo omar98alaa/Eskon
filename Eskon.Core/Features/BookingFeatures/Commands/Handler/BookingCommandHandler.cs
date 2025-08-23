@@ -27,6 +27,11 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
         #endregion
 
         #region Helpers
+        bool IsOverlappingBooking(Booking booking, DateOnly startDate, DateOnly endDate, Guid bookingId)
+        {
+            return booking.Id != bookingId && booking.EndDate >= startDate && booking.StartDate <= endDate;
+        }
+
         bool IsOverlappingBooking(Booking booking, DateOnly startDate, DateOnly endDate)
         {
             return booking.EndDate >= startDate && booking.StartDate <= endDate;
@@ -96,7 +101,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
             // Check overlapping with accepted bookings
             var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(property.Id);
 
-            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, bookingRequestDTO.StartDate, bookingRequestDTO.EndDate));
+            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, bookingRequestDTO.StartDate, bookingRequestDTO.EndDate, ));
 
             if (overlappingBookingsExist)
             {
@@ -139,7 +144,7 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
 
             // Check overlapping bookings (To avoid race conditions)
             var acceptedBookings = await _serviceUnitOfWork.BookingService.GetAcceptedBookingsPerPropertyAsync(booking.PropertyId);
-            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
+            var overlappingBookingsExist = acceptedBookings.Any(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate, booking.Id));
 
             // Auto reject booking if overlapping
             if (overlappingBookingsExist)
@@ -147,19 +152,21 @@ namespace Eskon.Core.Features.BookingFeatures.Commands.Handler
                 await _serviceUnitOfWork.BookingService.SetBookingAsRejectedAsync(booking);
                 await _serviceUnitOfWork.SaveChangesAsync();
 
-                return BadRequest<string>("Failed operation");
+                return BadRequest<string>("Overlapping with another booking");
             }
+
+
 
             // Get and reject all overlapping pending bookings
             var pendingBookings = await _serviceUnitOfWork.BookingService.GetPendingBookingsPerPropertyAsync(booking.PropertyId);
-            var overlappingPendingBookings = pendingBookings.FindAll(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate));
+            var overlappingPendingBookings = pendingBookings.FindAll(b => IsOverlappingBooking(b, booking.StartDate, booking.EndDate, booking.Id));
 
             foreach (var pendingBooking in overlappingPendingBookings)
             {
                 await _serviceUnitOfWork.BookingService.SetBookingAsRejectedAsync(pendingBooking);
             }
 
-            await _serviceUnitOfWork.SaveChangesAsync();
+
 
             _emailService.SendEmailAsync(
                 booking.Customer.Email,
