@@ -97,7 +97,7 @@ namespace Eskon.Core.Features.PropertyFeatures.Commands.Handler
                 ReceiverId: Admin.Id,
                 Content: $"A new property '{property.Title}' has been assigned to you.",
                 NotificationTypeName: "Property Created",
-                RedirectionId: propertyDetails.Id,
+                RedirectionId: property.Id,
                 RedirectionName: propertyDetails.Title
             ), cancellationToken);
 
