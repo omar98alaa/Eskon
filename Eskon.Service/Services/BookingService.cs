@@ -95,7 +95,7 @@ namespace Eskon.Service.Services
         public async Task<Paginated<Booking>> GetPaginatedPaidBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage)
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.CustomerId == customerId && b.StartDate > now && b.IsPayed);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.CustomerId == customerId && b.StartDate > now && b.IsPayed && !b.Payment.IsRefund);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedPendingBookingsPerCustomerAsync(Guid customerId, int pageNum, int itemsPerPage)
@@ -123,7 +123,7 @@ namespace Eskon.Service.Services
         public async Task<Paginated<Booking>> GetPaginatedPaidBookingsPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.Property.OwnerId == ownerId && b.StartDate > now && b.IsPayed);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.Property.OwnerId == ownerId && b.StartDate > now && b.IsPayed && !b.Payment.IsRefund);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedBookingHistoryPerOwnerAsync(Guid ownerId, int pageNum, int itemsPerPage)
@@ -158,7 +158,7 @@ namespace Eskon.Service.Services
         public async Task<Paginated<Booking>> GetPaginatedPaidBookingsPerPropertyAsync(Guid propertyId, int pageNum, int itemsPerPage)
         {
             var now = DateOnly.FromDateTime(DateTime.UtcNow);
-            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.PropertyId == propertyId && b.StartDate > now && b.IsPayed);
+            return await _bookingRepository.GetPaginatedAsync(pageNum, itemsPerPage, filter: b => b.PropertyId == propertyId && b.StartDate > now && b.IsPayed && !b.Payment.IsRefund);
         }
 
         public async Task<Paginated<Booking>> GetPaginatedRejectedBookingsPerPropertyAsync(Guid propertyId, int pageNum, int itemsPerPage)
