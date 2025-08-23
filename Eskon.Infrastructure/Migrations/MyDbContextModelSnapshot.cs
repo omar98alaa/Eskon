@@ -350,7 +350,7 @@ namespace Eskon.Infrastructure.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("ReadAt")
+                    b.Property<DateTime?>("ReadAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("SenderId")

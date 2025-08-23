@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Askon.Infrastructure.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20250818060454_AddNotificationOutboxMessages")]
-    partial class AddNotificationOutboxMessages
+    [Migration("20250823082443_NullableChatMessageReadAt")]
+    partial class NullableChatMessageReadAt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -353,7 +353,7 @@ namespace Askon.Infrastructure.Migrations
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("ReadAt")
+                    b.Property<DateTime?>("ReadAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("SenderId")

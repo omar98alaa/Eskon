@@ -27,7 +27,6 @@ namespace Eskon.Core.Features.NotificationFeatures.Commands.Handler
         {
 
             var type = await _serviceUnitOfWork.NotificationTypeService.GetNotificationTypeByNameAsync(request.NotificationTypeName);
-            Console.WriteLine("[send command n type]" + type);
             if (type == null)
                 throw new Exception($"NotificationType '{request.NotificationTypeName}' not found.");
 
@@ -35,7 +34,7 @@ namespace Eskon.Core.Features.NotificationFeatures.Commands.Handler
             {
                 Content = request.Content,
                 ReceiverId = request.ReceiverId,
-                RedirectionId =  Guid.Empty,
+                RedirectionId =  request.RedirectionId,
                 CreatedAt = DateTime.UtcNow,
                 IsRead = false,
                 NotificationTypeId = type.Id
