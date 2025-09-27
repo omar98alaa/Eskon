@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Eskon.Domian.Models;
 using Microsoft.AspNetCore.Identity;
-using Eskon.Domian.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 namespace Eskon.Domian.Entities.Identity
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser<Guid>, IBaseModel
     {
         [StringLength(100)]
         public string FirstName { get; set; }
@@ -17,7 +18,15 @@ namespace Eskon.Domian.Entities.Identity
         [DataType(DataType.Date)]
         public DateOnly BirthDate { get; set; }
 
+        public string? stripeAccountId { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
+
+        public string? Code { get; set; }
+        [InverseProperty(nameof(UserRefreshToken.User))]
+        public virtual ICollection<UserRefreshToken> UserRefreshTokens { get; set; } = new HashSet<UserRefreshToken>();
 
         //
         //  Navigation Properties
@@ -56,13 +65,9 @@ namespace Eskon.Domian.Entities.Identity
         //  ResolvedTickets
         public virtual ICollection<Ticket> ResolvedTickets { get; set; }
 
-        //  Transactions Out
-        public virtual ICollection<Transaction> TransactionsOut { get; set; }
-
-        //  Transactions In
-        public virtual ICollection<Transaction> TransactionsIn { get; set; }
-
         public virtual ICollection<Property> Properties { get; set; }
-    }
+
+        public virtual ICollection<UserRoles> UserRoles { get; set; } = new List<UserRoles>();
+}
 
 }

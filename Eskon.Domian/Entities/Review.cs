@@ -5,7 +5,7 @@ using Eskon.Domian.Entities.Identity;
 
 namespace Eskon.Domian.Models
 {
-    [Index(nameof(UserId), nameof(PropertyId), IsUnique = true)]
+    [Index(nameof(CustomerId), nameof(PropertyId), IsUnique = true)]
     public class Review : BaseModel
     {
         [Required, Range(0, 5)]
@@ -20,8 +20,8 @@ namespace Eskon.Domian.Models
 
         //  User
         //[ForeignKey(nameof(User))]
-        public Guid UserId { get; set; }
-        public virtual User User { get; set; }
+        public Guid CustomerId { get; set; }
+        public virtual User Customer { get; set; }
 
         //  Property
         //[ForeignKey(nameof(Property))]

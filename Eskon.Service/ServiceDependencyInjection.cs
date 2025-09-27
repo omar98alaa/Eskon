@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Eskon.Service.Interfaces;
+﻿using Eskon.Service.Interfaces;
 using Eskon.Service.Services;
+using Eskon.Service.UnitOfWork;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Eskon.Service
 {
@@ -8,7 +9,9 @@ namespace Eskon.Service
     {
         public static IServiceCollection InjectingServiceDependencies(this IServiceCollection services)
         {
-            services.AddTransient<IUserService, UserService>();
+            services.AddScoped<IServiceUnitOfWork, ServiceUnitOfWork>();
+            services.AddScoped<IEmailService, EmailService>();
+
             return services;
         }
     }

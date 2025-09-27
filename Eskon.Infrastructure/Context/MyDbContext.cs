@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Eskon.Domian.Entities;
+using Eskon.Domian.Entities.Identity;
+using Eskon.Domian.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using Eskon.Domian.Entities.Identity;
-using Eskon.Domian.Models;
 namespace Eskon.Infrastructure.Context
 {
-    public class MyDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+    public class MyDbContext : IdentityDbContext<User, Role, Guid ,
+                        IdentityUserClaim<Guid>, UserRoles,
+                        IdentityUserLogin<Guid>,
+                        IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         // To migrate
         //Add-Migration InitialCreate -OutputDir Migrations/
@@ -39,7 +43,10 @@ namespace Eskon.Infrastructure.Context
         public DbSet<PropertyType> PropertyTypes { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRoles> UserRoles { get; set; }
+        public DbSet<NotificationOutboxMessage> NotificationOutboxMessages { get; set; }
         #endregion
 
         #region Configurations
@@ -50,9 +57,9 @@ namespace Eskon.Infrastructure.Context
             #region Booking
             //  Booking
             modelBuilder.Entity<Booking>()
-                .HasOne(b => b.User)
+                .HasOne(b => b.Customer)
                 .WithMany(u => u.Bookings)
-                .HasForeignKey(b => b.UserId)
+                .HasForeignKey(b => b.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Booking>()
@@ -60,6 +67,12 @@ namespace Eskon.Infrastructure.Context
                 .WithMany(p => p.Bookings)
                 .HasForeignKey(b => b.PropertyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Payment)
+                .WithOne(p => p.Booking)
+                .HasForeignKey<Payment>(p => p.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
             #endregion
 
             #region Chat
@@ -99,6 +112,9 @@ namespace Eskon.Infrastructure.Context
                 .WithMany(cntry => cntry.Cities)
                 .HasForeignKey(cty => cty.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<City>()
+        .HasIndex(cty => new { cty.Name, cty.CountryId })
+        .IsUnique();
             #endregion
 
             #region Favourite
@@ -116,7 +132,7 @@ namespace Eskon.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
-            #region Entity
+            #region Image
             // Image
             modelBuilder.Entity<Image>()
                 .HasOne(I => I.Property)
@@ -143,10 +159,16 @@ namespace Eskon.Infrastructure.Context
             #region Payment
             // Payment
             modelBuilder.Entity<Payment>()
-                .HasOne(p => p.User)
+                .HasOne(p => p.Customer)
                 .WithMany(u => u.Payments)
-                .HasForeignKey(p => p.UserId)
+                .HasForeignKey(p => p.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Booking)
+                .WithOne(u => u.Payment)
+                .OnDelete(DeleteBehavior.Restrict);
+
             #endregion
 
             #region Property
@@ -179,9 +201,9 @@ namespace Eskon.Infrastructure.Context
             #region Review
             // Review
             modelBuilder.Entity<Review>()
-                .HasOne(r => r.User)
+                .HasOne(r => r.Customer)
                 .WithMany(u => u.Reviews)
-                .HasForeignKey(r => r.UserId)
+                .HasForeignKey(r => r.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Review>()
@@ -206,29 +228,33 @@ namespace Eskon.Infrastructure.Context
                 .OnDelete(DeleteBehavior.Restrict);
             #endregion
 
-            #region Transactions
-            // Transaction
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Sender)
-                .WithMany(u => u.TransactionsOut)
-                .HasForeignKey(t => t.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Receiver)
-                .WithMany(u => u.TransactionsIn)
-                .HasForeignKey(t => t.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict);
-            #endregion
-
             #region Identity
             modelBuilder.Entity<User>().ToTable("Users");
             modelBuilder.Entity<IdentityUserLogin<Guid>>(b =>
             {
                 b.HasKey(l => new { l.LoginProvider, l.ProviderKey });
             });
+
+            modelBuilder.Entity<UserRefreshToken>().Ignore(x => x.DeletedAt);
+
             #endregion
 
+            #region UserRoles
+            modelBuilder.Entity<UserRoles>()
+                .HasKey(ur => new { ur.UserId, ur.RoleId });
+
+            modelBuilder.Entity<UserRoles>()
+                    .HasOne(ur => ur.User)
+                    .WithMany(u => u.UserRoles)
+                    .HasForeignKey(ur => ur.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserRoles>()
+                 .HasOne(ur => ur.Role)
+                 .WithMany(r => r.UserRoles)
+                 .HasForeignKey(ur => ur.RoleId)
+                 .OnDelete(DeleteBehavior.Restrict);
+            #endregion
         }
 
         //
@@ -250,7 +276,7 @@ namespace Eskon.Infrastructure.Context
         private void SetTimestamps()
         {
             var entries = ChangeTracker.Entries()
-                .Where(e => e.Entity is BaseModel &&
+                .Where(e => e.Entity is IBaseModel &&
                             (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             var now = DateTime.UtcNow;
@@ -259,10 +285,10 @@ namespace Eskon.Infrastructure.Context
             {
                 if (entry.State == EntityState.Added)
                 {
-                    entry.Property(nameof(BaseModel.CreatedAt)).CurrentValue = now;
+                    entry.Property(nameof(IBaseModel.CreatedAt)).CurrentValue = now;
                 }
 
-                entry.Property(nameof(BaseModel.UpdatedAt)).CurrentValue = now;
+                entry.Property(nameof(IBaseModel.UpdatedAt)).CurrentValue = now;
             }
         }
         #endregion

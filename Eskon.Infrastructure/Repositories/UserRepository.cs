@@ -3,6 +3,7 @@ using Eskon.Domian.Entities.Identity;
 using Eskon.Infrastructure.Context;
 using Eskon.Infrastructure.Generics;
 using Eskon.Infrastructure.Interfaces;
+using Eskon.Domian.Entities;
 
 namespace Eskon.Infrastructure.Repositories
 {
@@ -22,7 +23,29 @@ namespace Eskon.Infrastructure.Repositories
         #region Methods
         public async Task<User> GetUserByEmailAsync(string email)
         {
-            return  _userDbSet.FirstOrDefault(s => s.Email == email);
+            return  await _userDbSet.FirstOrDefaultAsync(s => s.Email == email);
+        }
+
+        public async Task<bool> SetUserStripeAccountIdAsync(Guid userId, string stripeAccountId)
+        {
+            var user = await _userDbSet.FirstOrDefaultAsync(u => u.Id ==  userId);
+            if (user == null)
+            {
+                return false;
+            }
+            user.stripeAccountId = stripeAccountId;
+            _userDbSet.Update(user);
+            return true;
+        }
+
+        public async Task<User> GetUserByStripeAccountIdAsync(string stripeAccountId)
+        {
+            return await _userDbSet.FirstOrDefaultAsync(s => s.stripeAccountId == stripeAccountId);
+        }
+        public Task<int> CountUsersByRoleAsync(string role)
+        {
+            return _userDbSet
+                .CountAsync(u => u.UserRoles.Any(ur => ur.Role.Name == role));
         }
         #endregion
     }

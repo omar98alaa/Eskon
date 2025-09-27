@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Eskon.Infrastructure.Generics;
-using Eskon.Infrastructure.Interfaces;
+﻿using Eskon.Infrastructure.Interfaces;
 using Eskon.Infrastructure.Repositories;
+using Eskon.Infrastructure.UnitOfWork;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Eskon.Infrastructure
 {
@@ -9,8 +9,7 @@ namespace Eskon.Infrastructure
     {
         public static IServiceCollection InjectingInfrastructureDependencies(this IServiceCollection services)
         {
-            services.AddTransient(typeof(IGenericRepositoryAsync<>), typeof(GenericRepositoryAsync<>));
-            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddScoped<IRepositoryUnitOfWork, RepositoryUnitOfWork>();
             return services;
         }
     }

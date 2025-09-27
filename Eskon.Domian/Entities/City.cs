@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Eskon.Domian.Models
 {
-    [Index(nameof(Name), IsUnique = true)]
     public class City : BaseModel
     {
         [Required, StringLength(50)]

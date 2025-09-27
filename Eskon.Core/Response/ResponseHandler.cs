@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Eskon.Domain.Utilities;
+using System.Net;
 
 namespace Eskon.Core.Response
 {
@@ -83,8 +84,18 @@ namespace Eskon.Core.Response
             return new Response<T>()
             {
                 StatusCode = System.Net.HttpStatusCode.Unauthorized,
-                Succeeded = true,
+                Succeeded = false,
                 Message = "UnAuthorized"
+            };
+        }
+
+        public Response<T> Forbidden<T>()
+        {
+            return new Response<T>()
+            {
+                StatusCode = System.Net.HttpStatusCode.Forbidden,
+                Succeeded = false,
+                Message = "Forbidden"
             };
         }
         public Response<T> BadRequest<T>(string Message = null)
@@ -94,7 +105,7 @@ namespace Eskon.Core.Response
                 StatusCode = System.Net.HttpStatusCode.BadRequest,
                 Succeeded = false,
                 Message = Message == null ? "Bad Request" : Message,
-                
+
             };
         }
 
@@ -105,7 +116,7 @@ namespace Eskon.Core.Response
                 StatusCode = HttpStatusCode.BadRequest,
                 Succeeded = false,
                 Message = Message == null ? "Bad Request" : Message,
-                Errors = ErrorsList,                
+                Errors = ErrorsList,
             };
         }
 

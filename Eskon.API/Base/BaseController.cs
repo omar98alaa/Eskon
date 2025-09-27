@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace Eskon.API.Base
 {
@@ -24,6 +25,8 @@ namespace Eskon.API.Base
                     return new UnauthorizedObjectResult(response);
                 case HttpStatusCode.BadRequest:
                     return new BadRequestObjectResult(response);
+                case HttpStatusCode.Forbidden:
+                    return new ObjectResult(response) { StatusCode = (int)HttpStatusCode.Forbidden};
                 case HttpStatusCode.NotFound:
                     return new NotFoundObjectResult(response);
                 case HttpStatusCode.Accepted:
@@ -33,6 +36,13 @@ namespace Eskon.API.Base
                 default:
                     return new BadRequestObjectResult(response);
             }
+        }
+
+        protected Guid GetUserIdFromAuthenticatedUserToken()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = Guid.Parse(userIdClaim.Value);
+            return userId;
         }
     }
 }

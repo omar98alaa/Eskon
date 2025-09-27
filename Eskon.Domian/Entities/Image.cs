@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Eskon.Domian.Models
 {
@@ -14,7 +13,7 @@ namespace Eskon.Domian.Models
 
         //  Property
         //[ForeignKey(nameof(Property))]
-        public Guid PropertyId { get; set; }
-        public virtual Property Property { get; set; }
+        public Guid? PropertyId { get; set; }
+        public virtual Property? Property { get; set; }
     }
 }

@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
-using Eskon.Domian.Entities.Identity;
+﻿using Eskon.Domian.Entities.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Eskon.Domian.Models
 {

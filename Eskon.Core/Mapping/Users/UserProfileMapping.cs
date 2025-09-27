@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Eskon.Domian.DTOs.UserDTOs;
+using Eskon.Domian.Entities.Identity;
 
 namespace Eskon.Core.Mapping.Users
 {
@@ -6,8 +8,14 @@ namespace Eskon.Core.Mapping.Users
     {
         public UserProfileMapping()
         {
-            GetUserListMapping();
+            #region Commands
             AddUserMapping();
+            #endregion
+
+            #region Queries
+            GetUserListMapping();
+            GetAdminListMapping(); 
+            #endregion
         }
 
     }
